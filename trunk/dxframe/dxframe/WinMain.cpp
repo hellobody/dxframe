@@ -20,6 +20,8 @@ CUSTOMVERTEX g_Vertices[] = {
 	{ 220.0f, 220.0f, 0.5f, 1.0f, 0xffffff00, },
 };
 
+ifstream pFile;
+
 LRESULT CALLBACK WindowProc (HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
 	switch (message) {
 		case WM_ACTIVATE:
@@ -78,6 +80,11 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 	d3dpp.BackBufferFormat = d3ddm.Format;
 
 	p_d3d->CreateDevice (D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hWnd, D3DCREATE_SOFTWARE_VERTEXPROCESSING, &d3dpp, &p_d3d_Device);
+
+
+	pFile.open ("box.dxf", ios_base::in | ios_base::binary);
+
+	dxObj obj;
 
 	p_d3d_Device->CreateVertexBuffer (6*sizeof (CUSTOMVERTEX), 0, D3DFVF_CUSTOMVERTEX, D3DPOOL_DEFAULT, &p_VertexBuffer);
 
