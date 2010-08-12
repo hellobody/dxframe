@@ -74,17 +74,22 @@ void SceneSaver::ProcNode(INode *node)
 	
 	TObj->mesh.buildNormals();
 
-	fout.write ((char *) &obj, sizeof (obj));
-	
-	/*for (int i = 0; i < TObj->mesh.numVerts; i++)
-	{
-		Point3 v = tm * TObj->mesh.verts[i];
-		obj.vVerts.push_back (v.x);
-		obj.vVerts.push_back (v.z);
-		obj.vVerts.push_back (v.y);
-	}
+	fout.write ((char *) &obj, sizeof (dxObj));
 
-	fout.write ((char *) &obj, sizeof (obj));*/
+	Point3 v;
+	
+	for (int i = 0; i < TObj->mesh.numVerts; i++)
+	{
+		v = tm * TObj->mesh.verts[i];
+
+		fout.write ((char *) &v.x, 4);
+		fout.write ((char *) &v.z, 4);
+		fout.write ((char *) &v.y, 4);
+
+		/*obj.vVerts.push_back (v.x);
+		obj.vVerts.push_back (v.z);
+		obj.vVerts.push_back (v.y);*/
+	}
 }
 
 static SceneSaver TreeEnum;
