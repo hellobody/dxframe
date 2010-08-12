@@ -22,37 +22,6 @@
 #include "iparamm2.h"
 //SIMPLE TYPE
 
-
-
 extern TCHAR *GetString(int id);
 
 extern HINSTANCE hInstance;
-
-//****************************added by me************************************/
-
-#define ID_NODE_HEADER          0xABCD
-#define ID_MTL_HEADER           0x1FF1
-#define ID_VERTEX_HEADER        0x2FF2
-#define ID_TVERTEX_HEADER       0x2EE2
-#define ID_FACE_HEADER          0x3FF3
-
-//***************************************************************************/
-
-#include <vector>
-
-class dxObj {
-public:
-
-	int numVerts;
-	int numTVerts;
-	int numFaces;
-
-	std::vector <float> vVerts;
-
-	dxObj () {
-		numVerts = 0;
-		vVerts.clear ();
-	};
-	~dxObj () {
-	}; 
-};
