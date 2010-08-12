@@ -1,4 +1,5 @@
 #include "WinMain.h"
+#include "TCHAR.h"
 #include <fstream>
 
 using namespace std;
@@ -24,6 +25,8 @@ CUSTOMVERTEX g_Vertices[] = {
 	{ 220.0f,  80.0f, 0.5f, 1.0f, 0xff00ff00, },
 	{ 220.0f, 220.0f, 0.5f, 1.0f, 0xffffff00, },
 };
+
+dxObj obj;
 
 LRESULT CALLBACK WindowProc (HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
 	switch (message) {
@@ -58,7 +61,7 @@ bool WindowInit (HINSTANCE hThisInst, int nCmdShow) {
 
 	RegisterClass (&wcl);
 
-	hWnd = CreateWindowEx (WS_EX_TOPMOST, APPNAME, APPTITLE, WS_OVERLAPPEDWINDOW, 0, 0, 640, 480, NULL, NULL, hThisInst, NULL);
+	hWnd = CreateWindowEx (WS_EX_OVERLAPPEDWINDOW, APPNAME, APPTITLE, WS_OVERLAPPEDWINDOW, 0, 0, 640, 480, NULL, NULL, hThisInst, NULL);
 
 	if (!hWnd) return false;
 	return true;
@@ -84,13 +87,15 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 
 	p_d3d->CreateDevice (D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hWnd, D3DCREATE_SOFTWARE_VERTEXPROCESSING, &d3dpp, &p_d3d_Device);
 
+	fin.open ("test.DXF", ios::in | ios::binary);
 
-	fin.open ("data\test.dxf", ios_base::in | ios_base::binary);
+	if (!fin.fail ())
+	{
+		fin.read ((char *) &obj, sizeof (dxObj));
+	}
 
-	dxObj obj;
-
-	fin.read ((char *) &obj, sizeof (dxObj));
-
+	fin.close ();
+	
 	p_d3d_Device->CreateVertexBuffer (6*sizeof (CUSTOMVERTEX), 0, D3DFVF_CUSTOMVERTEX, D3DPOOL_DEFAULT, &p_VertexBuffer);
 
 	VOID * pVertices;
