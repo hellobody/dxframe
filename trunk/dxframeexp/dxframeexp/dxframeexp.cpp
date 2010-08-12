@@ -15,11 +15,13 @@
 #include "dxframeexp.h"
 
 //****************************added by me************************************/
+#include "dxObj.h"
 #include <fstream>
 
 using namespace std;
 
-static ofstream pFile;
+static ofstream fout;
+
 Interface * ip;
 
 TriObject *GetTriObjFromNode(INode *node, int &deleteIt)
@@ -71,8 +73,10 @@ void SceneSaver::ProcNode(INode *node)
 	Matrix3 tm = node->GetObjTMAfterWSM(ip->GetTime());
 	
 	TObj->mesh.buildNormals();
+
+	fout.write ((char *) &obj, sizeof (obj));
 	
-	for (int i = 0; i < TObj->mesh.numVerts; i++)
+	/*for (int i = 0; i < TObj->mesh.numVerts; i++)
 	{
 		Point3 v = tm * TObj->mesh.verts[i];
 		obj.vVerts.push_back (v.x);
@@ -80,7 +84,7 @@ void SceneSaver::ProcNode(INode *node)
 		obj.vVerts.push_back (v.y);
 	}
 
-	pFile.write ((char *) &obj, sizeof (obj));
+	fout.write ((char *) &obj, sizeof (obj));*/
 }
 
 static SceneSaver TreeEnum;
@@ -110,10 +114,7 @@ class dxframeexp : public SceneExport {
 		//Constructor/Destructor
 		dxframeexp();
 		~dxframeexp();		
-
 };
-
-
 
 class dxframeexpClassDesc : public ClassDesc2 
 {
@@ -127,16 +128,10 @@ public:
 
 	virtual const TCHAR* InternalName() 			{ return _T("dxframeexp"); }	// returns fixed parsable name (scripter-visible name)
 	virtual HINSTANCE HInstance() 					{ return hInstance; }					// returns owning module handle
-	
-
 };
 
 static dxframeexpClassDesc dxframeexpDesc;
 ClassDesc2* GetdxframeexpDesc() { return &dxframeexpDesc; }
-
-
-
-
 
 INT_PTR CALLBACK dxframeexpOptionsDlgProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam) {
 	static dxframeexp *imp = NULL;
@@ -232,23 +227,20 @@ BOOL dxframeexp::SupportsOptions(int ext, DWORD options)
 	return TRUE;
 }
 
-
 int	dxframeexp::DoExport(const TCHAR *name,ExpInterface *ei,Interface *i, BOOL suppressPrompts, DWORD options)
 {
 	#pragma message(TODO("Implement the actual file Export here and"))
 
 	ip = i;
 
-	pFile.open (name, ios::out | ios::binary);
+	fout.open (name, ios::out | ios::binary);
 
 	ei->theScene->EnumTree (&TreeEnum);
 
-	pFile.close ();
+	fout.close ();
 
 	return TRUE;
 
 	#pragma message(TODO("return TRUE If the file is exported properly"))
 	return FALSE;
 }
-
-
