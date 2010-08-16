@@ -51,7 +51,7 @@ bool WindowInit (HINSTANCE hThisInst, int nCmdShow) {
 
 	RegisterClass (&wcl);
 
-	hWnd = CreateWindowEx (WS_EX_OVERLAPPEDWINDOW, APPNAME, APPTITLE, WS_OVERLAPPEDWINDOW, 0, 0, 640, 480, NULL, NULL, hThisInst, NULL);
+	hWnd = CreateWindowEx (WS_EX_OVERLAPPEDWINDOW, APPNAME, APPTITLE, WS_OVERLAPPEDWINDOW, 0, 0, WIDTH, HEIGHT, NULL, NULL, hThisInst, NULL);
 
 	if (!hWnd) return false;
 	return true;
@@ -95,7 +95,7 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 	g_Vertices = new CUSTOMVERTEX [obj.numVerts];
 
 	forup (obj.numVerts) {
-		g_Vertices[i] = CUSTOMVERTEX (obj.pVerts[i*3], obj.pVerts[i*3+1], obj.pVerts[i*3+2], 1.0f, 0xffff0000);
+		g_Vertices[i] = CUSTOMVERTEX (obj.pVerts[i*3] + WIDTH/2, obj.pVerts[i*3+2] + HEIGHT/2, obj.pVerts[i*3+1], 1.0f, 0xffff0000);
 	}
 	
 	/*g_Vertices[0] = CUSTOMVERTEX (60.0f, 60.0f, 0.5f, 1.0f, 0xffff0000);

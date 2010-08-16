@@ -15,6 +15,9 @@ using namespace std;
 #define DEL(p) {if (p) {delete (p); (p) = NULL;}}
 #define DELA(p) {if (p) {delete [] (p); (p) = NULL;}}
 
+#define WIDTH 800
+#define HEIGHT 600
+
 struct CUSTOMVERTEX { 
 	float x, y, z, rhw; 
 	DWORD color; 
