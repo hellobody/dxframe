@@ -18,6 +18,10 @@ LPDIRECT3DVERTEXBUFFER8 p_VertexBuffer = NULL;
 
 dxObj obj;
 
+D3DXMATRIX matWorld;
+D3DXMATRIX matView;
+D3DXMATRIX matProj;
+
 LRESULT CALLBACK WindowProc (HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
 	switch (message) {
 		case WM_ACTIVATE:
@@ -77,6 +81,12 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 
 	p_d3d->CreateDevice (D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hWnd, D3DCREATE_SOFTWARE_VERTEXPROCESSING, &d3dpp, &p_d3d_Device);
 
+	D3DXMatrixRotationY (&matWorld, 0.0f);
+	D3DXMatrixLookAtLH (&matView, &D3DXVECTOR3 (0.0f, 0.0f, -500.0f),
+		&D3DXVECTOR3 (0.0f, 0.0f, 0.0f),
+		&D3DXVECTOR3 (0.0f, 1.0f, 0.0f));
+	D3DXMatrixPerspectiveFovLH (&matProj, D3DX_PI/4, 1.0f, 1.0f, 10000.0f);
+
 	fin.open (_T("data\\test.DXF"), ios::in | ios::binary);
 
 	if (!fin.fail ()) {
@@ -95,7 +105,7 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 	g_Vertices = new CUSTOMVERTEX [obj.numVerts];
 
 	forup (obj.numVerts) {
-		g_Vertices[i] = CUSTOMVERTEX (obj.pVerts[i*3] + WIDTH/2, obj.pVerts[i*3+2] + HEIGHT/2, obj.pVerts[i*3+1], 1.0f, 0xffff0000);
+		g_Vertices[i] = CUSTOMVERTEX (obj.pVerts[i*3] + WIDTH/2, obj.pVerts[i*3+2] + HEIGHT/2, obj.pVerts[i*3+1]);
 	}
 	
 	/*g_Vertices[0] = CUSTOMVERTEX (60.0f, 60.0f, 0.5f, 1.0f, 0xffff0000);
@@ -106,7 +116,7 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 	g_Vertices[4] = CUSTOMVERTEX (220.0f, 80.0f, 0.5f, 1.0f, 0xff00ff00);
 	g_Vertices[5] = CUSTOMVERTEX (220.0f, 220.0f, 0.5f, 1.0f, 0xffffff00);*/
 	
-	p_d3d_Device->CreateVertexBuffer (obj.numVerts * sizeof (CUSTOMVERTEX), 0, D3DFVF_CUSTOMVERTEX, D3DPOOL_DEFAULT, &p_VertexBuffer);
+	p_d3d_Device->CreateVertexBuffer (obj.numVerts * sizeof (CUSTOMVERTEX), 0, D3DFVF_CUSTOMVERTEX, D3DPOOL_MANAGED, &p_VertexBuffer);
 
 	VOID * pVertices;
 	p_VertexBuffer->Lock (0, obj.numVerts * sizeof (CUSTOMVERTEX), (BYTE**)&pVertices, 0);
@@ -119,6 +129,15 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 }
 
 void Render () {
+
+	p_d3d_Device->SetTransform (D3DTS_WORLD, &matWorld);
+	p_d3d_Device->SetTransform (D3DTS_VIEW, &matView);
+	p_d3d_Device->SetTransform (D3DTS_PROJECTION, &matProj);
+
+	p_d3d_Device->SetRenderState (D3DRS_CULLMODE, D3DCULL_NONE);
+
+
+
 	
 	p_d3d_Device->Clear (0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB (0, 0, 0), 1.f, 0);
 	p_d3d_Device->BeginScene ();
