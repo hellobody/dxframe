@@ -19,21 +19,16 @@ using namespace std;
 #define HEIGHT 600
 
 struct CUSTOMVERTEX { 
-	float x, y, z, rhw; 
-	DWORD color; 
-	CUSTOMVERTEX () {
-		
-	}
-	CUSTOMVERTEX (float x, float y, float z, float rhw, DWORD color) {
+	float x, y, z;
+	CUSTOMVERTEX () {};
+	CUSTOMVERTEX (float x, float y, float z) {
 		this->x = x;
 		this->y = y;
 		this->z = z;
-		this->rhw = rhw; 
-		this->color = color;
 	}
 };
 
-#define D3DFVF_CUSTOMVERTEX (D3DFVF_XYZRHW | D3DFVF_DIFFUSE)
+#define D3DFVF_CUSTOMVERTEX (D3DFVF_XYZ)
 
 #define forup(x) for (int i=0; i<x; i++)
 
