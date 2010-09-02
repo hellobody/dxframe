@@ -53,7 +53,7 @@ bool WindowInit (HINSTANCE hThisInst, int nCmdShow) {
 
 	RegisterClass (&wcl);
 
-	hWnd = CreateWindowEx (WS_EX_OVERLAPPEDWINDOW, APPNAME, APPTITLE, WS_OVERLAPPEDWINDOW, 0, 0, WIDTH, HEIGHT, NULL, NULL, hThisInst, NULL);
+	hWnd = CreateWindowEx (WS_EX_OVERLAPPEDWINDOW, APPNAME, APPTITLE, WS_THICKFRAME, 0, 0, WIDTH, HEIGHT, NULL, NULL, hThisInst, NULL);
 
 	if (!hWnd) return false;
 	return true;
@@ -79,10 +79,11 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 	//working with using hardware acceleration D3DDEVTYPE_HAL
 	//the window context will be hWnd
 	//will be use software vertex processing D3DCREATE_SOFTWARE_VERTEXPROCESSING
+	//will be use above setted present parameters d3dpp
+	//p_d3d_Device - will be the pointer to this device
 	p_d3d->CreateDevice (D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hWnd, D3DCREATE_SOFTWARE_VERTEXPROCESSING, &d3dpp, &p_d3d_Device);
 
-	
-
+	//open file with .dxf models
 	fin.open (_T("data\\test.DXF"), ios::in | ios::binary);
 
 	if (!fin.fail ()) {
@@ -100,19 +101,11 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 
 	g_Vertices = new CUSTOMVERTEX [obj.numVerts];
 
-	/*forup (obj.numVerts) {
-		g_Vertices[i] = CUSTOMVERTEX (obj.pVerts[i*3] + WIDTH/2, obj.pVerts[i*3+2] + HEIGHT/2, obj.pVerts[i*3+1]);
-	}*/
+	forup (obj.numVerts) {
+		g_Vertices[i] = CUSTOMVERTEX (obj.pVerts[i*3], obj.pVerts[i*3+2], obj.pVerts[i*3+1]);
+	}
 
-	obj.numVerts = 6;
-	
-	g_Vertices[0] = CUSTOMVERTEX (   0.0f, 100.0f, 0.5f );
-	g_Vertices[1] = CUSTOMVERTEX ( 200.0f, 100.0f, 0.5f );
-	g_Vertices[2] = CUSTOMVERTEX (   0.0f,-100.0f, 0.5f );
-
-	g_Vertices[3] = CUSTOMVERTEX (  20.0f,-120.0f, 0.5f );
-	g_Vertices[4] = CUSTOMVERTEX ( 220.0f,  80.0f, 0.5f );
-	g_Vertices[5] = CUSTOMVERTEX ( 220.0f,-120.0f, 0.5f );
+	//bookmark, need to add faces and normals
 	
 	p_d3d_Device->CreateVertexBuffer (obj.numVerts * sizeof (CUSTOMVERTEX), 0, D3DFVF_CUSTOMVERTEX, D3DPOOL_MANAGED, &p_VertexBuffer);
 
@@ -121,57 +114,23 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 	memcpy (pVertices, g_Vertices, obj.numVerts * sizeof (CUSTOMVERTEX));
 	p_VertexBuffer->Unlock ();
 
+	DELA (g_Vertices);
+
 	D3DXMatrixRotationY (&matWorld, 0.0f);
-	D3DXMatrixLookAtLH (&matView, &D3DXVECTOR3 (0.0f, 0.0f, -500.0f),
-		&D3DXVECTOR3 (0.0f, 0.0f, 0.0f),
-		&D3DXVECTOR3 (0.0f, 1.0f, 0.0f));
-	D3DXMatrixPerspectiveFovLH (&matProj, D3DX_PI/4, 1.0f, 1.0f, 10000.0f);
+	D3DXMatrixLookAtLH (&matView, &D3DXVECTOR3 (0.0f, 0.0f, -200.0f), &D3DXVECTOR3 (0.f, 0.f, 0.f), &D3DXVECTOR3 (0.0f, 1.0f, 0.0f));
+	D3DXMatrixPerspectiveFovLH (&matProj, D3DX_PI/2, 4.f/3.f, 1.f, 10000.f); //last two edges of drawing, do not set near val < 1.f
+	//second param - angle of view, third - aspect ratio
 
 	p_d3d_Device->SetTransform (D3DTS_WORLD, &matWorld);
 	p_d3d_Device->SetTransform (D3DTS_VIEW, &matView);
 	p_d3d_Device->SetTransform (D3DTS_PROJECTION, &matProj);
-
 	p_d3d_Device->SetRenderState (D3DRS_CULLMODE, D3DCULL_NONE);
-
-	DELA (g_Vertices);
 
 	return true;
 }
-
-void Transform3D (void)
-{
-	static float x=0; x+=0.01f;
-
-	D3DXMatrixLookAtLH (&matView, &D3DXVECTOR3 (sin(x)*500, 0.0f, -cos(x)*500),
-		&D3DXVECTOR3 (0.0f, 0.0f, 0.0f),
-		&D3DXVECTOR3 (0.0f, 1.0f, 0.0f));
-	p_d3d_Device->SetTransform (D3DTS_VIEW, &matView);
-};
-
 void Render ()
 {
-	HRESULT hr;
-	hr=p_d3d_Device->TestCooperativeLevel();
-	if(hr==D3DERR_DEVICELOST) return;
-	if(hr==D3DERR_DEVICENOTRESET) { 
-		p_d3d_Device->Reset(&d3dpp); 
-
-		p_d3d_Device->SetTransform (D3DTS_WORLD, &matWorld);
-		p_d3d_Device->SetTransform (D3DTS_VIEW, &matView);
-		p_d3d_Device->SetTransform (D3DTS_PROJECTION, &matProj);
-
-		p_d3d_Device->SetRenderState (D3DRS_CULLMODE, D3DCULL_NONE); 
-	};
-
-	Transform3D();
-
-	static int c=0 , cc=1;
-	if(cc==1) c++;
-	if(cc==0) c--;
-	if(c==255) cc=0;
-	if(c==0) cc=1;
-
-	p_d3d_Device->Clear (0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB (c, 255-c, 0), 1.0f, 0);
+	p_d3d_Device->Clear (0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB (255, 255, 255), 1.0f, 0);
 	p_d3d_Device->BeginScene ();
 
 	p_d3d_Device->SetVertexShader (D3DFVF_CUSTOMVERTEX);
