@@ -4,12 +4,15 @@
 #include <windows.h>
 #include <time.h>
 #include <d3d8.h>
+#include <d3dx8.h>
 #include <fstream>
 #include "dxObj.h"
 
-using namespace std;
-
 #pragma comment (lib, "d3d8.lib") 
+#pragma comment (lib, "d3dx8.lib")
+//#pragma comment (lib, "winmm.lib")
+
+using namespace std;
 
 #define RELEASE(p) {if (p) {(p)->Release (); (p) = NULL;}}
 #define DEL(p) {if (p) {delete (p); (p) = NULL;}}
