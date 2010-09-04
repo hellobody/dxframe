@@ -8,10 +8,11 @@ public:
 	int numTVerts;
 	int numFaces;
 
-	float * pVerts;
+	float * pVertsWithNormals;
+	float * pFaces;
 
 	dxObj ();
-	~dxObj () {};
+	~dxObj ();
 };
 
 #endif

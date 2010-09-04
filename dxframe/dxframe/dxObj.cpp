@@ -8,10 +8,11 @@ dxObj::dxObj () {
 	numTVerts = 0;
 	numFaces = 0;
 
-	pVerts = NULL;
+	pVertsWithNormals = NULL;
+	pFaces = NULL;
 }
 
 dxObj::~dxObj () {
-
-	DEL (pVerts);
+	if (pVertsWithNormals) delete [] pVertsWithNormals;
+	if (pFaces) delete [] pFaces;
 }

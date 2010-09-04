@@ -80,15 +80,24 @@ void SceneSaver::ProcNode(INode *node)
 	
 	for (int i = 0; i < TObj->mesh.numVerts; i++)
 	{
+		//write vertexes
 		v = tm * TObj->mesh.verts[i];
 
 		fout.write ((char *) &v.x, 4);
 		fout.write ((char *) &v.z, 4);
 		fout.write ((char *) &v.y, 4);
 
-		/*obj.vVerts.push_back (v.x);
-		obj.vVerts.push_back (v.z);
-		obj.vVerts.push_back (v.y);*/
+		//write noramals
+		v = TObj->mesh.getNormal (i);
+
+		fout.write ((char *) &v.x, 4);
+		fout.write ((char *) &v.z, 4);
+		fout.write ((char *) &v.y, 4);
+	}
+
+	for (int i = 0; i < TObj->mesh.numFaces; i++)
+	{
+		fout.write ((char *) &TObj->mesh.faces[i].v[0], 12);
 	}
 }
 

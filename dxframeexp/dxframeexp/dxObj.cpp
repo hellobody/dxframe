@@ -3,9 +3,15 @@
 
 dxObj::dxObj () {
 
-	numVerts = 1;
-	numTVerts = 2;
-	numFaces = 3;
+	numVerts = 0;
+	numTVerts = 0;
+	numFaces = 0;
 
-	pVerts = NULL;
+	pVertsWithNormals = NULL;
+	pFaces = NULL;
+}
+
+dxObj::~dxObj () {
+	if (pVertsWithNormals) delete [] pVertsWithNormals;
+	if (pFaces) delete [] pFaces;
 }
