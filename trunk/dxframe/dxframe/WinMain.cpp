@@ -9,7 +9,7 @@ LPCWSTR APPTITLE = L"dxframe";
 LPDIRECT3D8 p_d3d = NULL;				//direct 3d main interface
 LPDIRECT3DDEVICE8 p_d3d_Device = NULL;	//direct 3d device
 LPDIRECT3DVERTEXBUFFER8 p_VertexBuffer = NULL; //vertex buffer
-LPDIRECT3DINDEXBUFFER8 p_IndexBuffer  = NULL; //indexes buffer
+LPDIRECT3DINDEXBUFFER8 p_IndexBuffer = NULL; //indexes buffer
 
 D3DDISPLAYMODE d3ddm;					//display mode parameters
 D3DPRESENT_PARAMETERS d3dpp;			//present parameters
@@ -17,13 +17,6 @@ D3DPRESENT_PARAMETERS d3dpp;			//present parameters
 D3DXMATRIX matWorld;
 D3DXMATRIX matView;
 D3DXMATRIX matProj;
-
-//materials
-D3DMATERIAL8 mtrl1;
-D3DMATERIAL8 mtrl2;
-
-//light
-D3DLIGHT8 light;
 
 ifstream fin;							//file input
 dxObj obj;								//my object
@@ -61,7 +54,7 @@ bool WindowInit (HINSTANCE hThisInst, int nCmdShow) {
 
 	RegisterClass (&wcl);
 
-	hWnd = CreateWindowEx (WS_EX_TOPMOST, APPNAME, APPTITLE, WS_OVERLAPPEDWINDOW, 0, 0, WIDTH, HEIGHT, NULL, NULL, hThisInst, NULL);
+	hWnd = CreateWindowEx (WS_EX_OVERLAPPEDWINDOW, APPNAME, APPTITLE, WS_THICKFRAME | WS_SYSMENU, 0, 0, WIDTH, HEIGHT, NULL, NULL, hThisInst, NULL);
 
 	if (!hWnd) return false;
 	return true;
@@ -71,9 +64,6 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 
 	if (!WindowInit (hThisInst, nCmdShow)) return false; 
 
-	ShowWindow (hWnd, nCmdShow);
-	UpdateWindow (hWnd);
-
 	p_d3d = Direct3DCreate8 (D3D_SDK_VERSION); //creating main interface
 	p_d3d->GetAdapterDisplayMode (D3DADAPTER_DEFAULT, &d3ddm); //get info about current display mode (resolution and parameters) 
 
@@ -81,22 +71,6 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 	d3dpp.Windowed = true;
 	d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;	//set method of window update
 	d3dpp.BackBufferFormat = d3ddm.Format;		//set format of surface of second buffer
-
-	//init materials
-	ZeroMemory (&mtrl1, sizeof(D3DMATERIAL8));
-	mtrl1.Diffuse.r = mtrl1.Ambient.r = 0.0f;
-	mtrl1.Diffuse.g = mtrl1.Ambient.g = 0.0f;
-	mtrl1.Diffuse.b = mtrl1.Ambient.b = 1.0f;
-	mtrl1.Diffuse.a = mtrl1.Ambient.a = 1.0f;
-
-	ZeroMemory (&mtrl2, sizeof(D3DMATERIAL8));
-	mtrl2.Diffuse.r = mtrl1.Ambient.r = 1.0f;
-	mtrl2.Diffuse.g = mtrl1.Ambient.g = 1.0f;
-	mtrl2.Diffuse.b = mtrl1.Ambient.b = 0.0f;
-	mtrl2.Diffuse.a = mtrl1.Ambient.a = 1.0f;
-	//
-
-	
 
 	//create and init d3d device
 	//it is will belonged to first video adapter D3DADAPTER_DEFAULT
@@ -130,17 +104,9 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 
 	//Read vertexes
 	CUSTOMVERTEX *g_Vertices;
-	//obj.numVerts = 3; //temp
 	g_Vertices = new CUSTOMVERTEX [obj.numVerts];
-
-	//temp
-	/*g_Vertices[0] = CUSTOMVERTEX (0,	0,	0,	0,	1,	0);
-	g_Vertices[1] = CUSTOMVERTEX (100,	0,	0,	0,	1,	0);
-	g_Vertices[2] = CUSTOMVERTEX (0,	0,	100,0,	1,	0);*/
-	//
-
 	forup (obj.numVerts) {
-		g_Vertices[i] = CUSTOMVERTEX (obj.pVertsWithNormals[i*6], obj.pVertsWithNormals[i*6+2], obj.pVertsWithNormals[i*6+1], obj.pVertsWithNormals[i*6+3], obj.pVertsWithNormals[i*6+4], obj.pVertsWithNormals[i*6+5]);
+		g_Vertices[i] = CUSTOMVERTEX (obj.pVertsWithNormals[i*6], obj.pVertsWithNormals[i*6+2], obj.pVertsWithNormals[i*6+1]);
 	}
 	
 	//Create vertex buffer
@@ -154,20 +120,11 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 	DELA (g_Vertices);
 
 	//Create index buffer
-
-	//obj.numFaces = 1; //temp
-
-	//temp
-	/*obj.pFaces[0] = 0;
-	obj.pFaces[1] = 1; 
-	obj.pFaces[2] = 2;*/
-	//
-
-	p_d3d_Device->CreateIndexBuffer (obj.numFaces * 12, 0, D3DFMT_INDEX16, D3DPOOL_MANAGED, &p_IndexBuffer);
+	p_d3d_Device->CreateIndexBuffer (obj.numFaces * 12, 0, D3DFMT_INDEX32, D3DPOOL_MANAGED, &p_IndexBuffer);
 
 	VOID* pVerticesI;
 	p_IndexBuffer->Lock (0, obj.numFaces * 12, (BYTE**)&pVerticesI, 0);
-	memcpy (pVerticesI, obj.pFaces, obj.numFaces * 4);
+	memcpy (pVerticesI, obj.pFaces, obj.numFaces * 12);
 	p_IndexBuffer->Unlock();
 
 	D3DXMatrixRotationY (&matWorld, 0.0f);
@@ -180,26 +137,8 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 	p_d3d_Device->SetTransform (D3DTS_PROJECTION, &matProj);
 	p_d3d_Device->SetRenderState (D3DRS_CULLMODE, D3DCULL_NONE);
 
-	//light init
-	D3DXVECTOR3 vecDir;
-	ZeroMemory (&light, sizeof(D3DLIGHT8));
-	light.Type = D3DLIGHT_DIRECTIONAL;
-
-	light.Diffuse.r  = 1.0f;
-	light.Diffuse.g  = 1.0f;
-	light.Diffuse.b  = 1.0f;
-
-	vecDir = D3DXVECTOR3 (0.0f, 0.0f, 1.0f);
-	D3DXVec3Normalize ((D3DXVECTOR3*)&light.Direction, &vecDir);
-
-	light.Range = 20000.0f;
-
-	p_d3d_Device->SetLight (0, &light);
-	p_d3d_Device->LightEnable (0, true);
-
-	p_d3d_Device->SetRenderState (D3DRS_LIGHTING, true);
-	p_d3d_Device->SetRenderState (D3DRS_AMBIENT, 0);
-	//
+	ShowWindow (hWnd, nCmdShow);
+	UpdateWindow (hWnd);
 
 	return true;
 }
@@ -209,17 +148,25 @@ void Render ()
 	p_d3d_Device->BeginScene ();
 
 	p_d3d_Device->SetVertexShader (D3DFVF_CUSTOMVERTEX);
-	p_d3d_Device->SetStreamSource (0, p_VertexBuffer, sizeof(CUSTOMVERTEX));
-	p_d3d_Device->SetIndices (p_IndexBuffer, 0);
+	if (D3D_OK == p_d3d_Device->SetStreamSource (0, p_VertexBuffer, sizeof(CUSTOMVERTEX)))
+	{
+		int a = 0;
+	}
+	if (D3D_OK == p_d3d_Device->SetIndices (p_IndexBuffer, 0))
+	{
+		int a = 0;
+	}
+	if (D3D_OK == p_d3d_Device->DrawIndexedPrimitive (D3DPT_TRIANGLELIST, 0, obj.numVerts, 0, obj.numFaces))
+	{
+		int a = 0;
+	}
+	
 
-	p_d3d_Device->SetMaterial (&mtrl1);
-
-	p_d3d_Device->DrawIndexedPrimitive (D3DPT_TRIANGLELIST, 0, obj.numVerts, 0, obj.numFaces); 
+	 
 
 	p_d3d_Device->EndScene ();
 	p_d3d_Device->Present (NULL, NULL, NULL, NULL);
 };
-
 int APIENTRY WinMain (HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nCmdShow) {
 	MSG msg;
 
