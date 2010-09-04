@@ -18,6 +18,13 @@ D3DXMATRIX matWorld;
 D3DXMATRIX matView;
 D3DXMATRIX matProj;
 
+//materials
+D3DMATERIAL8 mtrl1;
+D3DMATERIAL8 mtrl2;
+
+//light
+D3DLIGHT8 light;
+
 ifstream fin;							//file input
 //std::vector <dxObj*> objs;			//for future
 dxObj obj;								//my object
@@ -73,6 +80,11 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 	d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;	//set method of window update
 	d3dpp.BackBufferFormat = d3ddm.Format;		//set format of surface of second buffer
 
+	//for Z-buffer
+	d3dpp.EnableAutoDepthStencil = true;
+	d3dpp.AutoDepthStencilFormat = D3DFMT_D16;
+	//
+
 	//create and init d3d device
 	//it is will belonged to first video adapter D3DADAPTER_DEFAULT
 	//working with using hardware acceleration D3DDEVTYPE_HAL
@@ -107,7 +119,7 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 	CUSTOMVERTEX *g_Vertices;
 	g_Vertices = new CUSTOMVERTEX [obj.numVerts];
 	forup (obj.numVerts) {
-		g_Vertices[i] = CUSTOMVERTEX (obj.pVertsWithNormals[i*6], obj.pVertsWithNormals[i*6+2], obj.pVertsWithNormals[i*6+1]);
+		g_Vertices[i] = CUSTOMVERTEX (obj.pVertsWithNormals[i*6], obj.pVertsWithNormals[i*6+2], obj.pVertsWithNormals[i*6+1], obj.pVertsWithNormals[i*6+3], obj.pVertsWithNormals[i*6+4], obj.pVertsWithNormals[i*6+5]);
 	}
 	
 	//Create vertex buffer
@@ -136,7 +148,46 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 	p_d3d_Device->SetTransform (D3DTS_WORLD, &matWorld);
 	p_d3d_Device->SetTransform (D3DTS_VIEW, &matView);
 	p_d3d_Device->SetTransform (D3DTS_PROJECTION, &matProj);
-	p_d3d_Device->SetRenderState (D3DRS_CULLMODE, D3DCULL_NONE);
+	p_d3d_Device->SetRenderState (D3DRS_CULLMODE, D3DCULL_CCW);
+
+	//init materials
+	ZeroMemory (&mtrl1, sizeof(D3DMATERIAL8));
+	mtrl1.Diffuse.r = mtrl1.Ambient.r = 0.0f;
+	mtrl1.Diffuse.g = mtrl1.Ambient.g = 0.0f;
+	mtrl1.Diffuse.b = mtrl1.Ambient.b = 1.0f;
+	mtrl1.Diffuse.a = mtrl1.Ambient.a = 1.0f;
+
+	ZeroMemory (&mtrl2, sizeof(D3DMATERIAL8));
+	mtrl2.Diffuse.r = mtrl1.Ambient.r = 1.0f;
+	mtrl2.Diffuse.g = mtrl1.Ambient.g = 1.0f;
+	mtrl2.Diffuse.b = mtrl1.Ambient.b = 0.0f;
+	mtrl2.Diffuse.a = mtrl1.Ambient.a = 1.0f;
+	//
+
+	//init light
+	D3DXVECTOR3 vecDir;
+	ZeroMemory (&light, sizeof(D3DLIGHT8));
+	light.Type = D3DLIGHT_DIRECTIONAL;
+
+	light.Diffuse.r  = 1.0f;
+	light.Diffuse.g  = 1.0f;
+	light.Diffuse.b  = 1.0f;
+
+	vecDir = D3DXVECTOR3 (0.0f, 0.0f, -1.0f);
+	D3DXVec3Normalize ((D3DXVECTOR3*)&light.Direction, &vecDir);
+
+	light.Range = 10000.0f;
+
+	p_d3d_Device->SetLight (0, &light);
+	p_d3d_Device->LightEnable (0, true);
+
+	p_d3d_Device->SetRenderState (D3DRS_LIGHTING, true);
+	p_d3d_Device->SetRenderState (D3DRS_AMBIENT, 0);
+	//
+	
+	//for Z-buffer
+	p_d3d_Device->SetRenderState (D3DRS_ZENABLE, D3DZB_TRUE);
+	//
 
 	ShowWindow (hWnd, nCmdShow);
 	UpdateWindow (hWnd);
@@ -145,26 +196,25 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 }
 void Render ()
 {
-	p_d3d_Device->Clear (0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB (255, 255, 255), 1.0f, 0);
+	//transform
+	static float x=0; x+=0.01f;
+
+	D3DXMatrixLookAtLH (&matView, &D3DXVECTOR3 (sin(x)*200, 0.0f, -cos(x)*200),
+		&D3DXVECTOR3 (0.0f, 0.0f, 0.0f),
+		&D3DXVECTOR3 (0.0f, 1.0f, 0.0f));
+	p_d3d_Device->SetTransform (D3DTS_VIEW, &matView);
+	//
+
+	p_d3d_Device->Clear (0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB (255, 255, 255), 1.0f, 0);
+
 	p_d3d_Device->BeginScene ();
 
 	p_d3d_Device->SetVertexShader (D3DFVF_CUSTOMVERTEX);
-	if (D3D_OK == p_d3d_Device->SetStreamSource (0, p_VertexBuffer, sizeof(CUSTOMVERTEX)))
-	{
-		int a = 0;
-	}
-	if (D3D_OK == p_d3d_Device->SetIndices (p_IndexBuffer, 0))
-	{
-		int a = 0;
-	}
-	if (D3D_OK == p_d3d_Device->DrawIndexedPrimitive (D3DPT_TRIANGLELIST, 0, obj.numVerts, 0, obj.numFaces))
-	{
-		int a = 0;
-	}
+	p_d3d_Device->SetStreamSource (0, p_VertexBuffer, sizeof(CUSTOMVERTEX));
+	p_d3d_Device->SetIndices (p_IndexBuffer, 0);
+	p_d3d_Device->SetMaterial (&mtrl1);
+	p_d3d_Device->DrawIndexedPrimitive (D3DPT_TRIANGLELIST, 0, obj.numVerts, 0, obj.numFaces);
 	
-
-	 
-
 	p_d3d_Device->EndScene ();
 	p_d3d_Device->Present (NULL, NULL, NULL, NULL);
 };

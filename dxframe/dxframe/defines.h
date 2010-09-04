@@ -6,7 +6,7 @@
 #include <d3d8.h>
 #include <d3dx8.h>
 #include <fstream>
-#include <vector>
+//#include <vector>
 #include "dxObj.h"
 
 #pragma comment (lib, "d3d8.lib") 
@@ -23,16 +23,19 @@ using namespace std;
 #define HEIGHT 600
 
 struct CUSTOMVERTEX { 
-	float x, y, z;
+	float x, y, z, nx, ny, nz;
 	CUSTOMVERTEX () {};
-	CUSTOMVERTEX (float x, float y, float z) {
+	CUSTOMVERTEX (float x, float y, float z, float nx, float ny, float nz) {
 		this->x = x;
 		this->y = y;
 		this->z = z;
+		this->nx = nx;
+		this->ny = ny;
+		this->nz = nz;
 	}
 };
 
-#define D3DFVF_CUSTOMVERTEX (D3DFVF_XYZ)
+#define D3DFVF_CUSTOMVERTEX (D3DFVF_XYZ | D3DFVF_NORMAL)
 
 #define forup(x) for (int i=0; i<x; i++)
 
