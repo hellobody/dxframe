@@ -22,12 +22,15 @@ using namespace std;
 #define HEIGHT 600
 
 struct CUSTOMVERTEX { 
-	float x, y, z;
+	float x, y, z, nx, ny, nz;
 	CUSTOMVERTEX () {};
-	CUSTOMVERTEX (float x, float y, float z) {
+	CUSTOMVERTEX (float x, float y, float z, float nx, float ny, float nz) {
 		this->x = x;
 		this->y = y;
 		this->z = z;
+		this->nx = nx;
+		this->ny = ny;
+		this->nz = nz;
 	}
 };
 
