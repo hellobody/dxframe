@@ -9,7 +9,7 @@ public:
 	int numFaces;
 
 	float * pVertsWithNormals;
-	float * pFaces;
+	int * pFaces;
 
 	dxObj ();
 	~dxObj ();
