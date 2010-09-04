@@ -19,6 +19,7 @@ D3DXMATRIX matView;
 D3DXMATRIX matProj;
 
 ifstream fin;							//file input
+//std::vector <dxObj*> objs;			//for future
 dxObj obj;								//my object
 
 LRESULT CALLBACK WindowProc (HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
@@ -62,13 +63,13 @@ bool WindowInit (HINSTANCE hThisInst, int nCmdShow) {
 
 bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 
-	if (!WindowInit (hThisInst, nCmdShow)) return false; 
+	if (!WindowInit (hThisInst, nCmdShow)) return false; //init window
 
 	p_d3d = Direct3DCreate8 (D3D_SDK_VERSION); //creating main interface
 	p_d3d->GetAdapterDisplayMode (D3DADAPTER_DEFAULT, &d3ddm); //get info about current display mode (resolution and parameters) 
 
-	ZeroMemory (&d3dpp, sizeof (d3dpp));
-	d3dpp.Windowed = true;
+	ZeroMemory (&d3dpp, sizeof (d3dpp));		//clear struct
+	d3dpp.Windowed = true;						//windowed mode
 	d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;	//set method of window update
 	d3dpp.BackBufferFormat = d3ddm.Format;		//set format of surface of second buffer
 
