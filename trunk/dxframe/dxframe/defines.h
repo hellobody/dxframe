@@ -11,7 +11,6 @@
 
 #pragma comment (lib, "d3d8.lib") 
 #pragma comment (lib, "d3dx8.lib")
-//#pragma comment (lib, "winmm.lib")
 
 using namespace std;
 
