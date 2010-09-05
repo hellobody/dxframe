@@ -687,10 +687,6 @@
 				RelativePath=".\dxframeexp.def"
 				>
 			</File>
-			<File
-				RelativePath=".\dxObj.cpp"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -702,10 +698,6 @@
 			</File>
 			<File
 				RelativePath=".\dxframeexp.h"
-				>
-			</File>
-			<File
-				RelativePath=".\dxObj.h"
 				>
 			</File>
 			<File

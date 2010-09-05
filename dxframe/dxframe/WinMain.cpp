@@ -6,13 +6,13 @@ BOOL bActive;
 LPCWSTR APPNAME = L"dxframe";
 LPCWSTR APPTITLE = L"dxframe";
 
-LPDIRECT3D8 p_d3d = NULL;				//direct 3d main interface
-LPDIRECT3DDEVICE8 p_d3d_Device = NULL;	//direct 3d device
-LPDIRECT3DVERTEXBUFFER8 p_VertexBuffer = NULL; //vertex buffer
-LPDIRECT3DINDEXBUFFER8 p_IndexBuffer = NULL; //indexes buffer
+LPDIRECT3D8 p_d3d = NULL;						//direct 3d main interface
+LPDIRECT3DDEVICE8 p_d3d_Device = NULL;			//direct 3d device
+LPDIRECT3DVERTEXBUFFER8 p_VertexBuffer = NULL;	//vertex buffer
+LPDIRECT3DINDEXBUFFER8 p_IndexBuffer = NULL;	//indexes buffer
 
-D3DDISPLAYMODE d3ddm;					//display mode parameters
-D3DPRESENT_PARAMETERS d3dpp;			//present parameters
+D3DDISPLAYMODE d3ddm;							//display mode parameters
+D3DPRESENT_PARAMETERS d3dpp;					//present parameters
 
 D3DXMATRIX matWorld;
 D3DXMATRIX matView;
@@ -98,7 +98,8 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 	fin.open (_T("data\\test.DXF"), ios::in | ios::binary);
 
 	if (!fin.fail ()) {
-		fin.read ((char *) &obj, sizeof (dxObj));
+		fin.read ((char *) &obj.numVerts, 4);
+		fin.read ((char *) &obj.numFaces, 4);
 		
 		obj.pVertsWithNormals = new float [obj.numVerts * 3 * 2]; //because verts with normals
 		

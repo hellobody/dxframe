@@ -15,7 +15,6 @@
 #include "dxframeexp.h"
 
 //****************************added by me************************************/
-#include "dxObj.h"
 #include <fstream>
 
 using namespace std;
@@ -65,16 +64,17 @@ void SceneSaver::ProcNode(INode *node)
 	TObj = GetTriObjFromNode(node, Del);
 	if (!TObj) return;
 
-	dxObj obj;
+	/*dxObj obj;
 	obj.numVerts = TObj->mesh.numVerts;
 	obj.numTVerts = TObj->mesh.numTVerts;
-	obj.numFaces = TObj->mesh.numFaces;
+	obj.numFaces = TObj->mesh.numFaces;*/
+
+	fout.write ((char *) &TObj->mesh.numVerts, 4);
+	fout.write ((char *) &TObj->mesh.numFaces, 4);
 	
 	Matrix3 tm = node->GetObjTMAfterWSM(ip->GetTime());
 	
 	TObj->mesh.buildNormals();
-
-	fout.write ((char *) &obj, sizeof (dxObj));
 
 	Point3 v;
 	
