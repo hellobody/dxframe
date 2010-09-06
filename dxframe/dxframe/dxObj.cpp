@@ -16,9 +16,16 @@ dxObj::~dxObj () {
 	if (pFaces) delete [] pFaces;
 }
 
-dxObj::Transform ()
+void dxObj::Transform ()
 {
+	//memcpy (pTransformedVerts, pOriginalVerts, numVerts);
 
+	mainM = rotationM * transformM * scaleM;
+
+	forup (numVerts)
+	{
+		
+	}
 }
 
 //csc3Dobj::Transform (void)

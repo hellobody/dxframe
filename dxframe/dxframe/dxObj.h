@@ -3,12 +3,19 @@
 
 #include "defines.h"
 
-class dxObj {
+class dxObj
+{
 public:
 
 	PDIRECT3DDEVICE8 using_d3d_Device;
 	LPDIRECT3DVERTEXBUFFER8 p_VertexBuffer;
 	LPDIRECT3DINDEXBUFFER8 p_IndexBuffer;
+
+	VERTEX_3DPNT pOriginalVerts;
+	VERTEX_3DPNT pTransformedVerts;
+
+
+
 
 	int numVerts;	//number of vertex
 	int numTVerts;	//number of texture vertexes - do not using now
@@ -25,6 +32,8 @@ public:
 
 	dxObj ();
 	~dxObj ();
+
+	void Transform ();
 };
 
 #endif

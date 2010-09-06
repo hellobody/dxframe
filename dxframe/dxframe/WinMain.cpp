@@ -1,6 +1,8 @@
 #include "WinMain.h"
 #include "TCHAR.h"
 
+using namespace std;
+
 HWND hWnd;
 BOOL bActive;
 LPCWSTR APPNAME = L"dxframe";
