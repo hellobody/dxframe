@@ -1,5 +1,4 @@
-#ifndef DEFINES_H
-#define DEFINES_H
+#pragma once
 
 #include <windows.h>
 #include <time.h>
@@ -7,7 +6,6 @@
 #include <d3dx8.h>
 #include <fstream>
 //#include <vector>
-#include "dxObj.h"
 
 #pragma comment (lib, "d3d8.lib") 
 #pragma comment (lib, "d3dx8.lib")
@@ -21,10 +19,12 @@ using namespace std;
 #define WIDTH 800
 #define HEIGHT 600
 
-struct CUSTOMVERTEX { 
+struct CUSTOMVERTEX
+{ 
+	CUSTOMVERTEX () {}
 	float x, y, z, nx, ny, nz;
-	CUSTOMVERTEX () {};
-	CUSTOMVERTEX (float x, float y, float z, float nx, float ny, float nz) {
+	CUSTOMVERTEX (float x, float y, float z, float nx, float ny, float nz) 
+	{
 		this->x = x;
 		this->y = y;
 		this->z = z;
@@ -34,8 +34,13 @@ struct CUSTOMVERTEX {
 	}
 };
 
+struct VERTEX_3DPNT
+{  
+	D3DXVECTOR3 position; 
+	D3DXVECTOR3 normal; 
+	D3DXVECTOR2 texture; 
+};
+
 #define D3DFVF_CUSTOMVERTEX (D3DFVF_XYZ | D3DFVF_NORMAL)
 
 #define forup(x) for (int i=0; i<x; i++)
-
-#endif
