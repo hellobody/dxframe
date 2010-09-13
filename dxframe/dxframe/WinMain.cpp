@@ -226,6 +226,14 @@ void Render ()
 	p_d3d_Device->SetMaterial (&mtrl1);
 	//p_d3d_Device->DrawIndexedPrimitive (D3DPT_TRIANGLELIST, 0, obj.numVerts, 0, obj.numFaces);
 
+	//obj.RotateX (D3DX_PI/500);
+	obj.RotateY (D3DX_PI/600);
+	//obj.RotateZ (D3DX_PI/450);
+
+	//obj.Move (0, 0, 0);
+
+	obj.Scale (.999f, .999f, .999f);
+	
 	obj.Transform ();
 	obj.Render ();
 	

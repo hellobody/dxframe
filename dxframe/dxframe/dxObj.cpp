@@ -36,6 +36,8 @@ void dxObj::Create (LPDIRECT3DDEVICE8 d3d_device, int numVerts, int numFaces) {
 	D3DXMatrixIdentity (&scaleM);
 	D3DXMatrixIdentity (&textureM);
 
+	D3DXMatrixIdentity (&tempM);
+
 	///////////////////////////////////////////////////////////////////////////
 	//temporary, rewrite it////////////////////////////////////////////////////
 	forup (numVerts) {
@@ -54,6 +56,31 @@ void dxObj::Create (LPDIRECT3DDEVICE8 d3d_device, int numVerts, int numFaces) {
 	p_IndexBuffer->Unlock();
 	///////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////
+}
+
+void dxObj::RotateX (float ang) {
+	D3DXMatrixRotationX (&tempM, ang);
+	rotationM *= tempM;
+}
+
+void dxObj::RotateY (float ang) {
+	D3DXMatrixRotationY (&tempM, ang);
+	rotationM *= tempM;
+}
+
+void dxObj::RotateZ (float ang) {
+	D3DXMatrixRotationZ (&tempM, ang);
+	rotationM *= tempM;
+}
+
+void dxObj::Move (float x, float y, float z) {
+	D3DXMatrixTranslation (&tempM, x, y, z);
+	transformM *= tempM;
+}
+
+void dxObj::Scale (float x, float y, float z) {
+	D3DXMatrixScaling (&tempM, x, y, z);
+	scaleM *= tempM;
 }
 
 void dxObj::Transform () {

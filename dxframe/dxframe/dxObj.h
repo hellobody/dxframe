@@ -24,6 +24,8 @@ public:
 	D3DXMATRIX scaleM;		//scale matrix
 	D3DXMATRIX textureM;	//texture matrix
 
+	D3DXMATRIX tempM;       //temp matrix
+
 	float * pVertsWithNormals;	//pointer to array of vertexes and normal, like this 30,45,65,0,1,0 (first three vertex coordinates, last - normal)
 	int * pFaces;				//pointer to array of indexes
 
@@ -31,6 +33,13 @@ public:
 	~dxObj ();
 
 	void Create (LPDIRECT3DDEVICE8 d3d_device, int numVerts, int numIndexes);
+
+	void RotateX (float);
+	void RotateY (float);
+	void RotateZ (float);
+	void Move (float, float, float);
+	void Scale (float, float, float);
+
 	void Transform ();
 	void Render ();
 };
