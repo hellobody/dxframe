@@ -27,32 +27,19 @@ void dxObj::Create (LPDIRECT3DDEVICE8 d3d_device, int numVerts, int numFaces) {
 
 void dxObj::Transform ()
 {
-	//memcpy (pTransformedVerts, pOriginalVerts, numVerts);
+	memcpy (pTransformedVerts, pOriginalVerts, numVerts); //copy original coordinates to buffer for transformation
 
-	mainM = rotationM * transformM * scaleM;
+	mainM = scaleM * rotationM * transformM;			//computing eventual outcome matrix
 
 	forup (numVerts)
 	{
-		
+		D3DXVec3TransformCoord (&pTransformedVerts[i].position, &pTransformedVerts[i].position, &mainM); //transforming positions by eventual outcome matrix 
+		D3DXVec3TransformNormal (&pTransformedVerts[i].normal, &pTransformedVerts[i].normal, &mainM); //transforming normals
+		D3DXVec3Normalize (&pTransformedVerts[i].normal, &pTransformedVerts[i].normal);				//normalizing normals
 	}
-}
 
-//csc3Dobj::Transform (void)
-//{
-//	memcpy (p_Vertices, p_ObjVert, numVerts);
-//
-//	objMatr = objMatrS*objMatrR*objMatrT;
-//
-//	for(DWORD i=0; i<dwNumVerticies; i++)
-//	{
-//		D3DXVec3TransformCoord (&p_Vertices[i].position,
-//			&p_Vertices[i].position, &objMatr);
-//		D3DXVec3TransformNormal (&p_Vertices[i].normal, 
-//			&p_Vertices[i].normal, &objMatr);
-//		D3DXVec3Normalize (&p_Vertices[i].normal, &p_Vertices[i].normal);
-//	};
-//	p_VertexBuffer->Lock (0, sizeOfAllVerteces, (BYTE**)&t_pVertices, 0);
-//	memcpy (t_pVertices, p_Vertices, sizeOfAllVerteces);
-//	p_VertexBuffer->Unlock();
-//	return 0;
-//};
+	void *tPointer = NULL;
+	p_VertexBuffer->Lock (0, numVerts * sizeof (CUSTOMVERTEX), (BYTE**) &tPointer, 0);
+	memcpy (tPointer, pTransformedVerts, numVerts * sizeof (CUSTOMVERTEX));
+	p_VertexBuffer->Unlock ();
+}
