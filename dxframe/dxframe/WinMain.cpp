@@ -118,6 +118,8 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 		fin.close ();
 	}
 
+	
+
 	//Read vertexes
 	CUSTOMVERTEX *g_Vertices;
 	g_Vertices = new CUSTOMVERTEX [obj.numVerts];
@@ -192,7 +194,11 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 	p_d3d_Device->SetRenderState (D3DRS_ZENABLE, D3DZB_TRUE);
 	//
 
+
+	//Create object
 	obj.Create (p_d3d_Device, obj.numVerts, obj.numFaces);
+	
+	//
 
 	ShowWindow (hWnd, nCmdShow);
 	UpdateWindow (hWnd);
@@ -202,12 +208,12 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 void Render ()
 {
 	//transform
-	static float x=0; x+=0.01f;
+	/*static float x=0; x+=0.01f;
 
 	D3DXMatrixLookAtLH (&matView, &D3DXVECTOR3 (sin(x)*200, 0.0f, -cos(x)*200),
 		&D3DXVECTOR3 (0.0f, 0.0f, 0.0f),
 		&D3DXVECTOR3 (0.0f, 1.0f, 0.0f));
-	p_d3d_Device->SetTransform (D3DTS_VIEW, &matView);
+	p_d3d_Device->SetTransform (D3DTS_VIEW, &matView);*/
 	//
 
 	p_d3d_Device->Clear (0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB (255, 255, 255), 1.0f, 0);
@@ -215,10 +221,13 @@ void Render ()
 	p_d3d_Device->BeginScene ();
 
 	p_d3d_Device->SetVertexShader (D3DFVF_CUSTOMVERTEX);
-	p_d3d_Device->SetStreamSource (0, p_VertexBuffer, sizeof(CUSTOMVERTEX));
+	p_d3d_Device->SetStreamSource (0, p_VertexBuffer, sizeof (CUSTOMVERTEX));
 	p_d3d_Device->SetIndices (p_IndexBuffer, 0);
 	p_d3d_Device->SetMaterial (&mtrl1);
-	p_d3d_Device->DrawIndexedPrimitive (D3DPT_TRIANGLELIST, 0, obj.numVerts, 0, obj.numFaces);
+	//p_d3d_Device->DrawIndexedPrimitive (D3DPT_TRIANGLELIST, 0, obj.numVerts, 0, obj.numFaces);
+
+	obj.Transform ();
+	obj.Render ();
 	
 	p_d3d_Device->EndScene ();
 	p_d3d_Device->Present (NULL, NULL, NULL, NULL);
