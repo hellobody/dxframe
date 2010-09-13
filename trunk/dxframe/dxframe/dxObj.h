@@ -14,7 +14,6 @@ public:
 	VERTEX_3DPNT *pOriginalVerts;
 	VERTEX_3DPNT *pTransformedVerts;
 
-
 	int numVerts;	//number of vertex
 	int numTVerts;	//number of texture vertexes - do not using now
 	int numFaces;	//number of primitives
@@ -31,8 +30,9 @@ public:
 	dxObj ();
 	~dxObj ();
 
-	void Transform ();
 	void Create (LPDIRECT3DDEVICE8 d3d_device, int numVerts, int numIndexes);
+	void Transform ();
+	void Render ();
 };
 
 #endif
