@@ -11,10 +11,8 @@ public:
 	LPDIRECT3DVERTEXBUFFER8 p_VertexBuffer;
 	LPDIRECT3DINDEXBUFFER8 p_IndexBuffer;
 
-	VERTEX_3DPNT pOriginalVerts;
-	VERTEX_3DPNT pTransformedVerts;
-
-
+	VERTEX_3DPNT *pOriginalVerts;
+	VERTEX_3DPNT *pTransformedVerts;
 
 
 	int numVerts;	//number of vertex
@@ -34,6 +32,7 @@ public:
 	~dxObj ();
 
 	void Transform ();
+	void Create (LPDIRECT3DDEVICE8 d3d_device, int numVerts, int numIndexes);
 };
 
 #endif

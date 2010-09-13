@@ -192,6 +192,8 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 	p_d3d_Device->SetRenderState (D3DRS_ZENABLE, D3DZB_TRUE);
 	//
 
+	obj.Create (p_d3d_Device, obj.numVerts, obj.numFaces);
+
 	ShowWindow (hWnd, nCmdShow);
 	UpdateWindow (hWnd);
 

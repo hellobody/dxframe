@@ -42,5 +42,6 @@ struct VERTEX_3DPNT
 };
 
 #define D3DFVF_CUSTOMVERTEX (D3DFVF_XYZ | D3DFVF_NORMAL)
+#define D3DFVF_3DPNT (D3DFVF_XYZ | D3DFVF_NORMAL)
 
 #define forup(x) for (int i=0; i<x; i++)
