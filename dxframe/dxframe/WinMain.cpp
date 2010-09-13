@@ -178,7 +178,7 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 	light.Diffuse.g  = 1.0f;
 	light.Diffuse.b  = 1.0f;
 
-	vecDir = D3DXVECTOR3 (0.0f, 0.0f, -1.0f);
+	vecDir = D3DXVECTOR3 (0.0f, 0.0f, 1.0f);
 	D3DXVec3Normalize ((D3DXVECTOR3*)&light.Direction, &vecDir);
 
 	light.Range = 10000.0f;
@@ -226,13 +226,13 @@ void Render ()
 	p_d3d_Device->SetMaterial (&mtrl1);
 	//p_d3d_Device->DrawIndexedPrimitive (D3DPT_TRIANGLELIST, 0, obj.numVerts, 0, obj.numFaces);
 
-	//obj.RotateX (D3DX_PI/500);
-	obj.RotateY (D3DX_PI/600);
+	//obj.RotateX (D3DX_PI/300);
+	obj.RotateY (D3DX_PI/500);
 	//obj.RotateZ (D3DX_PI/450);
 
 	//obj.Move (0, 0, 0);
 
-	obj.Scale (.999f, .999f, .999f);
+	obj.Scale (.9995f, .9995f, .9995f);
 	
 	obj.Transform ();
 	obj.Render ();
