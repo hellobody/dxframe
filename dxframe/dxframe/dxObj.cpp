@@ -16,6 +16,15 @@ dxObj::~dxObj () {
 	if (pFaces) delete [] pFaces;
 }
 
+void dxObj::Create (LPDIRECT3DDEVICE8 d3d_device, int numVerts, int numFaces) {
+	using_d3d_Device = d3d_device; //pointer to d3d device
+	VERTEX_3DPNT *pOriginalVerts = new VERTEX_3DPNT [numVerts];
+	VERTEX_3DPNT *pTransformedVerts = new VERTEX_3DPNT [numVerts];
+
+	using_d3d_Device->CreateVertexBuffer (numVerts * sizeof (VERTEX_3DPNT), 0, D3DFVF_3DPNT, D3DPOOL_MANAGED, &p_VertexBuffer);
+	using_d3d_Device->CreateIndexBuffer (numFaces * 12, 0, D3DFMT_INDEX32, D3DPOOL_MANAGED, &p_IndexBuffer);
+}
+
 void dxObj::Transform ()
 {
 	//memcpy (pTransformedVerts, pOriginalVerts, numVerts);
