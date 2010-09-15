@@ -8,8 +8,14 @@
 #include <map>
 #include <string>
 
+#include <dinput.h>
+
 #pragma comment (lib, "d3d8.lib") 
 #pragma comment (lib, "d3dx8.lib")
+
+#pragma comment (lib, "dinput8.lib")
+#pragma comment (lib, "dxguid.lib")
+
 
 using namespace std;
 
