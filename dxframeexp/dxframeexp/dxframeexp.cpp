@@ -23,6 +23,8 @@ static ofstream fout;
 
 Interface * ip;
 
+#define nameSize 256
+
 TriObject *GetTriObjFromNode(INode *node, int &deleteIt)
 {
 	deleteIt = FALSE;
@@ -64,10 +66,11 @@ void SceneSaver::ProcNode(INode *node)
 	TObj = GetTriObjFromNode(node, Del);
 	if (!TObj) return;
 
-	/*dxObj obj;
-	obj.numVerts = TObj->mesh.numVerts;
-	obj.numTVerts = TObj->mesh.numTVerts;
-	obj.numFaces = TObj->mesh.numFaces;*/
+	//Get and write name
+	char *Name = new char [nameSize];
+	strcpy_s (Name, nameSize, node->GetName ());
+	fout.write (Name, nameSize);
+	//
 
 	fout.write ((char *) &TObj->mesh.numVerts, 4);
 	fout.write ((char *) &TObj->mesh.numFaces, 4);

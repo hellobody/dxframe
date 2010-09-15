@@ -28,8 +28,8 @@ D3DMATERIAL8 mtrl2;
 D3DLIGHT8 light;
 
 ifstream fin;							//file input
-//std::vector <dxObj*> objs;			//for future
-dxObj obj;								//my object
+objMap objs;						
+dxObj *obj;								//my object
 
 LRESULT CALLBACK WindowProc (HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
 	switch (message) {
@@ -40,6 +40,7 @@ LRESULT CALLBACK WindowProc (HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			RELEASE (p_VertexBuffer);
 			RELEASE (p_d3d_Device);
 			RELEASE (p_d3d);
+			DEL (obj);
 			PostQuitMessage (0);
 			break;
 		case WM_SETCURSOR:
@@ -100,50 +101,78 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 	fin.open (_T("data\\test.DXF"), ios::in | ios::binary);
 
 	if (!fin.fail ()) {
-		fin.read ((char *) &obj.numVerts, 4);
-		fin.read ((char *) &obj.numFaces, 4);
+	
+		do  
+		{
+			obj = new dxObj;
+
+			//Read name model
+			fin.read ((char *) &obj->Name, nameSize);
+			//
+
+			objs.insert (objPair (obj->Name, obj)); //push new model to map 
+
+			fin.read ((char *) &obj->numVerts, 4);
+			fin.read ((char *) &obj->numFaces, 4);
+
+			obj->pVertsWithNormals = new float [obj->numVerts * 3 * 2]; //because verts with normals
+
+			forup (obj->numVerts * 3 * 2) {
+				fin.read ((char *) &obj->pVertsWithNormals[i], 4);
+			}
+
+			obj->pFaces = new int [obj->numFaces * 3]; 
+
+			forup (obj->numFaces * 3) {
+				fin.read ((char *) &obj->pFaces[i], 4);
+			}
+
+			//Read vertexes
+			CUSTOMVERTEX *g_Vertices;
+			g_Vertices = new CUSTOMVERTEX [obj->numVerts];
+			forup (obj->numVerts) {
+				g_Vertices[i] = CUSTOMVERTEX (obj->pVertsWithNormals[i*6], obj->pVertsWithNormals[i*6+2], obj->pVertsWithNormals[i*6+1], obj->pVertsWithNormals[i*6+3], obj->pVertsWithNormals[i*6+4], obj->pVertsWithNormals[i*6+5]);
+			}
+
+			//Create vertex buffer
+			p_d3d_Device->CreateVertexBuffer (obj->numVerts * sizeof (CUSTOMVERTEX), 0, D3DFVF_CUSTOMVERTEX, D3DPOOL_MANAGED, &p_VertexBuffer);
+
+			VOID * pVertices;
+			p_VertexBuffer->Lock (0, obj->numVerts * sizeof (CUSTOMVERTEX), (BYTE**)&pVertices, 0);
+			memcpy (pVertices, g_Vertices, obj->numVerts * sizeof (CUSTOMVERTEX));
+			p_VertexBuffer->Unlock ();
+
+			DELA (g_Vertices);
+
+			//Create index buffer
+			p_d3d_Device->CreateIndexBuffer (obj->numFaces * 12, 0, D3DFMT_INDEX32, D3DPOOL_MANAGED, &p_IndexBuffer);
+
+			VOID* pVerticesI;
+			p_IndexBuffer->Lock (0, obj->numFaces * 12, (BYTE**)&pVerticesI, 0);
+			memcpy (pVerticesI, obj->pFaces, obj->numFaces * 12);
+			p_IndexBuffer->Unlock();
+
+			//Create object
+			obj->Create (p_d3d_Device, obj->numVerts, obj->numFaces);
+
+			//
+
+			char endByte;
+			fin.read ((char *) &endByte, 1);
+
+			int a = fin.tellg ();
+
+			if (!fin.eof ()) 
+			{
+				fin.seekg (a - 1);
+			}
+
+		} while (!fin.eof ());
 		
-		obj.pVertsWithNormals = new float [obj.numVerts * 3 * 2]; //because verts with normals
-		
-		forup (obj.numVerts * 3 * 2) {
-			fin.read ((char *) &obj.pVertsWithNormals[i], 4);
-		}
-
-		obj.pFaces = new int [obj.numFaces * 3]; 
-
-		forup (obj.numFaces * 3) {
-			fin.read ((char *) &obj.pFaces[i], 4);
-		}
-
 		fin.close ();
 	}
 
 	
-
-	//Read vertexes
-	CUSTOMVERTEX *g_Vertices;
-	g_Vertices = new CUSTOMVERTEX [obj.numVerts];
-	forup (obj.numVerts) {
-		g_Vertices[i] = CUSTOMVERTEX (obj.pVertsWithNormals[i*6], obj.pVertsWithNormals[i*6+2], obj.pVertsWithNormals[i*6+1], obj.pVertsWithNormals[i*6+3], obj.pVertsWithNormals[i*6+4], obj.pVertsWithNormals[i*6+5]);
-	}
-	
-	//Create vertex buffer
-	p_d3d_Device->CreateVertexBuffer (obj.numVerts * sizeof (CUSTOMVERTEX), 0, D3DFVF_CUSTOMVERTEX, D3DPOOL_MANAGED, &p_VertexBuffer);
-
-	VOID * pVertices;
-	p_VertexBuffer->Lock (0, obj.numVerts * sizeof (CUSTOMVERTEX), (BYTE**)&pVertices, 0);
-	memcpy (pVertices, g_Vertices, obj.numVerts * sizeof (CUSTOMVERTEX));
-	p_VertexBuffer->Unlock ();
-
-	DELA (g_Vertices);
-
-	//Create index buffer
-	p_d3d_Device->CreateIndexBuffer (obj.numFaces * 12, 0, D3DFMT_INDEX32, D3DPOOL_MANAGED, &p_IndexBuffer);
-
-	VOID* pVerticesI;
-	p_IndexBuffer->Lock (0, obj.numFaces * 12, (BYTE**)&pVerticesI, 0);
-	memcpy (pVerticesI, obj.pFaces, obj.numFaces * 12);
-	p_IndexBuffer->Unlock();
 
 	D3DXMatrixRotationY (&matWorld, 0.0f);
 	D3DXMatrixLookAtLH (&matView, &D3DXVECTOR3 (0.0f, 0.0f, -200.0f), &D3DXVECTOR3 (0.f, 0.f, 0.f), &D3DXVECTOR3 (0.0f, 1.0f, 0.0f));
@@ -195,10 +224,7 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 	//
 
 
-	//Create object
-	obj.Create (p_d3d_Device, obj.numVerts, obj.numFaces);
 	
-	//
 
 	ShowWindow (hWnd, nCmdShow);
 	UpdateWindow (hWnd);
@@ -226,16 +252,19 @@ void Render ()
 	p_d3d_Device->SetMaterial (&mtrl1);
 	//p_d3d_Device->DrawIndexedPrimitive (D3DPT_TRIANGLELIST, 0, obj.numVerts, 0, obj.numFaces);
 
-	//obj.RotateX (D3DX_PI/300);
-	obj.RotateY (D3DX_PI/500);
-	//obj.RotateZ (D3DX_PI/450);
+	for (objMap::iterator it = objs.begin (); it != objs.end (); it++)
+	{
+		//obj.RotateX (D3DX_PI/300);
+		it->second->RotateY (D3DX_PI/500);
+		//obj.RotateZ (D3DX_PI/450);
 
-	//obj.Move (0, 0, 0);
+		//obj.Move (0, 0, 0);
 
-	obj.Scale (.9995f, .9995f, .9995f);
-	
-	obj.Transform ();
-	obj.Render ();
+		//it->second->Scale (.9995f, .9995f, .9995f);
+
+		it->second->Transform ();
+		it->second->Render ();
+	}
 	
 	p_d3d_Device->EndScene ();
 	p_d3d_Device->Present (NULL, NULL, NULL, NULL);
