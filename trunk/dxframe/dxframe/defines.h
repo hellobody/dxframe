@@ -5,7 +5,8 @@
 #include <d3d8.h>
 #include <d3dx8.h>
 #include <fstream>
-//#include <vector>
+#include <map>
+#include <string>
 
 #pragma comment (lib, "d3d8.lib") 
 #pragma comment (lib, "d3dx8.lib")
@@ -18,6 +19,13 @@ using namespace std;
 
 #define WIDTH 800
 #define HEIGHT 600
+
+#define nameSize 256 
+
+class dxObj;
+
+typedef pair <string, dxObj*> objPair;
+typedef map <string, dxObj*> objMap;
 
 struct CUSTOMVERTEX
 { 

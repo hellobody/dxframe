@@ -7,6 +7,8 @@ class dxObj
 {
 public:
 
+	char Name [nameSize];
+
 	PDIRECT3DDEVICE8 using_d3d_Device;
 	LPDIRECT3DVERTEXBUFFER8 p_VertexBuffer;
 	LPDIRECT3DINDEXBUFFER8 p_IndexBuffer;
