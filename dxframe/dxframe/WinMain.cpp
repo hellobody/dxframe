@@ -1,78 +1,22 @@
 #include "WinMain.h"
 #include "TCHAR.h"
 
-using namespace std;
-
 HWND hWnd;
 BOOL bActive;
 LPCWSTR APPNAME = L"dxframe";
 LPCWSTR APPTITLE = L"dxframe";
 
-//////////dinput//////////////////////////////////////////////////////////
 LPDIRECTINPUT8 din;    // the pointer to our DirectInput interface
-LPDIRECTINPUTDEVICE8 dinkeyboard;    // the pointer to the keyboard device
+LPDIRECTINPUTDEVICE8 dinkeybd;    // the pointer to the keyboard device
 LPDIRECTINPUTDEVICE8 dinmouse;    // the pointer to the mouse device
-BYTE keystate[256];    // the storage for the key-information
+
 DIMOUSESTATE mousestate;    // the storage for the mouse-information
-
-void initDInput(HINSTANCE hInstance, HWND hWnd);    // sets up and initializes DirectInput
-void detect_input(void);    // gets the current input state
-void cleanDInput(void);    // closes DirectInput and releases memory
-
-void initDInput(HINSTANCE hInstance, HWND hWnd)
-{
-	// create the DirectInput interface
-	DirectInput8Create(hInstance,    // the handle to the application
-		DIRECTINPUT_VERSION,    // the compatible version
-		IID_IDirectInput8,    // the DirectInput interface version
-		(void**)&din,    // the pointer to the interface
-		NULL);    // COM stuff, so we'll set it to NULL
-
-	// create the keyboard device
-	din->CreateDevice(GUID_SysKeyboard,    // the default keyboard ID being used
-		&dinkeyboard,    // the pointer to the device interface
-		NULL);    // COM stuff, so we'll set it to NULL
-
-	din->CreateDevice(GUID_SysMouse,
-		&dinmouse,
-		NULL);
-
-	// set the data format to keyboard format
-	dinkeyboard->SetDataFormat(&c_dfDIKeyboard);
-
-	dinmouse->SetDataFormat(&c_dfDIMouse);
-
-	// set the control you will have over the keyboard
-	dinkeyboard->SetCooperativeLevel(hWnd, DISCL_NONEXCLUSIVE | DISCL_FOREGROUND);
-	dinmouse->SetCooperativeLevel(hWnd, DISCL_EXCLUSIVE | DISCL_FOREGROUND);
-}
-
-// this is the function that closes DirectInput
-void cleanDInput(void)
-{
-	dinkeyboard->Unacquire();    // make sure the keyboard is unacquired
-	dinmouse->Unacquire();    // make sure the mouse in unacquired
-	din->Release();    // close DirectInput before exiting
-}
-
-// this is the function that gets the latest input data
-void detect_input(void)
-{
-	// get access if we don't have it already
-	dinkeyboard->Acquire();
-	dinmouse->Acquire();
-
-	// get the input data
-	dinkeyboard->GetDeviceState(256, (LPVOID)keystate);
-	dinmouse->GetDeviceState(sizeof(DIMOUSESTATE), (LPVOID)&mousestate);
-}
-
-//////////////////////////////////////////////////////////////////////////
+BYTE keystate [256];    // the storage for the key-information
 
 LPDIRECT3D8 p_d3d = NULL;						//direct 3d main interface
 LPDIRECT3DDEVICE8 p_d3d_Device = NULL;			//direct 3d device
-LPDIRECT3DVERTEXBUFFER8 p_VertexBuffer = NULL;	//vertex buffer
 LPDIRECT3DINDEXBUFFER8 p_IndexBuffer = NULL;	//indexes buffer
+LPDIRECT3DVERTEXBUFFER8 p_VertexBuffer = NULL;	//vertex buffer
 
 D3DDISPLAYMODE d3ddm;							//display mode parameters
 D3DPRESENT_PARAMETERS d3dpp;					//present parameters
@@ -92,11 +36,60 @@ ifstream fin;							//file input
 objMap objs;						
 dxObj *obj;								//my object
 
+void initDInput (HINSTANCE hInstance, HWND hWnd) {
+	// create the DirectInput interface
+	DirectInput8Create (hInstance,    // the handle to the application
+		DIRECTINPUT_VERSION,    // the compatible version
+		IID_IDirectInput8,    // the DirectInput interface version
+		(void**)&din,    // the pointer to the interface
+		NULL);    // COM stuff, so we'll set it to NULL
+
+	// create the keyboard device
+	din->CreateDevice (GUID_SysKeyboard,    // the default keyboard ID being used
+		&dinkeybd,    // the pointer to the device interface
+		NULL);    // COM stuff, so we'll set it to NULL
+
+	din->CreateDevice(GUID_SysMouse,
+		&dinmouse,
+		NULL);
+
+	// set the data format to keyboard format
+	dinkeybd->SetDataFormat (&c_dfDIKeyboard);
+	dinmouse->SetDataFormat (&c_dfDIMouse);
+
+	// set the control you will have over the keyboard
+	dinkeybd->SetCooperativeLevel (hWnd, DISCL_NONEXCLUSIVE | DISCL_FOREGROUND);
+	dinmouse->SetCooperativeLevel (hWnd, DISCL_EXCLUSIVE | DISCL_FOREGROUND);
+}
+
+// this is the function that closes DirectInput
+void cleanDInput ()
+{
+	dinkeybd->Unacquire ();    // make sure the keyboard is unacquired
+	dinmouse->Unacquire ();    // make sure the mouse in unacquired
+	din->Release ();    // close DirectInput before exiting
+}
+
+// this is the function that gets the latest input data
+void updateInput ()
+{
+	// get access if we don't have it already
+	dinkeybd->Acquire ();
+	dinmouse->Acquire ();
+
+	// get the input data
+	dinkeybd->GetDeviceState (256, (LPVOID) keystate);
+	dinmouse->GetDeviceState (sizeof (DIMOUSESTATE), (LPVOID) &mousestate);
+}
+
 LRESULT CALLBACK WindowProc (HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
+
 	switch (message) {
+
 		case WM_ACTIVATE:
 			bActive = LOWORD (wParam);
 			break;
+
 		case WM_DESTROY:
 			RELEASE (p_VertexBuffer);
 			RELEASE (p_d3d_Device);
@@ -105,6 +98,7 @@ LRESULT CALLBACK WindowProc (HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			cleanDInput ();
 			PostQuitMessage (0);
 			break;
+
 		case WM_SETCURSOR:
 			SetCursor (NULL);
 			break;
@@ -112,6 +106,7 @@ LRESULT CALLBACK WindowProc (HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 }
 
 bool WindowInit (HINSTANCE hThisInst, int nCmdShow) {
+
 	WNDCLASS wcl;
 
 	wcl.hInstance = hThisInst;
@@ -163,17 +158,12 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 	fin.open (_T("data\\test.DXF"), ios::in | ios::binary);
 
 	if (!fin.fail ()) {
-	
-		do  
-		{
+
+		do {
+
 			obj = new dxObj;
 
-			//Read name model
 			fin.read ((char *) &obj->Name, nameSize);
-			//
-
-			objs.insert (objPair (obj->Name, obj)); //push new model to map 
-
 			fin.read ((char *) &obj->numVerts, 4);
 			fin.read ((char *) &obj->numFaces, 4);
 
@@ -214,19 +204,15 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 			memcpy (pVerticesI, obj->pFaces, obj->numFaces * 12);
 			p_IndexBuffer->Unlock();
 
-			//Create object
 			obj->Create (p_d3d_Device, obj->numVerts, obj->numFaces);
 
-			//
+			objs.insert (objPair (obj->Name, obj)); //push new model to map 
 
 			char endByte;
 			fin.read ((char *) &endByte, 1);
 
-			int a = fin.tellg ();
-
-			if (!fin.eof ()) 
-			{
-				fin.seekg (a - 1);
+			if (!fin.eof ()) {
+				fin.seekg (int (fin.tellg ()) - 1);
 			}
 
 		} while (!fin.eof ());
@@ -234,15 +220,13 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 		fin.close ();
 	}
 
-	
-
 	D3DXMatrixRotationY (&matWorld, 0.0f);
 	D3DXMatrixLookAtLH (&matView, &D3DXVECTOR3 (0.0f, 0.0f, -200.0f), &D3DXVECTOR3 (0.f, 0.f, 0.f), &D3DXVECTOR3 (0.0f, 1.0f, 0.0f));
 	D3DXMatrixPerspectiveFovLH (&matProj, D3DX_PI/2, 4.f/3.f, 1.f, 10000.f); //last two edges of drawing, do not set near val < 1.f
 	//second param - angle of view, third - aspect ratio
 
-	p_d3d_Device->SetTransform (D3DTS_WORLD, &matWorld);
 	p_d3d_Device->SetTransform (D3DTS_VIEW, &matView);
+	p_d3d_Device->SetTransform (D3DTS_WORLD, &matWorld);
 	p_d3d_Device->SetTransform (D3DTS_PROJECTION, &matProj);
 	p_d3d_Device->SetRenderState (D3DRS_CULLMODE, D3DCULL_CCW);
 
@@ -285,10 +269,8 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 	p_d3d_Device->SetRenderState (D3DRS_ZENABLE, D3DZB_TRUE);
 	//
 
-
 	initDInput (hThisInst, hWnd);
 	
-
 	ShowWindow (hWnd, nCmdShow);
 	UpdateWindow (hWnd);
 
@@ -305,38 +287,31 @@ void Render ()
 	p_d3d_Device->SetTransform (D3DTS_VIEW, &matView);*/
 	//
 
-	p_d3d_Device->Clear (0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB (255, 255, 255), 1.0f, 0);
-
-	p_d3d_Device->BeginScene ();
-
-	p_d3d_Device->SetVertexShader (D3DFVF_CUSTOMVERTEX);
-	p_d3d_Device->SetStreamSource (0, p_VertexBuffer, sizeof (CUSTOMVERTEX));
-	p_d3d_Device->SetIndices (p_IndexBuffer, 0);
-	p_d3d_Device->SetMaterial (&mtrl1);
-	//p_d3d_Device->DrawIndexedPrimitive (D3DPT_TRIANGLELIST, 0, obj.numVerts, 0, obj.numFaces);
-
-	detect_input ();
+	//move to Update
+	updateInput ();
 
 	if (keystate [DIK_LEFT] & 0x80) {
 		int a = 0;
 	}
 
-	for (objMap::iterator it = objs.begin (); it != objs.end (); it++)
-	{
-		//obj.RotateX (D3DX_PI/300);
-		//it->second->RotateY (D3DX_PI/500);
-		//obj.RotateZ (D3DX_PI/450);
+	if (mousestate.rgbButtons[0] & 0x80) {
+		int a = 0;
+	}
 
-		//obj.Move (0, 0, 0);
+	for (objMap::iterator it = objs.begin (); it != objs.end (); it++) {
 
-		//it->second->Scale (.9995f, .9995f, .9995f);
-
-		static float index = 0.0f;
-		index += mousestate.lX * 0.003f;
-
-		it->second->Move (index,0,0);
-
+		it->second->RotateY (D3DX_PI/500);
+		it->second->Move (mousestate.lX * 0.5f,-mousestate.lY * 0.5f,0);
 		it->second->Transform ();
+	}
+	//
+
+	p_d3d_Device->Clear (0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB (255, 255, 255), 1.0f, 0);
+	p_d3d_Device->BeginScene ();
+
+	p_d3d_Device->SetMaterial (&mtrl1);
+
+	for (objMap::iterator it = objs.begin (); it != objs.end (); it++) {
 		it->second->Render ();
 	}
 	
@@ -344,12 +319,15 @@ void Render ()
 	p_d3d_Device->Present (NULL, NULL, NULL, NULL);
 };
 int APIENTRY WinMain (HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nCmdShow) {
+
 	MSG msg;
 
 	if (!AppInit (hThisInst, nCmdShow)) return false;
 
 	while (true) {
+
 		if (PeekMessage (&msg, NULL, 0, 0, PM_NOREMOVE)) {
+
 			if (!GetMessage (&msg, NULL, 0, 0)) break;
 			TranslateMessage (&msg);
 			DispatchMessage (&msg);

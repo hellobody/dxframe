@@ -4,25 +4,26 @@
 dxObj::dxObj () {
 
 	numVerts = 0;
-	numTVerts = 0;
 	numFaces = 0;
-
+	numTVerts = 0;
+	
 	pVertsWithNormals = NULL;
 	pFaces = NULL;
 }
 
 dxObj::~dxObj () {
+
 	DELA (pVertsWithNormals);
-	DELA (pFaces);
-
-	DELA (pOriginalVerts);
 	DELA (pTransformedVerts);
-
+	DELA (pOriginalVerts);
+	DELA (pFaces);
+	
 	RELEASE (p_VertexBuffer);
 	RELEASE (p_IndexBuffer);
 }
 
 void dxObj::Create (LPDIRECT3DDEVICE8 d3d_device, int numVerts, int numFaces) {
+
 	using_d3d_Device = d3d_device; //pointer to d3d device
 	pOriginalVerts = new VERTEX_3DPNT [numVerts];
 	pTransformedVerts = new VERTEX_3DPNT [numVerts];
@@ -30,12 +31,11 @@ void dxObj::Create (LPDIRECT3DDEVICE8 d3d_device, int numVerts, int numFaces) {
 	using_d3d_Device->CreateVertexBuffer (numVerts * sizeof (CUSTOMVERTEX), 0, D3DFVF_CUSTOMVERTEX, D3DPOOL_MANAGED, &p_VertexBuffer);
 	using_d3d_Device->CreateIndexBuffer (numFaces * 12, 0, D3DFMT_INDEX32, D3DPOOL_MANAGED, &p_IndexBuffer);
 
-	D3DXMatrixIdentity (&mainM);
-	D3DXMatrixIdentity (&rotationM);
 	D3DXMatrixIdentity (&transformM);
-	D3DXMatrixIdentity (&scaleM);
+	D3DXMatrixIdentity (&rotationM);
 	D3DXMatrixIdentity (&textureM);
-
+	D3DXMatrixIdentity (&scaleM);
+	D3DXMatrixIdentity (&mainM);
 	D3DXMatrixIdentity (&tempM);
 
 	///////////////////////////////////////////////////////////////////////////
@@ -59,36 +59,43 @@ void dxObj::Create (LPDIRECT3DDEVICE8 d3d_device, int numVerts, int numFaces) {
 }
 
 void dxObj::RotateX (float ang) {
+
 	D3DXMatrixRotationX (&tempM, ang);
 	rotationM *= tempM;
 }
 
 void dxObj::RotateY (float ang) {
+
 	D3DXMatrixRotationY (&tempM, ang);
 	rotationM *= tempM;
 }
 
 void dxObj::RotateZ (float ang) {
+
 	D3DXMatrixRotationZ (&tempM, ang);
 	rotationM *= tempM;
 }
 
 void dxObj::Move (float x, float y, float z) {
+
 	D3DXMatrixTranslation (&tempM, x, y, z);
 	transformM *= tempM;
 }
 
 void dxObj::Scale (float x, float y, float z) {
+
 	D3DXMatrixScaling (&tempM, x, y, z);
 	scaleM *= tempM;
 }
 
 void dxObj::Transform () {
+
 	memcpy (pTransformedVerts, pOriginalVerts, numVerts * sizeof (CUSTOMVERTEX)); //copy original coordinates to buffer for transformation
 
 	mainM = scaleM * rotationM * transformM;			//computing eventual outcome matrix
 
 	forup (numVerts) {
+
 		D3DXVec3TransformCoord (&pTransformedVerts[i].position, &pTransformedVerts[i].position, &mainM); //transforming positions by eventual outcome matrix 
 		D3DXVec3TransformNormal (&pTransformedVerts[i].normal, &pTransformedVerts[i].normal, &mainM); //transforming normals
 		D3DXVec3Normalize (&pTransformedVerts[i].normal, &pTransformedVerts[i].normal);				//normalizing normals
@@ -101,6 +108,8 @@ void dxObj::Transform () {
 }
 
 void dxObj::Render () {
+
+	using_d3d_Device->SetVertexShader (D3DFVF_CUSTOMVERTEX);
 	using_d3d_Device->SetStreamSource (0, p_VertexBuffer, sizeof (CUSTOMVERTEX));
 	using_d3d_Device->SetIndices (p_IndexBuffer, 0);
 	using_d3d_Device->DrawIndexedPrimitive (D3DPT_TRIANGLELIST, 0, numVerts, 0, numFaces);
