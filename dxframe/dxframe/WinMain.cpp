@@ -94,8 +94,14 @@ LRESULT CALLBACK WindowProc (HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			RELEASE (p_VertexBuffer);
 			RELEASE (p_d3d_Device);
 			RELEASE (p_d3d);
-			DEL (obj);
+			
 			cleanDInput ();
+
+			for (objMap::iterator it = objs.begin (); it != objs.end (); it++)
+			{
+				DEL (it->second);
+			}
+
 			PostQuitMessage (0);
 			break;
 
@@ -183,7 +189,7 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 			CUSTOMVERTEX *g_Vertices;
 			g_Vertices = new CUSTOMVERTEX [obj->numVerts];
 			forup (obj->numVerts) {
-				g_Vertices[i] = CUSTOMVERTEX (obj->pVertsWithNormals[i*6], obj->pVertsWithNormals[i*6+2], obj->pVertsWithNormals[i*6+1], obj->pVertsWithNormals[i*6+3], obj->pVertsWithNormals[i*6+4], obj->pVertsWithNormals[i*6+5]);
+				g_Vertices[i] = CUSTOMVERTEX (obj->pVertsWithNormals[i*6], obj->pVertsWithNormals[i*6+1], obj->pVertsWithNormals[i*6+2], obj->pVertsWithNormals[i*6+3], obj->pVertsWithNormals[i*6+4], obj->pVertsWithNormals[i*6+5]);
 			}
 
 			//Create vertex buffer
@@ -221,14 +227,14 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 	}
 
 	D3DXMatrixRotationY (&matWorld, 0.0f);
-	D3DXMatrixLookAtLH (&matView, &D3DXVECTOR3 (0.0f, 0.0f, -200.0f), &D3DXVECTOR3 (0.f, 0.f, 0.f), &D3DXVECTOR3 (0.0f, 1.0f, 0.0f));
+	D3DXMatrixLookAtLH (&matView, &D3DXVECTOR3 (0.0f, 0.0f, -500.0f), &D3DXVECTOR3 (0.f, 0.f, 0.f), &D3DXVECTOR3 (0.0f, 1.0f, 0.0f));
 	D3DXMatrixPerspectiveFovLH (&matProj, D3DX_PI/2, 4.f/3.f, 1.f, 10000.f); //last two edges of drawing, do not set near val < 1.f
 	//second param - angle of view, third - aspect ratio
 
 	p_d3d_Device->SetTransform (D3DTS_VIEW, &matView);
 	p_d3d_Device->SetTransform (D3DTS_WORLD, &matWorld);
 	p_d3d_Device->SetTransform (D3DTS_PROJECTION, &matProj);
-	p_d3d_Device->SetRenderState (D3DRS_CULLMODE, D3DCULL_CCW);
+	p_d3d_Device->SetRenderState (D3DRS_CULLMODE, D3DCULL_CW);
 
 	//init materials
 	ZeroMemory (&mtrl1, sizeof(D3DMATERIAL8));
@@ -278,30 +284,61 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 }
 void Render ()
 {
-	//transform
-	/*static float x=0; x+=0.01f;
-
-	D3DXMatrixLookAtLH (&matView, &D3DXVECTOR3 (sin(x)*200, 0.0f, -cos(x)*200),
-		&D3DXVECTOR3 (0.0f, 0.0f, 0.0f),
-		&D3DXVECTOR3 (0.0f, 1.0f, 0.0f));
-	p_d3d_Device->SetTransform (D3DTS_VIEW, &matView);*/
-	//
-
 	//move to Update
 	updateInput ();
 
-	if (keystate [DIK_LEFT] & 0x80) {
-		int a = 0;
-	}
+	static D3DXVECTOR3 pEye = D3DXVECTOR3 (0,0,-400);
+	static D3DXVECTOR3 pAt = D3DXVECTOR3 (0,0,0);
+	static D3DXVECTOR3 pUp = D3DXVECTOR3 (0,1,0);
 
-	if (mousestate.rgbButtons[0] & 0x80) {
-		int a = 0;
+	
+
+	static float ang0 = 0;
+	static float ang1 = 0;
+
+	ang0 += mousestate.lX * .005f;
+	ang1 -= mousestate.lY * .005f;
+
+	if (ang1 > D3DX_PI/2) ang1 = D3DX_PI/2;
+	else if (ang1 < -D3DX_PI/2) ang1 = -D3DX_PI/2;
+
+	D3DXVECTOR3 dir = D3DXVECTOR3 (sin (ang0), sin (ang1), cos (ang0));
+
+	pAt = pEye + dir;
+
+	D3DXMatrixLookAtLH (&matView, &pEye, &pAt, &pUp);
+	p_d3d_Device->SetTransform (D3DTS_VIEW, &matView);
+	
+	if (keystate [DIK_W] & 0x80) {
+		pEye += dir * 3.f;
 	}
+	if (keystate [DIK_S] & 0x80) {
+		pEye -= dir * 3.f;
+	}
+	if (keystate [DIK_A] & 0x80) {
+		pEye -= dir2 * 3.f;
+	}
+	if (keystate [DIK_D] & 0x80) {
+		pEye += dir2 * 3.f;
+	}
+	
+	/*if (keystate [DIK_LEFT] & 0x80) {
+		pEye.x -= 3.f;
+	}
+	if (keystate [DIK_RIGHT] & 0x80) {
+		pEye.x += 3.f;
+	}
+	if (keystate [DIK_UP] & 0x80) {
+		pEye.z += 3.f;
+	}
+	if (keystate [DIK_DOWN] & 0x80) {
+		pEye.z -= 3.f;
+	}*/
 
 	for (objMap::iterator it = objs.begin (); it != objs.end (); it++) {
 
-		it->second->RotateY (D3DX_PI/500);
-		it->second->Move (mousestate.lX * 0.5f,-mousestate.lY * 0.5f,0);
+		//it->second->RotateY (D3DX_PI/500);
+		//it->second->Move (mousestate.lX * .5f, -mousestate.lY * .5f, mousestate.lZ * .5f);
 		it->second->Transform ();
 	}
 	//

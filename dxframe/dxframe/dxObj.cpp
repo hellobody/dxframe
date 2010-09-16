@@ -42,12 +42,12 @@ void dxObj::Create (LPDIRECT3DDEVICE8 d3d_device, int numVerts, int numFaces) {
 	//temporary, rewrite it////////////////////////////////////////////////////
 	forup (numVerts) {
 		pOriginalVerts[i].position.x = pVertsWithNormals[i*6];
-		pOriginalVerts[i].position.y = pVertsWithNormals[i*6+2];
-		pOriginalVerts[i].position.z = pVertsWithNormals[i*6+1];
+		pOriginalVerts[i].position.y = pVertsWithNormals[i*6+1];
+		pOriginalVerts[i].position.z = pVertsWithNormals[i*6+2];
 
 		pOriginalVerts[i].normal.x = pVertsWithNormals[i*6+3];
-		pOriginalVerts[i].normal.y = pVertsWithNormals[i*6+5];
-		pOriginalVerts[i].normal.z = pVertsWithNormals[i*6+4];
+		pOriginalVerts[i].normal.y = pVertsWithNormals[i*6+4];
+		pOriginalVerts[i].normal.z = pVertsWithNormals[i*6+5];
 	}
 
 	void *tPointer;

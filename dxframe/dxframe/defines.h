@@ -1,5 +1,6 @@
 #pragma once
 
+#include "vld.h" //comment me
 #include <time.h>
 #include <d3d8.h>
 #include <d3dx8.h>
@@ -23,8 +24,8 @@
 
 #define forup(x) for (int i=0; i<x; i++)
 
-#define WIDTH 800
-#define HEIGHT 600
+#define WIDTH 1024
+#define HEIGHT 768
 
 #define nameSize 256 
 
