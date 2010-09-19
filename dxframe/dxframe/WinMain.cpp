@@ -41,6 +41,7 @@ D3DXMATRIX matCamScale;
 D3DXMATRIX matCamRotate;
 D3DXMATRIX matCamTraslate;
 D3DXMATRIX tempM;
+D3DXMATRIX tempM2;
 ///////////////////////////////////////////////////
 
 
@@ -329,70 +330,60 @@ void Render ()
 
 	//положение камеры задается тремя векторами
 
-	/*D3DXMatrixIdentity (&tempM);
-	D3DXMatrixRotationY (&tempM, mousestate.lX * .01f);
+	D3DXMatrixIdentity (&tempM);
+	D3DXMatrixRotationY (&tempM, -mousestate.lX * .01f);
 	matCamRotate *= tempM;
 
 	D3DXMatrixIdentity (&tempM);
-	D3DXMatrixRotationX (&tempM, mousestate.lY * .01f);
-	matCamRotate *= tempM;*/
-
-	static D3DXVECTOR3 i,j,k;
-
-	i = D3DXVECTOR3 (matView._11, matView._12, matView._13);
-	j = D3DXVECTOR3 (matView._21, matView._22, matView._23);
-	k = D3DXVECTOR3 (matView._31, matView._32, matView._33);
-
-	 
-	D3DXVec3Normalize (&i, &i);
-	D3DXVec3Normalize (&j, &j);
-	D3DXVec3Normalize (&k, &k);
-
-
-	D3DXMatrixIdentity (&tempM);
-	D3DXMatrixRotationAxis (&tempM, &j, mousestate.lX * .01f);
+	D3DXVECTOR3 CamAxisX = D3DXVECTOR3 (matCamRotate._11, matCamRotate._12, matCamRotate._13);
+	D3DXVec3Normalize (&CamAxisX, &CamAxisX);
+	D3DXMatrixRotationAxis (&tempM, &CamAxisX, -mousestate.lY * .01f);
 	matCamRotate *= tempM;
 
-	matView = matCamTraslate * matCamRotate;
-
-	i = D3DXVECTOR3 (matView._11, matView._12, matView._13);
-	j = D3DXVECTOR3 (matView._21, matView._22, matView._23);
-	k = D3DXVECTOR3 (matView._31, matView._32, matView._33);
-
-	 
-	D3DXVec3Normalize (&i, &i);
-	D3DXVec3Normalize (&j, &j);
-	D3DXVec3Normalize (&k, &k);
-
-	D3DXMatrixIdentity (&tempM);
-	D3DXMatrixRotationAxis (&tempM, &i, mousestate.lY * .01f);
-	matCamRotate *= tempM;
-	
-	matView = matCamTraslate * matCamRotate;
-
-
-	/*matView = D3DXMATRIX (
-		1,		0,		0,		0,
-		0,		1,		0,		0,
-		0,		0,		1,		0,
-		0,		0,	  400,		1
-	);*/
-
-	p_d3d_Device->SetTransform (D3DTS_VIEW, &matView);
-	
 	if (keystate [DIK_W] & 0x80) {
-		pEye += dir * 3.f;
+		D3DXMatrixIdentity (&tempM);
+		D3DXVECTOR3 CamAxisZ = D3DXVECTOR3 (matCamRotate._31, matCamRotate._32, matCamRotate._33);
+		D3DXVec3Normalize (&CamAxisZ, &CamAxisZ);
+		D3DXMatrixTranslation (&tempM, CamAxisZ.x, CamAxisZ.y, CamAxisZ.z);
+		matCamTraslate *= tempM;
 	}
 	if (keystate [DIK_S] & 0x80) {
-		pEye -= dir * 3.f;
+		D3DXMatrixIdentity (&tempM);
+		D3DXVECTOR3 CamAxisZ = D3DXVECTOR3 (matCamRotate._31, matCamRotate._32, matCamRotate._33);
+		D3DXVec3Normalize (&CamAxisZ, &CamAxisZ);
+		D3DXMatrixTranslation (&tempM, CamAxisZ.x, CamAxisZ.y, -CamAxisZ.z);
+		matCamTraslate *= tempM;
 	}
 	if (keystate [DIK_A] & 0x80) {
-		pEye -= dir2 * 3.f;
+		D3DXMatrixIdentity (&tempM);
+		D3DXVECTOR3 CamAxisX = D3DXVECTOR3 (matCamRotate._11, matCamRotate._12, matCamRotate._13);
+		D3DXVec3Normalize (&CamAxisX, &CamAxisX);
+		D3DXMatrixTranslation (&tempM, CamAxisX.x, CamAxisX.y, CamAxisX.z);
+		matCamTraslate *= tempM;
 	}
 	if (keystate [DIK_D] & 0x80) {
-		pEye += dir2 * 3.f;
+		D3DXMatrixIdentity (&tempM);
+		D3DXVECTOR3 CamAxisX = D3DXVECTOR3 (matCamRotate._11, matCamRotate._12, matCamRotate._13);
+		D3DXVec3Normalize (&CamAxisX, &CamAxisX);
+		D3DXMatrixTranslation (&tempM, -CamAxisX.x, CamAxisX.y, CamAxisX.z);
+		matCamTraslate *= tempM;
 	}
+	
 
+	matView = matCamTraslate * matCamRotate;
+	p_d3d_Device->SetTransform (D3DTS_VIEW, &matView);
+
+
+
+
+
+
+
+
+
+
+
+	
 
 	for (objMap::iterator it = objs.begin (); it != objs.end (); it++) {
 
