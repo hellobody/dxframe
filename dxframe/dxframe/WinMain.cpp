@@ -342,12 +342,12 @@ void Render ()
 
 	if (keystate [DIK_W] & 0x80) {
 		D3DXMatrixIdentity (&tempM);
-		D3DXVECTOR3 CamAxisZ = D3DXVECTOR3 (matCamRotate._31, matCamRotate._32, matCamRotate._33);
+		D3DXVECTOR3 CamAxisZ = D3DXVECTOR3 (matCamRotate._31, matCamRotate._32, -matCamRotate._33);
 		D3DXVec3Normalize (&CamAxisZ, &CamAxisZ);
 		D3DXMatrixTranslation (&tempM, CamAxisZ.x, CamAxisZ.y, CamAxisZ.z);
 		matCamTraslate *= tempM;
 	}
-	if (keystate [DIK_S] & 0x80) {
+	/*if (keystate [DIK_S] & 0x80) {
 		D3DXMatrixIdentity (&tempM);
 		D3DXVECTOR3 CamAxisZ = D3DXVECTOR3 (matCamRotate._31, matCamRotate._32, matCamRotate._33);
 		D3DXVec3Normalize (&CamAxisZ, &CamAxisZ);
@@ -367,7 +367,7 @@ void Render ()
 		D3DXVec3Normalize (&CamAxisX, &CamAxisX);
 		D3DXMatrixTranslation (&tempM, -CamAxisX.x, CamAxisX.y, CamAxisX.z);
 		matCamTraslate *= tempM;
-	}
+	}*/
 	
 
 	matView = matCamTraslate * matCamRotate;
