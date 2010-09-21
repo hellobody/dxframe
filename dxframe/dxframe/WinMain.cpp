@@ -1,5 +1,4 @@
 #include "WinMain.h"
-#include "TCHAR.h"
 
 HWND hWnd;
 BOOL bActive;
@@ -310,8 +309,6 @@ void Render ()
 	static D3DXVECTOR3 pAt = D3DXVECTOR3 (0,0,0);
 	static D3DXVECTOR3 pUp = D3DXVECTOR3 (0,1,0);
 
-	
-
 	static float ang0 = 0;
 	static float ang1 = 0;
 
@@ -330,23 +327,60 @@ void Render ()
 
 	//положение камеры задается тремя векторами
 
-	D3DXMatrixIdentity (&tempM);
-	D3DXMatrixRotationY (&tempM, -mousestate.lX * .01f);
-	matCamRotate *= tempM;
+	static float Yaw = 0;
+	static float Pitch = 0;
+
+	Yaw -= mousestate.lX * .005f;
+	Pitch -= mousestate.lY * .005f;
+
+	D3DXMatrixIdentity (&matCamRotate);
 
 	D3DXMatrixIdentity (&tempM);
-	D3DXVECTOR3 CamAxisX = D3DXVECTOR3 (matCamRotate._11, matCamRotate._12, matCamRotate._13);
-	D3DXVec3Normalize (&CamAxisX, &CamAxisX);
-	D3DXMatrixRotationAxis (&tempM, &CamAxisX, -mousestate.lY * .01f);
-	matCamRotate *= tempM;
+	D3DXMatrixRotationAxis (&tempM, &D3DXVECTOR3 (0,1,0), Yaw);
+
+	D3DXMatrixIdentity (&tempM2);
+	D3DXMatrixRotationAxis (&tempM2, &D3DXVECTOR3 (matCamRotate._11,matCamRotate._12,matCamRotate._13), Pitch);
+	
+	matCamRotate = tempM * tempM2;
+
+
+	//Pos
+	static D3DXVECTOR3 Pos = D3DXVECTOR3 (0, 0, 400);
+
+	if (keystate [DIK_1] & 0x80) {
+		trace (_T("hello"));
+		trace (matCamRotate._31);
+		trace (matCamRotate._32);
+		trace (matCamRotate._33);
+	}
 
 	if (keystate [DIK_W] & 0x80) {
+		Pos += D3DXVECTOR3 (matCamRotate._31, matCamRotate._32, -matCamRotate._33);
+	}
+	if (keystate [DIK_S] & 0x80) {
+		Pos -= D3DXVECTOR3 (matCamRotate._31, matCamRotate._32, -matCamRotate._33);
+	}
+	if (keystate [DIK_A] & 0x80) {
+		Pos += D3DXVECTOR3 (matCamRotate._11, matCamRotate._12, -matCamRotate._13);
+	}
+	if (keystate [DIK_D] & 0x80) {
+		Pos -= D3DXVECTOR3 (matCamRotate._11, matCamRotate._12, -matCamRotate._13);
+	}
+
+	D3DXMatrixIdentity (&matCamTraslate);
+	D3DXMatrixIdentity (&tempM);
+	D3DXMatrixTranslation (&tempM, Pos.x, Pos.y, Pos.z);
+	matCamTraslate *= tempM;
+	
+	//
+
+	/*if (keystate [DIK_W] & 0x80) {
 		D3DXMatrixIdentity (&tempM);
 		D3DXVECTOR3 CamAxisZ = D3DXVECTOR3 (matCamRotate._31, matCamRotate._32, -matCamRotate._33);
 		D3DXVec3Normalize (&CamAxisZ, &CamAxisZ);
 		D3DXMatrixTranslation (&tempM, CamAxisZ.x, CamAxisZ.y, CamAxisZ.z);
 		matCamTraslate *= tempM;
-	}
+	}*/
 	/*if (keystate [DIK_S] & 0x80) {
 		D3DXMatrixIdentity (&tempM);
 		D3DXVECTOR3 CamAxisZ = D3DXVECTOR3 (matCamRotate._31, matCamRotate._32, matCamRotate._33);
@@ -373,17 +407,6 @@ void Render ()
 	matView = matCamTraslate * matCamRotate;
 	p_d3d_Device->SetTransform (D3DTS_VIEW, &matView);
 
-
-
-
-
-
-
-
-
-
-
-	
 
 	for (objMap::iterator it = objs.begin (); it != objs.end (); it++) {
 
