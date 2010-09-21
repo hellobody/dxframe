@@ -9,6 +9,7 @@
 #include <fstream>
 #include <string>
 #include <map>
+#include "tchar.h"
 
 #pragma comment (lib, "d3d8.lib") 
 #pragma comment (lib, "d3dx8.lib")
@@ -23,6 +24,22 @@
 #define D3DFVF_CUSTOMVERTEX (D3DFVF_XYZ | D3DFVF_NORMAL)
 
 #define forup(x) for (int i=0; i<x; i++)
+
+static void trace (TCHAR *str)
+{
+	TCHAR tStr [500] = _T("");
+	_tcscat_s (tStr, 400, str);
+	_tcscat_s (tStr, 8, _T("\n"));
+	OutputDebugString (tStr);
+}
+
+static void trace (float val)
+{
+	TCHAR tStr [500];
+	_stprintf_s (tStr, _T("%f"), val);
+	_tcscat_s (tStr, 20, _T("f\n"));
+	OutputDebugString (tStr);
+}
 
 #define WIDTH 1024
 #define HEIGHT 768
