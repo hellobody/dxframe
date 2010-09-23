@@ -246,14 +246,14 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 
 	//init materials
 	ZeroMemory (&mtrl1, sizeof(D3DMATERIAL8));
-	mtrl1.Diffuse.r = mtrl1.Ambient.r = 0.0f;
-	mtrl1.Diffuse.g = mtrl1.Ambient.g = 0.0f;
-	mtrl1.Diffuse.b = mtrl1.Ambient.b = 1.0f;
-	mtrl1.Diffuse.a = mtrl1.Ambient.a = 1.0f;
+	mtrl1.Diffuse.r = mtrl1.Ambient.r = 1.0f;
+	mtrl1.Diffuse.g = mtrl1.Ambient.g = 1.0f;
+	mtrl1.Diffuse.b = mtrl1.Ambient.b = 0.0f;
+	mtrl1.Diffuse.a = mtrl1.Ambient.a = 0.5f;
 
 	ZeroMemory (&mtrl2, sizeof(D3DMATERIAL8));
 	mtrl2.Diffuse.r = mtrl1.Ambient.r = 1.0f;
-	mtrl2.Diffuse.g = mtrl1.Ambient.g = 1.0f;
+	mtrl2.Diffuse.g = mtrl1.Ambient.g = 0.0f;
 	mtrl2.Diffuse.b = mtrl1.Ambient.b = 0.0f;
 	mtrl2.Diffuse.a = mtrl1.Ambient.a = 1.0f;
 	//
@@ -325,6 +325,8 @@ void Render ()
 
 	//D3DXMatrixLookAtLH (&matView, &pEye, &pAt, &pUp);
 
+	
+
 	//положение камеры задается тремя векторами
 
 	static float Yaw = 0;
@@ -345,27 +347,24 @@ void Render ()
 
 
 	//Pos
-	static D3DXVECTOR3 Pos = D3DXVECTOR3 (0, 0, 400);
+	static D3DXVECTOR3 Pos = D3DXVECTOR3 (0, -100, 400);
 
-	if (keystate [DIK_1] & 0x80) {
-		trace (_T("hello"));
-		trace (matCamRotate._31);
-		trace (matCamRotate._32);
-		trace (matCamRotate._33);
-	}
+	float speed = 4;
 
 	if (keystate [DIK_W] & 0x80) {
-		Pos += D3DXVECTOR3 (matCamRotate._31, matCamRotate._32, -matCamRotate._33);
+		Pos += D3DXVECTOR3 (matCamRotate._31 * speed, matCamRotate._32 * speed, -matCamRotate._33 * speed);
 	}
 	if (keystate [DIK_S] & 0x80) {
-		Pos -= D3DXVECTOR3 (matCamRotate._31, matCamRotate._32, -matCamRotate._33);
+		Pos -= D3DXVECTOR3 (matCamRotate._31 * speed, matCamRotate._32 * speed, -matCamRotate._33 * speed);
 	}
 	if (keystate [DIK_A] & 0x80) {
-		Pos += D3DXVECTOR3 (matCamRotate._11, matCamRotate._12, -matCamRotate._13);
+		Pos += D3DXVECTOR3 (matCamRotate._11 * speed, 0, -matCamRotate._13 * speed);
 	}
 	if (keystate [DIK_D] & 0x80) {
-		Pos -= D3DXVECTOR3 (matCamRotate._11, matCamRotate._12, -matCamRotate._13);
+		Pos -= D3DXVECTOR3 (matCamRotate._11 * speed, 0, -matCamRotate._13 * speed);
 	}
+
+
 
 	D3DXMatrixIdentity (&matCamTraslate);
 	D3DXMatrixIdentity (&tempM);
@@ -419,9 +418,13 @@ void Render ()
 	p_d3d_Device->Clear (0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB (255, 255, 255), 1.0f, 0);
 	p_d3d_Device->BeginScene ();
 
-	p_d3d_Device->SetMaterial (&mtrl1);
+	
 
+	static bool q = true;
 	for (objMap::iterator it = objs.begin (); it != objs.end (); it++) {
+		q = !q;
+		if (q) p_d3d_Device->SetMaterial (&mtrl1);
+		else p_d3d_Device->SetMaterial (&mtrl2);
 		it->second->Render ();
 	}
 	
