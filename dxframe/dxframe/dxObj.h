@@ -3,8 +3,8 @@
 
 #include "defines.h"
 
-class dxObj
-{
+class dxObj {
+
 public:
 
 	char Name [nameSize];

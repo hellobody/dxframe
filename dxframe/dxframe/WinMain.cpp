@@ -43,6 +43,9 @@ D3DXMATRIX tempM;
 D3DXMATRIX tempM2;
 ///////////////////////////////////////////////////
 
+//new camera
+cCamera camera;
+//
 
 void initDInput (HINSTANCE hInstance, HWND hWnd) {
 	// create the DirectInput interface
@@ -71,16 +74,14 @@ void initDInput (HINSTANCE hInstance, HWND hWnd) {
 }
 
 // this is the function that closes DirectInput
-void cleanDInput ()
-{
+void cleanDInput () {
 	dinkeybd->Unacquire ();    // make sure the keyboard is unacquired
 	dinmouse->Unacquire ();    // make sure the mouse in unacquired
 	din->Release ();    // close DirectInput before exiting
 }
 
 // this is the function that gets the latest input data
-void updateInput ()
-{
+void updateInput () {
 	// get access if we don't have it already
 	dinkeybd->Acquire ();
 	dinmouse->Acquire ();
@@ -174,7 +175,6 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 	if (!fin.fail ()) {
 
 		do {
-
 			obj = new dxObj;
 
 			fin.read ((char *) &obj->Name, nameSize);
@@ -228,7 +228,6 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 			if (!fin.eof ()) {
 				fin.seekg (int (fin.tellg ()) - 1);
 			}
-
 		} while (!fin.eof ());
 		
 		fin.close ();
@@ -268,7 +267,7 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 	light.Diffuse.b  = 1.0f;
 
 	vecDir = D3DXVECTOR3 (0.0f, 0.0f, 1.0f);
-	D3DXVec3Normalize ((D3DXVECTOR3*)&light.Direction, &vecDir);
+	D3DXVec3Normalize ((D3DXVECTOR3*) &light.Direction, &vecDir);
 
 	light.Range = 10000.0f;
 
@@ -300,137 +299,58 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 
 	return true;
 }
-void Render ()
-{
-	//move to Update
+
+void Update () {
 	updateInput ();
 
-	static D3DXVECTOR3 pEye = D3DXVECTOR3 (0,0,-400);
-	static D3DXVECTOR3 pAt = D3DXVECTOR3 (0,0,0);
-	static D3DXVECTOR3 pUp = D3DXVECTOR3 (0,1,0);
-
-	static float ang0 = 0;
-	static float ang1 = 0;
-
-	ang0 += mousestate.lX * .005f;
-	ang1 -= mousestate.lY * .005f;
-
-	if (ang1 > D3DX_PI/2) ang1 = D3DX_PI/2;
-	else if (ang1 < -D3DX_PI/2) ang1 = -D3DX_PI/2;
-
-	D3DXVECTOR3 dir = D3DXVECTOR3 (sin (ang0), sin (ang1), cos (ang0));
-	D3DXVECTOR3 dir2 = D3DXVECTOR3 (cos (ang0), 0, sin (ang0));
-
-	pAt = pEye + dir;
-
-	//D3DXMatrixLookAtLH (&matView, &pEye, &pAt, &pUp);
-
-	
-
-	//положение камеры задается тремя векторами
-
-	static float Yaw = 0;
-	static float Pitch = 0;
-
-	Yaw -= mousestate.lX * .005f;
-	Pitch -= mousestate.lY * .005f;
-
-	D3DXMatrixIdentity (&matCamRotate);
-
-	D3DXMatrixIdentity (&tempM);
-	D3DXMatrixRotationAxis (&tempM, &D3DXVECTOR3 (0,1,0), Yaw);
-
-	D3DXMatrixIdentity (&tempM2);
-	D3DXMatrixRotationAxis (&tempM2, &D3DXVECTOR3 (matCamRotate._11,matCamRotate._12,matCamRotate._13), Pitch);
-	
-	matCamRotate = tempM * tempM2;
-
-
-	//Pos
-	static D3DXVECTOR3 Pos = D3DXVECTOR3 (0, -100, 400);
-
-	float speed = 4;
-
-	if (keystate [DIK_W] & 0x80) {
-		Pos += D3DXVECTOR3 (matCamRotate._31 * speed, matCamRotate._32 * speed, -matCamRotate._33 * speed);
-	}
-	if (keystate [DIK_S] & 0x80) {
-		Pos -= D3DXVECTOR3 (matCamRotate._31 * speed, matCamRotate._32 * speed, -matCamRotate._33 * speed);
-	}
-	if (keystate [DIK_A] & 0x80) {
-		Pos += D3DXVECTOR3 (matCamRotate._11 * speed, 0, -matCamRotate._13 * speed);
-	}
-	if (keystate [DIK_D] & 0x80) {
-		Pos -= D3DXVECTOR3 (matCamRotate._11 * speed, 0, -matCamRotate._13 * speed);
-	}
-
-
-
-	D3DXMatrixIdentity (&matCamTraslate);
-	D3DXMatrixIdentity (&tempM);
-	D3DXMatrixTranslation (&tempM, Pos.x, Pos.y, Pos.z);
-	matCamTraslate *= tempM;
-	
-	//
-
-	/*if (keystate [DIK_W] & 0x80) {
-		D3DXMatrixIdentity (&tempM);
-		D3DXVECTOR3 CamAxisZ = D3DXVECTOR3 (matCamRotate._31, matCamRotate._32, -matCamRotate._33);
-		D3DXVec3Normalize (&CamAxisZ, &CamAxisZ);
-		D3DXMatrixTranslation (&tempM, CamAxisZ.x, CamAxisZ.y, CamAxisZ.z);
-		matCamTraslate *= tempM;
-	}*/
-	/*if (keystate [DIK_S] & 0x80) {
-		D3DXMatrixIdentity (&tempM);
-		D3DXVECTOR3 CamAxisZ = D3DXVECTOR3 (matCamRotate._31, matCamRotate._32, matCamRotate._33);
-		D3DXVec3Normalize (&CamAxisZ, &CamAxisZ);
-		D3DXMatrixTranslation (&tempM, CamAxisZ.x, CamAxisZ.y, -CamAxisZ.z);
-		matCamTraslate *= tempM;
-	}
-	if (keystate [DIK_A] & 0x80) {
-		D3DXMatrixIdentity (&tempM);
-		D3DXVECTOR3 CamAxisX = D3DXVECTOR3 (matCamRotate._11, matCamRotate._12, matCamRotate._13);
-		D3DXVec3Normalize (&CamAxisX, &CamAxisX);
-		D3DXMatrixTranslation (&tempM, CamAxisX.x, CamAxisX.y, CamAxisX.z);
-		matCamTraslate *= tempM;
-	}
-	if (keystate [DIK_D] & 0x80) {
-		D3DXMatrixIdentity (&tempM);
-		D3DXVECTOR3 CamAxisX = D3DXVECTOR3 (matCamRotate._11, matCamRotate._12, matCamRotate._13);
-		D3DXVec3Normalize (&CamAxisX, &CamAxisX);
-		D3DXMatrixTranslation (&tempM, -CamAxisX.x, CamAxisX.y, CamAxisX.z);
-		matCamTraslate *= tempM;
-	}*/
-	
-
-	matView = matCamTraslate * matCamRotate;
-	p_d3d_Device->SetTransform (D3DTS_VIEW, &matView);
-
-
 	for (objMap::iterator it = objs.begin (); it != objs.end (); it++) {
-
-		//it->second->RotateY (D3DX_PI/500);
-		//it->second->Move (mousestate.lX * .5f, -mousestate.lY * .5f, mousestate.lZ * .5f);
 		it->second->Transform ();
 	}
-	//
 
+	////Building camera
+
+	static float Yaw = 0;
+	static float Pitch = D3DX_PI/2;
+
+	D3DXVECTOR3 N (sin (Yaw), sin (Pitch), cos (Yaw) * cos (Pitch));
+
+	D3DXVec3Normalize (&N, &N);
+
+	int a = 0;
+
+	//D3DXVECTOR3 V = N
+
+	matView = matCamRotate;
+
+	///////////////////
+
+	if (keystate [DIK_W] & 0x80) camera.walk (30.f);
+	if (keystate [DIK_S] & 0x80) camera.walk (-30.f);
+	if (keystate [DIK_A] & 0x80) camera.strafe (-30.f);
+	if (keystate [DIK_D] & 0x80) camera.strafe (30.f);
+
+	camera.yaw (mousestate.lX * .01f);
+	camera.pitch (mousestate.lY * .01f);
+
+	matView = camera.getViewMatrix ();
+	p_d3d_Device->SetTransform (D3DTS_VIEW, &matView);
+}
+
+void Render () {
 	p_d3d_Device->Clear (0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB (255, 255, 255), 1.0f, 0);
 	p_d3d_Device->BeginScene ();
 
-	
-
 	static bool q = true;
 	for (objMap::iterator it = objs.begin (); it != objs.end (); it++) {
-		q = !q;
-		if (q) p_d3d_Device->SetMaterial (&mtrl1);
+		if (q = !q) p_d3d_Device->SetMaterial (&mtrl1);
 		else p_d3d_Device->SetMaterial (&mtrl2);
 		it->second->Render ();
 	}
 	
 	p_d3d_Device->EndScene ();
 	p_d3d_Device->Present (NULL, NULL, NULL, NULL);
-};
+}
+
 int APIENTRY WinMain (HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nCmdShow) {
 
 	MSG msg;
@@ -444,6 +364,9 @@ int APIENTRY WinMain (HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR lpCmdLine,
 			if (!GetMessage (&msg, NULL, 0, 0)) break;
 			TranslateMessage (&msg);
 			DispatchMessage (&msg);
-		} else if (bActive) Render ();
+		} else if (bActive) {
+			Render ();
+			Update (); 
+		}
 	} return 0;
 }
