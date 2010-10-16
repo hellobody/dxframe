@@ -1,6 +1,6 @@
 #pragma once
 
-#include "vld.h" //comment me
+//#include "vld.h" //comment me
 #include <time.h>
 #include <d3d8.h>
 #include <d3dx8.h>
@@ -8,6 +8,7 @@
 #include <windows.h>
 #include <fstream>
 #include <string>
+#include <ctime>
 #include <map>
 #include "tchar.h"
 
@@ -25,20 +26,25 @@
 
 #define forup(x) for (int i=0; i<x; i++)
 
-static void trace (TCHAR *str)
-{
+static void trace (TCHAR *str) {
+
 	TCHAR tStr [500] = _T("");
 	_tcscat_s (tStr, 400, str);
 	_tcscat_s (tStr, 8, _T("\n"));
 	OutputDebugString (tStr);
 }
 
-static void trace (float val)
-{
+static void trace (float val) {
+
 	TCHAR tStr [500];
 	_stprintf_s (tStr, _T("%f"), val);
 	_tcscat_s (tStr, 20, _T("f\n"));
 	OutputDebugString (tStr);
+}
+
+static void trace (int val) {
+
+	trace (float (val));
 }
 
 #define WIDTH 1024

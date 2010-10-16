@@ -35,16 +35,37 @@ ifstream fin;							//file input
 objMap objs;						
 dxObj *obj;								//my object
 
-//////////Camera///////////////////////////////////
-D3DXMATRIX matCamScale;
-D3DXMATRIX matCamRotate;
-D3DXMATRIX matCamTraslate;
-D3DXMATRIX tempM;
-D3DXMATRIX tempM2;
-///////////////////////////////////////////////////
-
-//new camera
+//camera
 cCamera camera;
+//
+
+//timer
+float lt = 0; //last clock value
+float ct;	//current clock value
+float dt; //tick size in seconds
+//
+
+//fps
+int fps;
+//
+
+//
+//#include <iostream>
+//#include <cstdio>
+//#include <ctime>
+//
+//int main()
+//{
+//	std::clock_t start;
+//	double diff;
+//
+//	start = std::clock();
+//	for ( int i = 0; i < 1000000; i++ )
+//		printf ( "iamthwee" );
+//	diff = ( std::clock() - start ) / (double)CLOCKS_PER_SEC;
+//
+//	std::cout<<"printf: "<< diff <<'\n';
+//}
 //
 
 void initDInput (HINSTANCE hInstance, HWND hWnd) {
@@ -70,7 +91,7 @@ void initDInput (HINSTANCE hInstance, HWND hWnd) {
 
 	// set the control you will have over the keyboard
 	dinkeybd->SetCooperativeLevel (hWnd, DISCL_NONEXCLUSIVE | DISCL_FOREGROUND);
-	dinmouse->SetCooperativeLevel (hWnd, DISCL_EXCLUSIVE | DISCL_FOREGROUND);
+	dinmouse->SetCooperativeLevel (hWnd, DISCL_NONEXCLUSIVE | DISCL_FOREGROUND);
 }
 
 // this is the function that closes DirectInput
@@ -220,7 +241,7 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 
 			obj->Create (p_d3d_Device, obj->numVerts, obj->numFaces);
 
-			objs.insert (objPair (obj->Name, obj)); //push new model to map 
+			objs.insert (objPair (obj->Name, obj)); //push new model to map
 
 			char endByte;
 			fin.read ((char *) &endByte, 1);
@@ -234,11 +255,9 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 	}
 
 	D3DXMatrixRotationY (&matWorld, 0.0f);
-	D3DXMatrixLookAtLH (&matView, &D3DXVECTOR3 (0.0f, 0.0f, -500.0f), &D3DXVECTOR3 (0.f, 0.f, 0.f), &D3DXVECTOR3 (0.0f, 1.0f, 0.0f));
 	D3DXMatrixPerspectiveFovLH (&matProj, D3DX_PI/2, 4.f/3.f, 1.f, 10000.f); //last two edges of drawing, do not set near val < 1.f
 	//second param - angle of view, third - aspect ratio
 
-	p_d3d_Device->SetTransform (D3DTS_VIEW, &matView);
 	p_d3d_Device->SetTransform (D3DTS_WORLD, &matWorld);
 	p_d3d_Device->SetTransform (D3DTS_PROJECTION, &matProj);
 	p_d3d_Device->SetRenderState (D3DRS_CULLMODE, D3DCULL_CW);
@@ -287,47 +306,39 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 	ShowWindow (hWnd, nCmdShow);
 	UpdateWindow (hWnd);
 
-	//////////Camera///////////////////////////////////
-	D3DXMatrixIdentity (&matCamScale);
-	D3DXMatrixIdentity (&matCamRotate);
-	D3DXMatrixIdentity (&matCamTraslate);
-
-	D3DXMatrixIdentity (&tempM);
-	D3DXMatrixTranslation (&tempM, 0, 0, 400);
-	matCamTraslate *= tempM;
-	///////////////////////////////////////////////////
-
 	return true;
 }
 
 void Update () {
 	updateInput ();
 
+	float ct = (float) clock () / CLOCKS_PER_SEC;
+	dt = ct - lt;
+	lt = ct;
+
+	static int cntFrame = 0;
+	static float oneSec = 0;
+	cntFrame ++;
+	oneSec += dt;
+
+	if (oneSec >= 1.f) {
+
+		fps = cntFrame;
+		cntFrame = 0;
+		oneSec = 0;
+		trace (fps);
+	}
+
 	for (objMap::iterator it = objs.begin (); it != objs.end (); it++) {
 		it->second->Transform ();
 	}
 
-	////Building camera
-
-	static float Yaw = 0;
-	static float Pitch = D3DX_PI/2;
-
-	D3DXVECTOR3 N (sin (Yaw), sin (Pitch), cos (Yaw) * cos (Pitch));
-
-	D3DXVec3Normalize (&N, &N);
-
-	int a = 0;
-
-	//D3DXVECTOR3 V = N
-
-	matView = matCamRotate;
-
 	///////////////////
 
-	if (keystate [DIK_W] & 0x80) camera.walk (30.f);
-	if (keystate [DIK_S] & 0x80) camera.walk (-30.f);
-	if (keystate [DIK_A] & 0x80) camera.strafe (-30.f);
-	if (keystate [DIK_D] & 0x80) camera.strafe (30.f);
+	if (keystate [DIK_W] & 0x80) camera.walk (dt * 100);
+	if (keystate [DIK_S] & 0x80) camera.walk (-dt * 100);
+	if (keystate [DIK_A] & 0x80) camera.strafe (-dt * 100);
+	if (keystate [DIK_D] & 0x80) camera.strafe (dt * 100);
 
 	camera.yaw (mousestate.lX * .01f);
 	camera.pitch (mousestate.lY * .01f);
