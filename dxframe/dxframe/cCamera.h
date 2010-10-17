@@ -15,8 +15,9 @@ public:
 	D3DXVECTOR3 right;
 	D3DXVECTOR3 pos;
 
-	cCamera (eCameraType);
 	cCamera ();
+	cCamera (eCameraType);
+	cCamera (D3DXVECTOR3);
 	~cCamera ();
 
 	void strafe (float);

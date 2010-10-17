@@ -1,12 +1,5 @@
 #include "cCamera.h"
 
-cCamera::cCamera (eCameraType type) {
-	cCamera tCam;
-	*this = tCam;
-
-	this->type = type;
-}
-
 cCamera::cCamera () {
 	type = AIRCRAFT;
 
@@ -14,6 +7,20 @@ cCamera::cCamera () {
 	look = D3DXVECTOR3 (0,0,1);
 	right = D3DXVECTOR3 (1,0,0);
 	pos = D3DXVECTOR3 (0,0,-400);
+}
+
+cCamera::cCamera (eCameraType type) {
+	cCamera tCam;
+	*this = tCam;
+
+	this->type = type;
+}
+
+cCamera::cCamera (D3DXVECTOR3 pos) {
+	cCamera tCam;
+	*this = tCam;
+
+	this->pos = pos;
 }
 
 cCamera::~cCamera () {
