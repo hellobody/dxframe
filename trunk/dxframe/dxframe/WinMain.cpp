@@ -36,7 +36,7 @@ objMap objs;
 dxObj *obj;								//my object
 
 //camera
-cCamera camera;
+cCamera camera (D3DXVECTOR3 (0,0,-10000));
 //
 
 //timer
@@ -255,7 +255,7 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 	}
 
 	D3DXMatrixRotationY (&matWorld, 0.0f);
-	D3DXMatrixPerspectiveFovLH (&matProj, D3DX_PI/2, 4.f/3.f, 1.f, 10000.f); //last two edges of drawing, do not set near val < 1.f
+	D3DXMatrixPerspectiveFovLH (&matProj, D3DX_PI/2, 4.f/3.f, 1.f, 1000000.f); //last two edges of drawing, do not set near val < 1.f
 	//second param - angle of view, third - aspect ratio
 
 	p_d3d_Device->SetTransform (D3DTS_WORLD, &matWorld);
@@ -326,7 +326,6 @@ void Update () {
 		fps = cntFrame;
 		cntFrame = 0;
 		oneSec = 0;
-		trace (fps);
 	}
 
 	for (objMap::iterator it = objs.begin (); it != objs.end (); it++) {
@@ -335,10 +334,22 @@ void Update () {
 
 	///////////////////
 
-	if (keystate [DIK_W] & 0x80) camera.walk (dt * 100);
-	if (keystate [DIK_S] & 0x80) camera.walk (-dt * 100);
-	if (keystate [DIK_A] & 0x80) camera.strafe (-dt * 100);
-	if (keystate [DIK_D] & 0x80) camera.strafe (dt * 100);
+	bool dik_space_pressed = false;
+
+	static float speed = 300;
+
+	if (keystate [DIK_RETURN] & 0x80) speed = 300;
+	if (keystate [DIK_SPACE] & 0x80) {
+		if (!dik_space_pressed && speed < 3000000) {
+			speed *= 10;
+			dik_space_pressed = true;
+		}
+	} else dik_space_pressed = false;
+
+	if (keystate [DIK_W] & 0x80) camera.walk (dt * speed);
+	if (keystate [DIK_S] & 0x80) camera.walk (-dt * speed);
+	if (keystate [DIK_A] & 0x80) camera.strafe (-dt * speed);
+	if (keystate [DIK_D] & 0x80) camera.strafe (dt * speed);
 
 	camera.yaw (mousestate.lX * .01f);
 	camera.pitch (mousestate.lY * .01f);
@@ -348,7 +359,7 @@ void Update () {
 }
 
 void Render () {
-	p_d3d_Device->Clear (0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB (255, 255, 255), 1.0f, 0);
+	p_d3d_Device->Clear (0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB (0, 0, 0), 1.0f, 0);
 	p_d3d_Device->BeginScene ();
 
 	static bool q = true;
