@@ -21,5 +21,5 @@ public:
 	Link ();
 	~Link ();
 
-	bool Transmit ();
+	bool Transmit (float);
 };

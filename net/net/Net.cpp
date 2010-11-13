@@ -2,8 +2,6 @@
 
 Net::Net (int sizeIn, int sizeOut, int numHideLayers)
 {
-	this->numHideLayers = numHideLayers;
-
 	vector <Neuron *> prewLayer;
 
 	forup (sizeIn)
@@ -28,17 +26,17 @@ Net::Net (int sizeIn, int sizeOut, int numHideLayers)
 				Link *tpLink = new Link;
 
 				tpLink->In = prewLayer [k];
-				tpLink->Out = hideLayer [(int) hideLayer->size ()-1];
+				tpLink->Out = (*hideLayer) [(int) hideLayer->size ()-1];
 
 				prewLayer [k]->linksOutput.push_back (tpLink);
-				hideLayer [(int) hideLayer.size ()-1]->linksInput.push_back (tpLink);
+				(*hideLayer) [(int) hideLayer->size ()-1]->linksInput.push_back (tpLink);
 			}
 		}
 
 		pHideLayers.push_back (hideLayer);
 
 		prewLayer.clear ();
-		forupj ((int) hideLayer->size ()) prewLayer.push_back (hideLayer [j]);
+		forupj ((int) hideLayer->size ()) prewLayer.push_back ((*hideLayer) [j]);
 	}
 
 	forup (sizeOut)
@@ -68,11 +66,13 @@ bool Net::Train (vector <float> *DataIn, vector <float> *DataOutExpected)
 	return true;
 }
 
-vector <float> * const Net::Work (vector <float> *DataIn)
+vector <float> const& Net::Work (vector <float> *DataIn)
 {
+	DataOut.clear ();
+
 	forup ((int) inputLayer.size ())
 	{
-		inputLayer [i]->Excitement = DataIn [i];
+		inputLayer [i]->Excitement = (*DataIn) [i];
 	}
 
 	forup ((int) inputLayer.size ())
@@ -82,11 +82,16 @@ vector <float> * const Net::Work (vector <float> *DataIn)
 
 	forup ((int) pHideLayers.size ())
 	{
-		forupj (pHideLayers [i]->size ())
+		forupj ((int) pHideLayers [i]->size ())
 		{
-			pHideLayers [i] [j]->Send ();
+			(*pHideLayers [i]) [j]->Send ();
 		}
 	}
 
-	return &outputLayer;
+	forup ((int) outputLayer.size ())
+	{
+		DataOut.push_back (Neuron::Activation (outputLayer [i]->Excitement));
+	}
+
+	return DataOut;
 }

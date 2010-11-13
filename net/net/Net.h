@@ -4,6 +4,8 @@ class Net
 {
 public:
 
+	vector <float> DataOut;
+
 	vector <Neuron *> inputLayer;
 	vector <Neuron *> outputLayer;
 
@@ -14,5 +16,5 @@ public:
 
 	bool Train (vector <float> *DataIn, vector <float> *DataOutExpected);
 
-	vector <float> * const Work (vector <float> *DataIn);
+	vector <float> const& Work (vector <float> *DataIn);
 };
