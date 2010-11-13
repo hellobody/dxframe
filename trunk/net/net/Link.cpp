@@ -1,8 +1,9 @@
 #include "Link.h"
+#include "Neuron.h"
 
 Link::Link ()
 {
-	Weight = .5f;
+	Weight = 1.f;
 
 	In = NULL;
 	Out = NULL;
@@ -13,11 +14,11 @@ Link::~Link ()
 	
 }
 
-bool Link::Transmit ()
+bool Link::Transmit (float Excitement)
 {
-	if (In && Out)
+	if (Out)
 	{
-		Out->Get (In->Excitement * Weight);
+		Out->Get (Excitement * Weight);
 
 		return true;
 	}

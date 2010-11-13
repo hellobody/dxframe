@@ -19,4 +19,6 @@ public:
 
 	void Get (float);
 	bool Send ();
+
+	static float Activation (float);
 };

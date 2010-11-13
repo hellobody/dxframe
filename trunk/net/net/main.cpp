@@ -5,23 +5,16 @@ using namespace std;
 
 void main ()
 {
-	Net net (10, 2, 2);
+	Net net (3, 3, 2);
 
 	vector <float> dataIn;
-	vector <float> *dataOut;
+	vector <float> *dataOut = NULL;
 
-	data.push_back (.1f);
-	data.push_back (.2f);
-	data.push_back (.3f);
-	data.push_back (.4f);
-	data.push_back (.5f);
-	data.push_back (.6f);
-	data.push_back (.7f);
-	data.push_back (.8f);
-	data.push_back (.9f);
-	data.push_back (1.f);
+	dataIn.push_back (.1f);
+	dataIn.push_back (0);
+	dataIn.push_back (.1f);
 
-	dataOut = net.Work (&data);
+	net.Work (&dataIn);
 
 	int a = 0;
 }
