@@ -9,7 +9,8 @@ class Neuron
 {
 public:
 
-	vector <Link *> links; 
+	vector <Link *> linksInput;
+	vector <Link *> linksOutput;
 
 	Neuron ();
 	~Neuron ();
