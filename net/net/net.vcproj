@@ -175,7 +175,19 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\Link.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\main.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Net.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Neuron.cpp"
 				>
 			</File>
 		</Filter>
@@ -184,6 +196,18 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath=".\Link.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Net.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Neuron.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
