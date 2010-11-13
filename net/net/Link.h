@@ -20,4 +20,6 @@ public:
 
 	Link ();
 	~Link ();
+
+	bool Transmit ();
 };
