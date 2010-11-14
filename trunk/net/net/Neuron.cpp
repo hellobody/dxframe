@@ -9,9 +9,15 @@ float Neuron::Activation (float Y)
 	return X;
 }
 
-Neuron::Neuron ()
+Neuron::Neuron (bool Input)
 {
+	this->Input = Input;
+
 	Excitement = 0.f;
+
+	Out = 0.f;
+
+	d = 0.f;
 }
 
 Neuron::~Neuron ()
@@ -30,7 +36,9 @@ bool Neuron::Send ()
 	{
 		if (linksOutput [i])
 		{
-			linksOutput [i]->Transmit (Activation (Excitement));
+			Out = Input ? Excitement : Activation (Excitement);
+
+			linksOutput [i]->Transmit (Out);
 		}
 		else return false;
 	}

@@ -14,7 +14,7 @@ public:
 	Net (int sizeIn = 3, int sizeOut = 3, int numHideLayers = 2);
 	~Net ();
 
-	bool Train (vector <float> *DataIn, vector <float> *DataOutExpected);
+	void Train (vector <float> *DataIn, vector <float> *DataOutExpect);
 
 	vector <float> const& Work (vector <float> *DataIn);
 };
