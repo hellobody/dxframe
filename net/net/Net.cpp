@@ -97,6 +97,10 @@ void Net::Train (vector <float> *DataIn, vector <float> *DataOutExpect)
 			(*pHideLayers [(int) pHideLayers.size ()-1 - i]) [j]->d = Out * (1.f - Out) * E;
 
 
+			forupk ((int) (*pHideLayers [(int) pHideLayers.size ()-1 - i]) [j]->linksInput.size ())
+			{
+				(*pHideLayers [(int) pHideLayers.size ()-1 - i]) [j]->linksInput [k]->Weight += n * (*pHideLayers [(int) pHideLayers.size ()-1 - i]) [j]->d * (*pHideLayers [(int) pHideLayers.size ()-1 - i]) [j]->linksInput [k]->In->Out;
+			}
 		}
 	}
 
