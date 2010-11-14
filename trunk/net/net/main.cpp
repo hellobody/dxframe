@@ -5,22 +5,41 @@ using namespace std;
 
 void main ()
 {
-	Net net (3, 3, 2);
+	Net net (2, 2, 5);
 
-	vector <float> dataIn;
-	vector <float> dataOutExpect;
+	vector <float> problem0;
+	vector <float> problem1;
+	vector <float> problem2;
+	vector <float> solution0;
+	vector <float> solution1;
+	vector <float> solution2;
+	vector <float> work;
 
-	dataIn.push_back (1);
-	dataIn.push_back (0);
-	dataIn.push_back (0);
+	/////////////////////////////////////////////////
+	problem0.push_back (1);
+	problem0.push_back (0);
+	solution0.push_back (0);
+	solution0.push_back (1);
+	/////////////////////////////////////////////////
 
-	dataOutExpect.push_back (0);
-	dataOutExpect.push_back (1);
-	dataOutExpect.push_back (1);
+	net.Train (&problem0, &solution0);
 
-	net.Train (&dataIn, &dataOutExpect);
+	net.Train (&problem0, &solution0);
 
-	net.Work (&dataIn);
+	net.Train (&problem0, &solution0);
+
+	net.Train (&problem0, &solution0);
+
+	net.Train (&problem0, &solution0);
+
+	net.Train (&problem0, &solution0);
+
+	net.Train (&problem0, &solution0);
+
+	work.push_back (0);
+	work.push_back (1);
+
+	net.Work (&work);
 
 	int a = 0;
 }
