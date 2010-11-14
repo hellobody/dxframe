@@ -1,6 +1,6 @@
 #include "Net.h"
 
-static float n = 10.f;
+static float n = 1.f;
 
 Net::Net (int sizeIn, int sizeOut, int numHideLayers)
 {
@@ -103,9 +103,6 @@ void Net::Train (vector <float> *DataIn, vector <float> *DataOutExpect)
 			}
 		}
 	}
-
-
-	int a = 0;
 }
 
 vector <float> const& Net::Work (vector <float> *DataIn)

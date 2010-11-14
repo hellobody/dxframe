@@ -3,7 +3,7 @@
 
 Link::Link ()
 {
-	Weight = 1.f;
+	Weight = 0.f;
 
 	In = NULL;
 	Out = NULL;
