@@ -1,12 +1,14 @@
 #include "Net.h"
 
+static float n = 10.f;
+
 Net::Net (int sizeIn, int sizeOut, int numHideLayers)
 {
 	vector <Neuron *> prewLayer;
 
 	forup (sizeIn)
 	{
-		inputLayer.push_back (new Neuron);
+		inputLayer.push_back (new Neuron (true));
 	}
 
 	forup ((int) inputLayer.size ()) prewLayer.push_back (inputLayer [i]);
@@ -61,9 +63,45 @@ Net::~Net ()
 
 }
 
-bool Net::Train (vector <float> *DataIn, vector <float> *DataOutExpected)
+void Net::Train (vector <float> *DataIn, vector <float> *DataOutExpect)
 {
-	return true;
+	vector <float> Out;
+	
+	Out = Work (DataIn);
+
+	forup ((int) Out.size ())
+	{
+		outputLayer [i]->d = Out [i] * (1.f - Out [i]) * ((*DataOutExpect) [i] - Out [i]);
+	}
+
+	forup ((int) outputLayer.size ())
+	{
+		forupj ((int) outputLayer [i]->linksInput.size ())
+		{
+			outputLayer [i]->linksInput [j]->Weight += n * outputLayer [i]->d * outputLayer [i]->linksInput [j]->In->Out;
+		}
+	}
+
+	forup ((int) pHideLayers.size ())
+	{
+		forupj ((int) (*pHideLayers [(int) pHideLayers.size ()-1 - i]).size ())
+		{
+			float E = 0;
+
+			forupk ((int) (*pHideLayers [(int) pHideLayers.size ()-1 - i]) [j]->linksOutput.size ())
+			{
+				E += (*pHideLayers [(int) pHideLayers.size ()-1 - i]) [j]->linksOutput [k]->Out->d * (*pHideLayers [(int) pHideLayers.size ()-1 - i]) [j]->linksOutput [k]->Weight;
+			}
+
+			float Out = (*pHideLayers [(int) pHideLayers.size ()-1 - i]) [j]->Out;
+			(*pHideLayers [(int) pHideLayers.size ()-1 - i]) [j]->d = Out * (1.f - Out) * E;
+
+
+		}
+	}
+
+
+	int a = 0;
 }
 
 vector <float> const& Net::Work (vector <float> *DataIn)
