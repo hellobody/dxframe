@@ -32,11 +32,11 @@ D3DMATERIAL8 mtrl2;
 D3DLIGHT8 light;
 
 ifstream fin;							//file input
-objMap objs;						
+objMap objs;
 dxObj *obj;								//my object
 
 //camera
-cCamera camera (D3DXVECTOR3 (0,0,-10000));
+cCamera camera (D3DXVECTOR3 (0, 0, -250));
 //
 
 //timer
@@ -81,7 +81,7 @@ void initDInput (HINSTANCE hInstance, HWND hWnd) {
 		&dinkeybd,    // the pointer to the device interface
 		NULL);    // COM stuff, so we'll set it to NULL
 
-	din->CreateDevice(GUID_SysMouse,
+	din->CreateDevice (GUID_SysMouse,
 		&dinmouse,
 		NULL);
 
@@ -225,7 +225,7 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 			p_d3d_Device->CreateVertexBuffer (obj->numVerts * sizeof (CUSTOMVERTEX), 0, D3DFVF_CUSTOMVERTEX, D3DPOOL_MANAGED, &p_VertexBuffer);
 
 			VOID * pVertices;
-			p_VertexBuffer->Lock (0, obj->numVerts * sizeof (CUSTOMVERTEX), (BYTE**)&pVertices, 0);
+			p_VertexBuffer->Lock (0, obj->numVerts * sizeof (CUSTOMVERTEX), (BYTE **) &pVertices, 0);
 			memcpy (pVertices, g_Vertices, obj->numVerts * sizeof (CUSTOMVERTEX));
 			p_VertexBuffer->Unlock ();
 
@@ -255,7 +255,7 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 	}
 
 	D3DXMatrixRotationY (&matWorld, 0.0f);
-	D3DXMatrixPerspectiveFovLH (&matProj, D3DX_PI/2, 4.f/3.f, 1.f, 1000000.f); //last two edges of drawing, do not set near val < 1.f
+	D3DXMatrixPerspectiveFovLH (&matProj, D3DX_PI/2, 4.f/3.f, 1.f, 10000.f); //last two edges of drawing, do not set near val < 1.f
 	//second param - angle of view, third - aspect ratio
 
 	p_d3d_Device->SetTransform (D3DTS_WORLD, &matWorld);
@@ -263,13 +263,13 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 	p_d3d_Device->SetRenderState (D3DRS_CULLMODE, D3DCULL_CW);
 
 	//init materials
-	ZeroMemory (&mtrl1, sizeof(D3DMATERIAL8));
+	ZeroMemory (&mtrl1, sizeof (D3DMATERIAL8));
 	mtrl1.Diffuse.r = mtrl1.Ambient.r = 1.0f;
 	mtrl1.Diffuse.g = mtrl1.Ambient.g = 1.0f;
 	mtrl1.Diffuse.b = mtrl1.Ambient.b = 0.0f;
 	mtrl1.Diffuse.a = mtrl1.Ambient.a = 0.5f;
 
-	ZeroMemory (&mtrl2, sizeof(D3DMATERIAL8));
+	ZeroMemory (&mtrl2, sizeof (D3DMATERIAL8));
 	mtrl2.Diffuse.r = mtrl1.Ambient.r = 1.0f;
 	mtrl2.Diffuse.g = mtrl1.Ambient.g = 0.0f;
 	mtrl2.Diffuse.b = mtrl1.Ambient.b = 0.0f;
@@ -278,14 +278,14 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 
 	//init light
 	D3DXVECTOR3 vecDir;
-	ZeroMemory (&light, sizeof(D3DLIGHT8));
+	ZeroMemory (&light, sizeof (D3DLIGHT8));
 	light.Type = D3DLIGHT_DIRECTIONAL;
 
 	light.Diffuse.r  = 1.0f;
 	light.Diffuse.g  = 1.0f;
 	light.Diffuse.b  = 1.0f;
 
-	vecDir = D3DXVECTOR3 (0.0f, 0.0f, 1.0f);
+	vecDir = D3DXVECTOR3 (0.0f, -1.0f, 0.0f);
 	D3DXVec3Normalize ((D3DXVECTOR3*) &light.Direction, &vecDir);
 
 	light.Range = 10000.0f;
@@ -338,10 +338,10 @@ void Update () {
 
 	static float speed = 300;
 
-	if (keystate [DIK_RETURN] & 0x80) speed = 300;
+	if (keystate [DIK_RETURN] & 0x80) speed = 30000;
 	if (keystate [DIK_SPACE] & 0x80) {
 		if (!dik_space_pressed && speed < 3000000) {
-			speed *= 10;
+			speed *= 2;
 			dik_space_pressed = true;
 		}
 	} else dik_space_pressed = false;
