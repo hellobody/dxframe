@@ -28,6 +28,8 @@ D3DXMATRIX matProj;
 D3DMATERIAL8 mtrl1;
 D3DMATERIAL8 mtrl2;
 
+LPDIRECT3DTEXTURE8 tex1;	//the pointer to texture
+
 //light
 D3DLIGHT8 light;
 
@@ -274,6 +276,10 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 	mtrl2.Diffuse.g = mtrl1.Ambient.g = 0.0f;
 	mtrl2.Diffuse.b = mtrl1.Ambient.b = 0.0f;
 	mtrl2.Diffuse.a = mtrl1.Ambient.a = 1.0f;
+	//
+
+	//load textures
+	D3DXCreateTextureFromFile (p_d3d_Device, _T("data\\test.jpg"), &tex1);
 	//
 
 	//init light

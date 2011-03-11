@@ -22,7 +22,7 @@
 #define DEL(p) {if (p) {delete (p); (p) = NULL;}}
 
 #define D3DFVF_3DPNT (D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1)
-#define D3DFVF_CUSTOMVERTEX (D3DFVF_XYZ | D3DFVF_NORMAL)
+#define D3DFVF_CUSTOMVERTEX (D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1)
 
 #define forup(x) for (int i=0; i<x; i++)
 
@@ -62,14 +62,16 @@ typedef map <string, dxObj*> objMap;
 struct CUSTOMVERTEX { 
 
 	CUSTOMVERTEX () {}
-	float x, y, z, nx, ny, nz;
-	CUSTOMVERTEX (float x, float y, float z, float nx, float ny, float nz) {
+	float x, y, z, nx, ny, nz, tu, tv;
+	CUSTOMVERTEX (float x, float y, float z, float nx, float ny, float nz, float tu, float tv) {
 		this->x = x;
 		this->y = y;
 		this->z = z;
 		this->nx = nx;
 		this->ny = ny;
 		this->nz = nz;
+		this->tu = tu;
+		this->tv = tv;
 	}
 };
 
@@ -77,5 +79,5 @@ struct VERTEX_3DPNT {
 
 	D3DXVECTOR3 position; 
 	D3DXVECTOR3 normal; 
-	//D3DXVECTOR2 texture; 
+	D3DXVECTOR2 texture; 
 };
