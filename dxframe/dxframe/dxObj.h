@@ -42,7 +42,7 @@ public:
 	void RotateZ (float);
 
 	void Transform ();
-	void Render ();
+	void Render (D3DMATERIAL8 tempMtrl, LPDIRECT3DTEXTURE8 tempTex);
 };
 
 #endif

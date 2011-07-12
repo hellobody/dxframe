@@ -30,7 +30,7 @@ static void trace (TCHAR *str) {
 
 	TCHAR tStr [500] = _T("");
 	_tcscat_s (tStr, 400, str);
-	_tcscat_s (tStr, 8, _T("\n"));
+	_tcscat_s (tStr, 100, _T("\\n"));
 	OutputDebugString (tStr);
 }
 

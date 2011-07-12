@@ -41,15 +41,16 @@ void dxObj::Create (LPDIRECT3DDEVICE8 d3d_device, int numVerts, int numFaces) {
 	///////////////////////////////////////////////////////////////////////////
 	//temporary, rewrite it////////////////////////////////////////////////////
 	forup (numVerts) {
-		pOriginalVerts[i].position.x = pVertsWithNormals[i*6];
-		pOriginalVerts[i].position.y = pVertsWithNormals[i*6+1];
-		pOriginalVerts[i].position.z = pVertsWithNormals[i*6+2];
+		pOriginalVerts[i].position.x = pVertsWithNormals[i*8];
+		pOriginalVerts[i].position.y = pVertsWithNormals[i*8+1];
+		pOriginalVerts[i].position.z = pVertsWithNormals[i*8+2];
 
-		pOriginalVerts[i].normal.x = pVertsWithNormals[i*6+3];
-		pOriginalVerts[i].normal.y = pVertsWithNormals[i*6+4];
-		pOriginalVerts[i].normal.z = pVertsWithNormals[i*6+5];
+		pOriginalVerts[i].normal.x = pVertsWithNormals[i*8+3];
+		pOriginalVerts[i].normal.y = pVertsWithNormals[i*8+4];
+		pOriginalVerts[i].normal.z = pVertsWithNormals[i*8+5];
 
-		//pOriginalVerts[i].texture
+		pOriginalVerts[i].texture.x = pVertsWithNormals[i*8+6];
+		pOriginalVerts[i].texture.y = pVertsWithNormals[i*8+7];
 	}
 
 	void *tPointer;
@@ -109,10 +110,16 @@ void dxObj::Transform () {
 	p_VertexBuffer->Unlock ();
 }
 
-void dxObj::Render () {
+void dxObj::Render (D3DMATERIAL8 tempMtrl, LPDIRECT3DTEXTURE8 tempTex) {
 
 	using_d3d_Device->SetVertexShader (D3DFVF_CUSTOMVERTEX);
 	using_d3d_Device->SetStreamSource (0, p_VertexBuffer, sizeof (CUSTOMVERTEX));
 	using_d3d_Device->SetIndices (p_IndexBuffer, 0);
+
+	//using_d3d_Device->SetMaterial (&tempMtrl);
+	using_d3d_Device->SetTexture (0, tempTex);
+	using_d3d_Device->SetTextureStageState (0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+	using_d3d_Device->SetTextureStageState (0, D3DTSS_COLOROP,   D3DTOP_SELECTARG1);
+	
 	using_d3d_Device->DrawIndexedPrimitive (D3DPT_TRIANGLELIST, 0, numVerts, 0, numFaces);
 }
