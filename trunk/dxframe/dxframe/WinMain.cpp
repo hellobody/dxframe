@@ -28,7 +28,7 @@ D3DXMATRIX matProj;
 D3DMATERIAL8 mtrl1;
 D3DMATERIAL8 mtrl2;
 
-LPDIRECT3DTEXTURE8 tex1;	//the pointer to texture
+LPDIRECT3DTEXTURE8 tex1 = NULL;	//the pointer to texture
 
 //light
 D3DLIGHT8 light;
@@ -126,6 +126,7 @@ LRESULT CALLBACK WindowProc (HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			RELEASE (p_VertexBuffer);
 			RELEASE (p_d3d_Device);
 			RELEASE (p_d3d);
+			RELEASE (tex1);
 			
 			cleanDInput ();
 
@@ -204,42 +205,64 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 			fin.read ((char *) &obj->numVerts, 4);
 			fin.read ((char *) &obj->numFaces, 4);
 
-			obj->pVertsWithNormals = new float [obj->numVerts * 3 * 2]; //because verts with normals
+			obj->pVertsWithNormals = new float [obj->numVerts * (3 * 2 + 2)]; //because verts with normals + texture coord
 
-			forup (obj->numVerts * 3 * 2) {
-				fin.read ((char *) &obj->pVertsWithNormals[i], 4);
+			//читаем, пропуская место для текстурных координат
+			int cnt = 0;
+			forup (obj->numVerts * (3 * 2 + 2)) {
+
+				if (cnt != 6 && cnt != 7)
+				{
+					fin.read ((char *) &obj->pVertsWithNormals[i], 4);
+				}
+				
+				//потом заменить это на настоящее чтение текстурных координат
+				
+				if (cnt == 6) obj->pVertsWithNormals[i] = 0;
+				if (cnt == 7) obj->pVertsWithNormals[i] = 0;
+
+				cnt ++;
+				if (cnt == 8) cnt = 0;
 			}
 
-			obj->pFaces = new int [obj->numFaces * 3]; 
+			obj->pFaces = new int [obj->numFaces * 3];
 
 			forup (obj->numFaces * 3) {
 				fin.read ((char *) &obj->pFaces[i], 4);
 			}
 
 			//Read vertexes
-			CUSTOMVERTEX *g_Vertices;
-			g_Vertices = new CUSTOMVERTEX [obj->numVerts];
-			forup (obj->numVerts) {
-				g_Vertices[i] = CUSTOMVERTEX (obj->pVertsWithNormals[i*6], obj->pVertsWithNormals[i*6+1], obj->pVertsWithNormals[i*6+2], obj->pVertsWithNormals[i*6+3], obj->pVertsWithNormals[i*6+4], obj->pVertsWithNormals[i*6+5]);
-			}
+			//CUSTOMVERTEX *g_Vertices;
+			//g_Vertices = new CUSTOMVERTEX [obj->numVerts];
+			//forup (obj->numVerts) {
+			//	g_Vertices[i] = CUSTOMVERTEX (	obj->pVertsWithNormals[i*6], 
+			//									obj->pVertsWithNormals[i*6+1],
+			//									obj->pVertsWithNormals[i*6+2],
+			//									obj->pVertsWithNormals[i*6+3],
+			//									obj->pVertsWithNormals[i*6+4],
+			//									obj->pVertsWithNormals[i*6+5],
+			//									obj->pVertsWithNormals[i*6+6],			//texture coordinate
+			//									obj->pVertsWithNormals[i*6+7]			//texture coordinate
+			//																	);
+			//}
 
-			//Create vertex buffer
-			p_d3d_Device->CreateVertexBuffer (obj->numVerts * sizeof (CUSTOMVERTEX), 0, D3DFVF_CUSTOMVERTEX, D3DPOOL_MANAGED, &p_VertexBuffer);
+			////Create vertex buffer
+			//p_d3d_Device->CreateVertexBuffer (obj->numVerts * sizeof (CUSTOMVERTEX), 0, D3DFVF_CUSTOMVERTEX, D3DPOOL_MANAGED, &p_VertexBuffer);
 
-			VOID * pVertices;
-			p_VertexBuffer->Lock (0, obj->numVerts * sizeof (CUSTOMVERTEX), (BYTE **) &pVertices, 0);
-			memcpy (pVertices, g_Vertices, obj->numVerts * sizeof (CUSTOMVERTEX));
-			p_VertexBuffer->Unlock ();
+			//VOID * pVertices;
+			//p_VertexBuffer->Lock (0, obj->numVerts * sizeof (CUSTOMVERTEX), (BYTE **) &pVertices, 0);
+			//memcpy (pVertices, g_Vertices, obj->numVerts * sizeof (CUSTOMVERTEX));
+			//p_VertexBuffer->Unlock ();
 
-			DELA (g_Vertices);
+			//DELA (g_Vertices);
 
-			//Create index buffer
-			p_d3d_Device->CreateIndexBuffer (obj->numFaces * 12, 0, D3DFMT_INDEX32, D3DPOOL_MANAGED, &p_IndexBuffer);
+			////Create index buffer
+			//p_d3d_Device->CreateIndexBuffer (obj->numFaces * 12, 0, D3DFMT_INDEX32, D3DPOOL_MANAGED, &p_IndexBuffer);
 
-			VOID* pVerticesI;
-			p_IndexBuffer->Lock (0, obj->numFaces * 12, (BYTE**)&pVerticesI, 0);
-			memcpy (pVerticesI, obj->pFaces, obj->numFaces * 12);
-			p_IndexBuffer->Unlock();
+			//VOID* pVerticesI;
+			//p_IndexBuffer->Lock (0, obj->numFaces * 12, (BYTE**)&pVerticesI, 0);
+			//memcpy (pVerticesI, obj->pFaces, obj->numFaces * 12);
+			//p_IndexBuffer->Unlock();
 
 			obj->Create (p_d3d_Device, obj->numVerts, obj->numFaces);
 
@@ -268,18 +291,14 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 	ZeroMemory (&mtrl1, sizeof (D3DMATERIAL8));
 	mtrl1.Diffuse.r = mtrl1.Ambient.r = 1.0f;
 	mtrl1.Diffuse.g = mtrl1.Ambient.g = 1.0f;
-	mtrl1.Diffuse.b = mtrl1.Ambient.b = 0.0f;
-	mtrl1.Diffuse.a = mtrl1.Ambient.a = 0.5f;
+	mtrl1.Diffuse.b = mtrl1.Ambient.b = 1.0f;
+	mtrl1.Diffuse.a = mtrl1.Ambient.a = 1.0f;
 
 	ZeroMemory (&mtrl2, sizeof (D3DMATERIAL8));
 	mtrl2.Diffuse.r = mtrl1.Ambient.r = 1.0f;
 	mtrl2.Diffuse.g = mtrl1.Ambient.g = 0.0f;
 	mtrl2.Diffuse.b = mtrl1.Ambient.b = 0.0f;
 	mtrl2.Diffuse.a = mtrl1.Ambient.a = 1.0f;
-	//
-
-	//load textures
-	D3DXCreateTextureFromFile (p_d3d_Device, _T("data\\test.jpg"), &tex1);
 	//
 
 	//init light
@@ -298,13 +317,22 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 
 	p_d3d_Device->SetLight (0, &light);
 	p_d3d_Device->LightEnable (0, true);
-
+	
 	p_d3d_Device->SetRenderState (D3DRS_LIGHTING, true);
 	p_d3d_Device->SetRenderState (D3DRS_AMBIENT, 0);
 	//
 	
 	//for Z-buffer
 	p_d3d_Device->SetRenderState (D3DRS_ZENABLE, D3DZB_TRUE);
+	//
+
+	
+
+	//load textures
+	if (S_OK != D3DXCreateTextureFromFile (p_d3d_Device, _T("data\\test.jpg"), &tex1))
+	{
+		int _break = 0;
+	}
 	//
 
 	initDInput (hThisInst, hWnd);
@@ -370,9 +398,9 @@ void Render () {
 
 	static bool q = true;
 	for (objMap::iterator it = objs.begin (); it != objs.end (); it++) {
-		if (q = !q) p_d3d_Device->SetMaterial (&mtrl1);
-		else p_d3d_Device->SetMaterial (&mtrl2);
-		it->second->Render ();
+		/*if (q = !q) p_d3d_Device->SetMaterial (&mtrl1);
+		else p_d3d_Device->SetMaterial (&mtrl2);*/
+		it->second->Render (mtrl1, tex1);
 	}
 	
 	p_d3d_Device->EndScene ();
