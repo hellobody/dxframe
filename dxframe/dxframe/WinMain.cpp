@@ -207,22 +207,8 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 
 			obj->pVertsWithNormals = new float [obj->numVerts * (3 * 2 + 2)]; //because verts with normals + texture coord
 
-			//читаем, пропуская место для текстурных координат
-			int cnt = 0;
 			forup (obj->numVerts * (3 * 2 + 2)) {
-
-				if (cnt != 6 && cnt != 7)
-				{
-					fin.read ((char *) &obj->pVertsWithNormals[i], 4);
-				}
-				
-				//потом заменить это на настоящее чтение текстурных координат
-				
-				if (cnt == 6) obj->pVertsWithNormals[i] = 0;
-				if (cnt == 7) obj->pVertsWithNormals[i] = 0;
-
-				cnt ++;
-				if (cnt == 8) cnt = 0;
+				fin.read ((char *) &obj->pVertsWithNormals[i], 4);
 			}
 
 			obj->pFaces = new int [obj->numFaces * 3];
@@ -280,7 +266,12 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 	}
 
 	D3DXMatrixRotationY (&matWorld, 0.0f);
-	D3DXMatrixPerspectiveFovLH (&matProj, D3DX_PI/2, 4.f/3.f, 1.f, 10000.f); //last two edges of drawing, do not set near val < 1.f
+
+	//if need ortographic camera
+	D3DXMatrixOrthoLH (&matProj, WIDTH, HEIGHT, -10000, 10000);	//turn on orthographic camera
+	//else
+	//D3DXMatrixPerspectiveFovLH (&matProj, D3DX_PI/2, 4.f/3.f, 1.f, 10000.f); //last two edges of drawing, do not set near val < 1.f
+	
 	//second param - angle of view, third - aspect ratio
 
 	p_d3d_Device->SetTransform (D3DTS_WORLD, &matWorld);
