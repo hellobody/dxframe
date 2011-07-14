@@ -96,6 +96,11 @@ void SceneSaver::ProcNode(INode *node)
 		fout.write ((char *) &v.x, 4);
 		fout.write ((char *) &v.z, 4);
 		fout.write ((char *) &v.y, 4);
+
+		//write texture coordinates
+		v = TObj->mesh.tVerts [i];
+		fout.write ((char *) &v.x, 4);
+		fout.write ((char *) &v.y, 4);
 	}
 
 	for (int i = 0; i < TObj->mesh.numFaces; i++)
