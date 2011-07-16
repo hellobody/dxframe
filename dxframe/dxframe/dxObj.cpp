@@ -3,6 +3,13 @@
 
 dxObj::dxObj () {
 
+	using_d3d_Device = NULL;
+	p_IndexBuffer = NULL;
+	p_VertexBuffer = NULL;
+
+	pOriginalVerts = NULL;
+	pTransformedVerts = NULL;
+
 	numVerts = 0;
 	numFaces = 0;
 	numTVerts = 0;
@@ -24,6 +31,11 @@ dxObj::~dxObj () {
 
 void dxObj::Create (LPDIRECT3DDEVICE8 d3d_device, int numVerts, int numFaces) {
 
+	if (d3d_device == NULL) {
+		trace (_T("Direct3D device pointer is NULL."));
+		return;
+	}
+	
 	using_d3d_Device = d3d_device; //pointer to d3d device
 	pOriginalVerts = new VERTEX_3DPNT [numVerts];
 	pTransformedVerts = new VERTEX_3DPNT [numVerts];
@@ -116,7 +128,6 @@ void dxObj::Render (D3DMATERIAL8 tempMtrl, LPDIRECT3DTEXTURE8 tempTex) {
 	using_d3d_Device->SetStreamSource (0, p_VertexBuffer, sizeof (CUSTOMVERTEX));
 	using_d3d_Device->SetIndices (p_IndexBuffer, 0);
 
-	//using_d3d_Device->SetMaterial (&tempMtrl);
 	using_d3d_Device->SetTexture (0, tempTex);
 	using_d3d_Device->SetTextureStageState (0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
 	using_d3d_Device->SetTextureStageState (0, D3DTSS_COLOROP,   D3DTOP_SELECTARG1);

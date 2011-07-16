@@ -18,7 +18,7 @@ public:
 
 	int numVerts;	//number of vertex
 	int numFaces;	//number of primitives
-	int numTVerts;	//number of texture vertexes
+	int numTVerts;	//number of texture vertexes	//?
 	
 	D3DXMATRIX transformM;	//transformation matrix
 	D3DXMATRIX rotationM;	//rotation matrix
