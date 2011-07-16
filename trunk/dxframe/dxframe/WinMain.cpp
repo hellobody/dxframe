@@ -5,9 +5,9 @@ BOOL bActive;
 LPCWSTR APPNAME = L"dxframe";
 LPCWSTR APPTITLE = L"dxframe";
 
-LPDIRECTINPUT8 din;    // the pointer to our DirectInput interface
-LPDIRECTINPUTDEVICE8 dinkeybd;    // the pointer to the keyboard device
-LPDIRECTINPUTDEVICE8 dinmouse;    // the pointer to the mouse device
+LPDIRECTINPUT8 din = NULL;    // the pointer to our DirectInput interface
+LPDIRECTINPUTDEVICE8 dinkeybd = NULL;    // the pointer to the keyboard device
+LPDIRECTINPUTDEVICE8 dinmouse = NULL;    // the pointer to the mouse device
 
 DIMOUSESTATE mousestate;    // the storage for the mouse-information
 BYTE keystate [256];    // the storage for the key-information
@@ -49,25 +49,6 @@ float dt; //tick size in seconds
 
 //fps
 int fps;
-//
-
-//
-//#include <iostream>
-//#include <cstdio>
-//#include <ctime>
-//
-//int main()
-//{
-//	std::clock_t start;
-//	double diff;
-//
-//	start = std::clock();
-//	for ( int i = 0; i < 1000000; i++ )
-//		printf ( "iamthwee" );
-//	diff = ( std::clock() - start ) / (double)CLOCKS_PER_SEC;
-//
-//	std::cout<<"printf: "<< diff <<'\n';
-//}
 //
 
 void initDInput (HINSTANCE hInstance, HWND hWnd) {
@@ -114,6 +95,8 @@ void updateInput () {
 	dinmouse->GetDeviceState (sizeof (DIMOUSESTATE), (LPVOID) &mousestate);
 }
 
+void Destroy ();
+
 LRESULT CALLBACK WindowProc (HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
 
 	switch (message) {
@@ -123,24 +106,14 @@ LRESULT CALLBACK WindowProc (HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			break;
 
 		case WM_DESTROY:
-			RELEASE (p_VertexBuffer);
-			RELEASE (p_d3d_Device);
-			RELEASE (p_d3d);
-			RELEASE (tex1);
-			
-			cleanDInput ();
-
-			for (objMap::iterator it = objs.begin (); it != objs.end (); it++)
-			{
-				DEL (it->second);
-			}
-
+			Destroy ();
 			PostQuitMessage (0);
 			break;
 
 		case WM_SETCURSOR:
 			SetCursor (NULL);
 			break;
+
 	} return DefWindowProc (hWnd, message, wParam, lParam);
 }
 
@@ -171,7 +144,11 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 
 	if (!WindowInit (hThisInst, nCmdShow)) return false; //init window
 
-	p_d3d = Direct3DCreate8 (D3D_SDK_VERSION); //creating main interface
+	if ((p_d3d = Direct3DCreate8 (D3D_SDK_VERSION)) == NULL) {	//creating main interface
+		trace (_T("Direct3D instance did not created."));
+		return false; 
+	}
+
 	p_d3d->GetAdapterDisplayMode (D3DADAPTER_DEFAULT, &d3ddm); //get info about current display mode (resolution and parameters) 
 
 	ZeroMemory (&d3dpp, sizeof (d3dpp));		//clear struct
@@ -191,7 +168,10 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 	//will be use software vertex processing D3DCREATE_SOFTWARE_VERTEXPROCESSING
 	//will be use above setted present parameters d3dpp
 	//p_d3d_Device - will be the pointer to this device
-	p_d3d->CreateDevice (D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hWnd, D3DCREATE_SOFTWARE_VERTEXPROCESSING, &d3dpp, &p_d3d_Device);
+	if (FAILED (p_d3d->CreateDevice (D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hWnd, D3DCREATE_SOFTWARE_VERTEXPROCESSING, &d3dpp, &p_d3d_Device))) {
+		trace (_T("Direct3D device did not created."));
+		return false;
+	}
 
 	//open file with .dxf models
 	fin.open (_T("data\\test.DXF"), ios::in | ios::binary);
@@ -216,39 +196,6 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 			forup (obj->numFaces * 3) {
 				fin.read ((char *) &obj->pFaces[i], 4);
 			}
-
-			//Read vertexes
-			//CUSTOMVERTEX *g_Vertices;
-			//g_Vertices = new CUSTOMVERTEX [obj->numVerts];
-			//forup (obj->numVerts) {
-			//	g_Vertices[i] = CUSTOMVERTEX (	obj->pVertsWithNormals[i*6], 
-			//									obj->pVertsWithNormals[i*6+1],
-			//									obj->pVertsWithNormals[i*6+2],
-			//									obj->pVertsWithNormals[i*6+3],
-			//									obj->pVertsWithNormals[i*6+4],
-			//									obj->pVertsWithNormals[i*6+5],
-			//									obj->pVertsWithNormals[i*6+6],			//texture coordinate
-			//									obj->pVertsWithNormals[i*6+7]			//texture coordinate
-			//																	);
-			//}
-
-			////Create vertex buffer
-			//p_d3d_Device->CreateVertexBuffer (obj->numVerts * sizeof (CUSTOMVERTEX), 0, D3DFVF_CUSTOMVERTEX, D3DPOOL_MANAGED, &p_VertexBuffer);
-
-			//VOID * pVertices;
-			//p_VertexBuffer->Lock (0, obj->numVerts * sizeof (CUSTOMVERTEX), (BYTE **) &pVertices, 0);
-			//memcpy (pVertices, g_Vertices, obj->numVerts * sizeof (CUSTOMVERTEX));
-			//p_VertexBuffer->Unlock ();
-
-			//DELA (g_Vertices);
-
-			////Create index buffer
-			//p_d3d_Device->CreateIndexBuffer (obj->numFaces * 12, 0, D3DFMT_INDEX32, D3DPOOL_MANAGED, &p_IndexBuffer);
-
-			//VOID* pVerticesI;
-			//p_IndexBuffer->Lock (0, obj->numFaces * 12, (BYTE**)&pVerticesI, 0);
-			//memcpy (pVerticesI, obj->pFaces, obj->numFaces * 12);
-			//p_IndexBuffer->Unlock();
 
 			obj->Create (p_d3d_Device, obj->numVerts, obj->numFaces);
 
@@ -335,6 +282,7 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 }
 
 void Update () {
+
 	updateInput ();
 
 	float ct = (float) clock () / CLOCKS_PER_SEC;
@@ -384,18 +332,32 @@ void Update () {
 }
 
 void Render () {
+
 	p_d3d_Device->Clear (0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB (0, 0, 0), 1.0f, 0);
 	p_d3d_Device->BeginScene ();
 
 	static bool q = true;
 	for (objMap::iterator it = objs.begin (); it != objs.end (); it++) {
-		/*if (q = !q) p_d3d_Device->SetMaterial (&mtrl1);
-		else p_d3d_Device->SetMaterial (&mtrl2);*/
 		it->second->Render (mtrl1, tex1);
 	}
 	
 	p_d3d_Device->EndScene ();
 	p_d3d_Device->Present (NULL, NULL, NULL, NULL);
+}
+
+void Destroy ()	{
+
+	RELEASE (p_VertexBuffer);
+	RELEASE (p_d3d_Device);
+	RELEASE (p_d3d);
+	RELEASE (tex1);
+	
+	cleanDInput ();
+
+	for (objMap::iterator it = objs.begin (); it != objs.end (); it++)
+	{
+		DEL (it->second);
+	}
 }
 
 int APIENTRY WinMain (HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nCmdShow) {
@@ -411,7 +373,9 @@ int APIENTRY WinMain (HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR lpCmdLine,
 			if (!GetMessage (&msg, NULL, 0, 0)) break;
 			TranslateMessage (&msg);
 			DispatchMessage (&msg);
+
 		} else if (bActive) {
+
 			Render ();
 			Update (); 
 		}
