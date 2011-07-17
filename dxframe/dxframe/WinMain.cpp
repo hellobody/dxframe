@@ -48,8 +48,13 @@ float dt; //tick size in seconds
 //
 
 //fps
-int fps;
+int fps = 0;
 //
+
+HFONT hFont = NULL;
+LPD3DXFONT Font = NULL;
+
+dxMainFrame MainFrame;
 
 void initDInput (HINSTANCE hInstance, HWND hWnd) {
 	// create the DirectInput interface
@@ -111,7 +116,7 @@ LRESULT CALLBACK WindowProc (HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			break;
 
 		case WM_SETCURSOR:
-			SetCursor (NULL);
+			//SetCursor (1);
 			break;
 
 	} return DefWindowProc (hWnd, message, wParam, lParam);
@@ -126,7 +131,7 @@ bool WindowInit (HINSTANCE hThisInst, int nCmdShow) {
 	wcl.lpfnWndProc = WindowProc;
 	wcl.style = 0;
 	wcl.hIcon = LoadIcon (hThisInst, IDC_ICON);
-	wcl.hCursor = LoadCursor (hThisInst, IDC_ARROW);
+	wcl.hCursor = LoadCursor (hThisInst, MAKEINTRESOURCE (IDC_POINTER));
 	wcl.lpszMenuName = NULL;
 	wcl.cbClsExtra = 0;
 	wcl.cbWndExtra = 0;
@@ -273,6 +278,14 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 	}
 	//
 
+	// Create a D3DX font object
+	hFont = CreateFont (20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, PROOF_QUALITY, 0, _T("Comic Sans MS"));
+	if (S_OK != D3DXCreateFont (p_d3d_Device, hFont, &Font)) {
+		trace (_T ("Font did not created."));
+	}
+
+	MainFrame.Create ();
+
 	initDInput (hThisInst, hWnd);
 	
 	ShowWindow (hWnd, nCmdShow);
@@ -301,6 +314,9 @@ void Update () {
 		oneSec = 0;
 	}
 
+	MainFrame.SetFrameTime (0);
+	MainFrame.Update ();
+
 	for (objMap::iterator it = objs.begin (); it != objs.end (); it++) {
 		it->second->Transform ();
 	}
@@ -311,24 +327,27 @@ void Update () {
 
 	static float speed = 300;
 
-	if (keystate [DIK_RETURN] & 0x80) speed = 30000;
-	if (keystate [DIK_SPACE] & 0x80) {
-		if (!dik_space_pressed && speed < 3000000) {
-			speed *= 2;
-			dik_space_pressed = true;
-		}
-	} else dik_space_pressed = false;
+	if (FALSE) {	//off camera move
 
-	if (keystate [DIK_W] & 0x80) camera.walk (dt * speed);
-	if (keystate [DIK_S] & 0x80) camera.walk (-dt * speed);
-	if (keystate [DIK_A] & 0x80) camera.strafe (-dt * speed);
-	if (keystate [DIK_D] & 0x80) camera.strafe (dt * speed);
+		if (keystate [DIK_RETURN] & 0x80) speed = 30000;
+		if (keystate [DIK_SPACE] & 0x80) {
+			if (!dik_space_pressed && speed < 3000000) {
+				speed *= 2;
+				dik_space_pressed = true;
+			}
+		} else dik_space_pressed = false;
 
-	camera.yaw (mousestate.lX * .01f);
-	camera.pitch (mousestate.lY * .01f);
+		if (keystate [DIK_W] & 0x80) camera.walk (dt * speed);
+		if (keystate [DIK_S] & 0x80) camera.walk (-dt * speed);
+		if (keystate [DIK_A] & 0x80) camera.strafe (-dt * speed);
+		if (keystate [DIK_D] & 0x80) camera.strafe (dt * speed);
 
-	matView = camera.getViewMatrix ();
-	p_d3d_Device->SetTransform (D3DTS_VIEW, &matView);
+		camera.yaw (mousestate.lX * .01f);
+		camera.pitch (mousestate.lY * .01f);
+
+		matView = camera.getViewMatrix ();
+		p_d3d_Device->SetTransform (D3DTS_VIEW, &matView);
+	}
 }
 
 void Render () {
@@ -336,16 +355,38 @@ void Render () {
 	p_d3d_Device->Clear (0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB (0, 0, 0), 1.0f, 0);
 	p_d3d_Device->BeginScene ();
 
+	MainFrame.Render ();
+
 	static bool q = true;
 	for (objMap::iterator it = objs.begin (); it != objs.end (); it++) {
 		it->second->Render (mtrl1, tex1);
 	}
-	
+
+	// Create a colour for the text - in this case blue
+	D3DCOLOR fontColor = D3DCOLOR_ARGB(255,0,0,255);    
+
+	// Create a rectangle to indicate where on the screen it should be drawn
+	RECT rct;
+	rct.left = 10;
+	rct.right = 780;
+	rct.top = 10;
+	rct.bottom = rct.top + 20;
+
+	if (Font) {
+		TCHAR tS [MAX_PATH];
+		_stprintf_s (tS, _T("fps: %i"), fps);
+		Font->DrawText (tS, -1, &rct, 0, fontColor);
+	}
+
 	p_d3d_Device->EndScene ();
 	p_d3d_Device->Present (NULL, NULL, NULL, NULL);
 }
 
 void Destroy ()	{
+
+	RELEASE (Font);
+
+	MainFrame.Destroy ();
 
 	RELEASE (p_VertexBuffer);
 	RELEASE (p_d3d_Device);
@@ -376,8 +417,8 @@ int APIENTRY WinMain (HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR lpCmdLine,
 
 		} else if (bActive) {
 
+			Update ();
 			Render ();
-			Update (); 
 		}
 	} return 0;
 }

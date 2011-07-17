@@ -23,7 +23,7 @@ static ofstream fout;
 
 Interface * ip;
 
-#define nameSize 256
+const int nameSize = 256;
 
 TriObject *GetTriObjFromNode(INode *node, int &deleteIt)
 {
@@ -68,6 +68,9 @@ void SceneSaver::ProcNode(INode *node)
 
 	//Get and write name
 	char *Name = new char [nameSize];
+	for (int i=0; i<nameSize; i++) {
+		Name [i] = '0';
+	}
 	strcpy_s (Name, nameSize, node->GetName ());
 	fout.write (Name, nameSize);
 	//
@@ -257,9 +260,16 @@ int	dxframeexp::DoExport(const TCHAR *name,ExpInterface *ei,Interface *i, BOOL s
 
 	fout.open (name, ios::out | ios::binary);
 
+	if (fout.fail ()) {
+		MessageBox (NULL, _T("Failed open file"), _T("Error"), MB_OK);
+		return FALSE;
+	}
+
 	ei->theScene->EnumTree (&TreeEnum);
 
 	fout.close ();
+
+	MessageBox (NULL, _T("Exported"), _T("Message"), MB_OK);
 
 	return TRUE;
 

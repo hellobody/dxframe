@@ -1,1 +1,1 @@
-copy "D:\Documents and Settings\Admin\Мои документы\3dsmax\export\test.DXF" F:\projects\dxframe\dxframe\dxframe\data\test.DXF /Y
+copy "C:\Documents and Settings\Admin\Мои документы\3dsmax\export\test.DXF" D:\projects\dxframe\dxframe\dxframe\data\test.DXF /Y

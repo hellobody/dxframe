@@ -12,7 +12,7 @@
 #include <map>
 #include "tchar.h"
 
-#pragma comment (lib, "d3d8.lib") 
+#pragma comment (lib, "d3d8.lib")
 #pragma comment (lib, "d3dx8.lib")
 #pragma comment (lib, "dxguid.lib")
 #pragma comment (lib, "dinput8.lib")
@@ -30,7 +30,7 @@
 #define WIDTH 1024
 #define HEIGHT 768
 
-#define nameSize 256 
+const int nameSize = 256;
 
 class dxObj;
 
