@@ -1,9 +1,14 @@
 #include "dxObj.h"
 #include "windows.h"
 
+objMap dxObj::objs;
+
+PDIRECT3DDEVICE8 dxObj::using_d3d_Device = NULL;
+
 dxObj::dxObj () {
 
-	using_d3d_Device = NULL;
+	_tcscpy_s (TexName, nameSize, _T(""));
+
 	p_IndexBuffer = NULL;
 	p_VertexBuffer = NULL;
 
@@ -20,16 +25,10 @@ dxObj::dxObj () {
 
 dxObj::~dxObj () {
 
-	DELA (pVertsWithNormals);
-	DELA (pTransformedVerts);
-	DELA (pOriginalVerts);
-	DELA (pFaces);
-	
-	RELEASE (p_VertexBuffer);
-	RELEASE (p_IndexBuffer);
+	InternalDestroy ();
 }
 
-void dxObj::Create (LPDIRECT3DDEVICE8 d3d_device, int numVerts, int numFaces) {
+void dxObj::Create (LPDIRECT3DDEVICE8 d3d_device, int numVerts, int numFaces) {	//depracated, prepare to delete
 
 	if (d3d_device == NULL) {
 		trace (_T("Direct3D device pointer is NULL."));
@@ -72,6 +71,65 @@ void dxObj::Create (LPDIRECT3DDEVICE8 d3d_device, int numVerts, int numFaces) {
 	p_IndexBuffer->Unlock();
 	///////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////
+}
+
+bool dxObj::CreateNew (const TCHAR *flName, const TCHAR *objName) {
+
+	InternalDestroy ();
+	
+	if (using_d3d_Device == NULL) {
+		trace (_T("Direct3D device pointer is NULL."));
+		return false;
+	}
+
+	TCHAR flPath [MAX_PATH];
+	_tcscpy_s (flPath, MAX_PATH, _T("data\\"));
+	_tcscat_s (flPath, MAX_PATH, flName);
+
+	//open file with .dxf models
+	ifstream fin;
+
+	fin.open (flPath, ios::in | ios::binary);
+
+	//CA2W
+
+	if (!fin.fail ()) {
+		
+		fin.read ((char *) &Name, nameSize);
+		fin.read ((char *) &numVerts, 4);
+		fin.read ((char *) &numFaces, 4);
+
+		pVertsWithNormals = new float [numVerts * (3 * 2 + 2)]; //because verts with normals + texture coord
+
+		forup (obj->numVerts * (3 * 2 + 2)) {
+			fin.read ((char *) &pVertsWithNormals[i], 4);
+		}
+
+		pFaces = new int [numFaces * 3];
+
+		forup (numFaces * 3) {
+			fin.read ((char *) &pFaces[i], 4);
+		}
+
+		objs.insert (objPair (Name, *this)); //push new model to map
+	} else {
+
+		trace (_T("File not found."));	//add here file path
+		return false;
+	}
+
+	return true;
+}
+
+void dxObj::InternalDestroy () {
+
+	DELA (pVertsWithNormals);
+	DELA (pTransformedVerts);
+	DELA (pOriginalVerts);
+	DELA (pFaces);
+	
+	RELEASE (p_VertexBuffer);
+	RELEASE (p_IndexBuffer);
 }
 
 void dxObj::RotateX (float ang) {

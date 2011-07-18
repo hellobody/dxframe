@@ -13,6 +13,8 @@
 //***************************************************************************/
 
 #include "dxframeexp.h"
+#include "stdmat.h"
+#include "tchar.h"
 
 //****************************added by me************************************/
 #include <fstream>
@@ -90,26 +92,61 @@ void SceneSaver::ProcNode(INode *node)
 		v = tm * TObj->mesh.verts[i];
 
 		fout.write ((char *) &v.x, 4);
-		fout.write ((char *) &v.z, 4);
 		fout.write ((char *) &v.y, 4);
+		fout.write ((char *) &v.z, 4);
 
 		//write noramals
 		v = TObj->mesh.getNormal (i);
 
 		fout.write ((char *) &v.x, 4);
-		fout.write ((char *) &v.z, 4);
 		fout.write ((char *) &v.y, 4);
+		fout.write ((char *) &v.z, 4);
 
 		//write texture coordinates
-		v = TObj->mesh.tVerts [i];
+		v = TObj->mesh.getTVert (i);
 		fout.write ((char *) &v.x, 4);
 		fout.write ((char *) &v.y, 4);
 	}
 
 	for (int i = 0; i < TObj->mesh.numFaces; i++)
 	{
-		fout.write ((char *) &TObj->mesh.faces[i].v[0], 12);
+		fout.write ((char *) &TObj->mesh.faces [i].v [0], 4);
+		fout.write ((char *) &TObj->mesh.faces [i].v [1], 4);
+		fout.write ((char *) &TObj->mesh.faces [i].v [2], 4);
 	}
+
+	//export texture name
+	TCHAR *TexName = new TCHAR [nameSize];
+	for (int i=0; i<nameSize; i++) {
+		TexName [i] = '0';
+	}
+
+	Mtl *m = node->GetMtl();
+	if (!m) {
+		MessageBox (NULL, _T("Material is not found"), _T("Warning"), MB_OK);
+		fout.write (TexName, nameSize * sizeof (TCHAR));
+		return;
+	}
+
+	Texmap *tmap = m->GetSubTexmap (ID_DI); //get diffuse subtexture map
+	if (!tmap) {
+		MessageBox (NULL, _T("Texture is not found"), _T("Warning"), MB_OK);
+		fout.write (TexName, nameSize * sizeof (TCHAR));
+		return;
+	}
+  
+	if (tmap->ClassID () != Class_ID (BMTEX_CLASS_ID, 0)) {
+		MessageBox (NULL, _T("Texture is not a bitmap"), _T("Warning"), MB_OK);
+		fout.write (TexName, nameSize * sizeof (TCHAR));
+		return;
+	}
+	
+	BitmapTex *bmt = (BitmapTex *) tmap;
+
+	//Get and write texture name
+	_tcscpy_s (TexName, nameSize, bmt->GetMapName ());
+	fout.write (TexName,  nameSize * sizeof (TCHAR));
+	//
 }
 
 static SceneSaver TreeEnum;

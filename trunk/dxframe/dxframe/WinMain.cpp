@@ -34,7 +34,6 @@ LPDIRECT3DTEXTURE8 tex1 = NULL;	//the pointer to texture
 D3DLIGHT8 light;
 
 ifstream fin;							//file input
-objMap objs;
 dxObj *obj;								//my object
 
 //camera
@@ -178,6 +177,9 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 		return false;
 	}
 
+	dxObj::objs.clear ();
+	dxObj::using_d3d_Device = p_d3d_Device;
+
 	//open file with .dxf models
 	fin.open (_T("data\\test.DXF"), ios::in | ios::binary);
 
@@ -204,7 +206,7 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 
 			obj->Create (p_d3d_Device, obj->numVerts, obj->numFaces);
 
-			objs.insert (objPair (obj->Name, obj)); //push new model to map
+			dxObj::objs.insert (objPair (obj->Name, obj)); //push new model to map
 
 			char endByte;
 			fin.read ((char *) &endByte, 1);
@@ -314,10 +316,9 @@ void Update () {
 		oneSec = 0;
 	}
 
-	MainFrame.SetFrameTime (0);
-	MainFrame.Update ();
+	MainFrame.Update (0);
 
-	for (objMap::iterator it = objs.begin (); it != objs.end (); it++) {
+	for (objMap::iterator it = dxObj::objs.begin (); it != dxObj::objs.end (); it++) {
 		it->second->Transform ();
 	}
 
@@ -358,7 +359,7 @@ void Render () {
 	MainFrame.Render ();
 
 	static bool q = true;
-	for (objMap::iterator it = objs.begin (); it != objs.end (); it++) {
+	for (objMap::iterator it = dxObj::objs.begin (); it != dxObj::objs.end (); it++) {
 		it->second->Render (mtrl1, tex1);
 	}
 
@@ -395,7 +396,7 @@ void Destroy ()	{
 	
 	cleanDInput ();
 
-	for (objMap::iterator it = objs.begin (); it != objs.end (); it++)
+	for (objMap::iterator it = dxObj::objs.begin (); it != dxObj::objs.end (); it++)
 	{
 		DEL (it->second);
 	}

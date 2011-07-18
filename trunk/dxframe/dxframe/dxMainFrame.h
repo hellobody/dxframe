@@ -3,16 +3,14 @@
 
 class dxMainFrame
 {
-	float dt;	//delta time between frames
+	//todo: place any members here	
 
 public:
 	dxMainFrame ();
 	~dxMainFrame ();
 
-	void SetFrameTime (float dt);
-
 	void Create ();
-	void Update ();
+	void Update (float dt);	//dt - delta time between frames
 	void Render ();
 	void Destroy ();
 };
