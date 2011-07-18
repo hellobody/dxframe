@@ -7,9 +7,13 @@ class dxObj {
 
 public:
 
+	static objMap objs;
+	static PDIRECT3DDEVICE8 using_d3d_Device;
+
 	char Name [MAX_PATH];
 
-	PDIRECT3DDEVICE8 using_d3d_Device;
+	TCHAR TexName [nameSize];
+
 	LPDIRECT3DINDEXBUFFER8 p_IndexBuffer;
 	LPDIRECT3DVERTEXBUFFER8 p_VertexBuffer;
 
@@ -33,7 +37,9 @@ public:
 	dxObj ();
 	~dxObj ();
 
-	void Create (LPDIRECT3DDEVICE8 d3d_device, int numVerts, int numIndexes);
+	void Create (LPDIRECT3DDEVICE8 d3d_device, int numVerts, int numIndexes);	//depracated, prepare to delete
+	bool CreateNew (const TCHAR *flName, const TCHAR *objName);
+	void InternalDestroy ();
 
 	void Move (float, float, float);
 	void Scale (float, float, float);

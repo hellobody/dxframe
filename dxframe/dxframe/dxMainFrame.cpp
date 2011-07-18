@@ -8,15 +8,12 @@ dxMainFrame::~dxMainFrame () {
 	
 }
 
-void dxMainFrame::SetFrameTime (float dt) {
-	
-}
-
 void dxMainFrame::Create () {
-
+	
+	//todo: create dxObjes here
 }
 
-void dxMainFrame::Update () {
+void dxMainFrame::Update (float dt) {
 	
 }
 
