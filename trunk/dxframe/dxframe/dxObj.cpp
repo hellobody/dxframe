@@ -101,7 +101,7 @@ bool dxObj::CreateNew (const TCHAR *flName, const TCHAR *objName) {
 
 		pVertsWithNormals = new float [numVerts * (3 * 2 + 2)]; //because verts with normals + texture coord
 
-		forup (obj->numVerts * (3 * 2 + 2)) {
+		forup (numVerts * (3 * 2 + 2)) {
 			fin.read ((char *) &pVertsWithNormals[i], 4);
 		}
 
@@ -111,7 +111,7 @@ bool dxObj::CreateNew (const TCHAR *flName, const TCHAR *objName) {
 			fin.read ((char *) &pFaces[i], 4);
 		}
 
-		objs.insert (objPair (Name, *this)); //push new model to map
+		objs.insert (objPair (Name, this)); //push new model to map
 	} else {
 
 		trace (_T("File not found."));	//add here file path
