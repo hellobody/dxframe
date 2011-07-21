@@ -10,7 +10,12 @@
 #include <string>
 #include <ctime>
 #include <map>
+#include <vector>
 #include "tchar.h"
+#include <io.h>
+#include <errno.h>
+
+#include "path.h"
 
 #pragma comment (lib, "d3d8.lib")
 #pragma comment (lib, "d3dx8.lib")

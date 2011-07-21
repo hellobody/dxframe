@@ -73,7 +73,7 @@ void dxObj::Create (LPDIRECT3DDEVICE8 d3d_device, int numVerts, int numFaces) {	
 	///////////////////////////////////////////////////////////////////////////
 }
 
-bool dxObj::CreateNew (const TCHAR *flName, const TCHAR *objName) {
+bool dxObj::CreateFromFile (const TCHAR *flName, const TCHAR *objName) {
 
 	InternalDestroy ();
 	
@@ -102,14 +102,16 @@ bool dxObj::CreateNew (const TCHAR *flName, const TCHAR *objName) {
 		pVertsWithNormals = new float [numVerts * (3 * 2 + 2)]; //because verts with normals + texture coord
 
 		forup (numVerts * (3 * 2 + 2)) {
-			fin.read ((char *) &pVertsWithNormals[i], 4);
+			fin.read ((char *) &pVertsWithNormals [i], 4);
 		}
 
 		pFaces = new int [numFaces * 3];
 
 		forup (numFaces * 3) {
-			fin.read ((char *) &pFaces[i], 4);
+			fin.read ((char *) &pFaces [i], 4);
 		}
+
+		fin.read ((char *) &TexName, nameSize);
 
 		objs.insert (objPair (Name, this)); //push new model to map
 	} else {

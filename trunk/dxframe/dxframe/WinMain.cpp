@@ -1,7 +1,9 @@
 #include "WinMain.h"
 
 HWND hWnd;
+
 BOOL bActive;
+
 LPCWSTR APPNAME = L"dxframe";
 LPCWSTR APPTITLE = L"dxframe";
 
@@ -14,8 +16,6 @@ BYTE keystate [256];    // the storage for the key-information
 
 LPDIRECT3D8 p_d3d = NULL;						//direct 3d main interface
 LPDIRECT3DDEVICE8 p_d3d_Device = NULL;			//direct 3d device
-LPDIRECT3DINDEXBUFFER8 p_IndexBuffer = NULL;	//indexes buffer
-LPDIRECT3DVERTEXBUFFER8 p_VertexBuffer = NULL;	//vertex buffer
 
 D3DDISPLAYMODE d3ddm;							//display mode parameters
 D3DPRESENT_PARAMETERS d3dpp;					//present parameters
@@ -29,6 +29,7 @@ D3DMATERIAL8 mtrl1;
 D3DMATERIAL8 mtrl2;
 
 LPDIRECT3DTEXTURE8 tex1 = NULL;	//the pointer to texture
+vector <LPDIRECT3DTEXTURE8> vTextures; //global textures storage 
 
 //light
 D3DLIGHT8 light;
@@ -146,6 +147,10 @@ bool WindowInit (HINSTANCE hThisInst, int nCmdShow) {
 
 bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 
+	dxLogger Logger;
+	Logger.GetSystemInfo ();
+	Logger.LogSystemInfo ();
+
 	if (!WindowInit (hThisInst, nCmdShow)) return false; //init window
 
 	if ((p_d3d = Direct3DCreate8 (D3D_SDK_VERSION)) == NULL) {	//creating main interface
@@ -195,14 +200,17 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 			obj->pVertsWithNormals = new float [obj->numVerts * (3 * 2 + 2)]; //because verts with normals + texture coord
 
 			forup (obj->numVerts * (3 * 2 + 2)) {
-				fin.read ((char *) &obj->pVertsWithNormals[i], 4);
+				fin.read ((char *) &obj->pVertsWithNormals [i], 4);
 			}
 
 			obj->pFaces = new int [obj->numFaces * 3];
 
 			forup (obj->numFaces * 3) {
-				fin.read ((char *) &obj->pFaces[i], 4);
+				fin.read ((char *) &obj->pFaces [i], 4);
 			}
+
+			char tArr [nameSize];
+			fin.read ((char *) &tArr, nameSize);
 
 			obj->Create (p_d3d_Device, obj->numVerts, obj->numFaces);
 
@@ -271,10 +279,10 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 	p_d3d_Device->SetRenderState (D3DRS_ZENABLE, D3DZB_TRUE);
 	//
 
-	
-
 	//load textures
-	if (S_OK != D3DXCreateTextureFromFile (p_d3d_Device, _T("data\\test.jpg"), &tex1))
+	TCHAR tStr [MAX_PATH];
+	_stprintf_s (tStr, _T("%s%s"), PATHTO_DATA, _T("test.jpg"));
+	if (S_OK != D3DXCreateTextureFromFile (p_d3d_Device, tStr, &tex1))
 	{
 		int _break = 0;
 	}
@@ -389,7 +397,6 @@ void Destroy ()	{
 
 	MainFrame.Destroy ();
 
-	RELEASE (p_VertexBuffer);
 	RELEASE (p_d3d_Device);
 	RELEASE (p_d3d);
 	RELEASE (tex1);
