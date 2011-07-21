@@ -179,6 +179,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\dxLogger.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\dxMainFrame.cpp"
 				>
 			</File>
@@ -205,11 +209,23 @@
 				>
 			</File>
 			<File
+				RelativePath=".\dxLogger.h"
+				>
+			</File>
+			<File
 				RelativePath=".\dxMainFrame.h"
 				>
 			</File>
 			<File
 				RelativePath=".\dxObj.h"
+				>
+			</File>
+			<File
+				RelativePath=".\dxTCHARofstrem.h"
+				>
+			</File>
+			<File
+				RelativePath=".\path.h"
 				>
 			</File>
 			<File

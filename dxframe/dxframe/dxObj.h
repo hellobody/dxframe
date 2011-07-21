@@ -37,8 +37,9 @@ public:
 	dxObj ();
 	~dxObj ();
 
-	void Create (LPDIRECT3DDEVICE8 d3d_device, int numVerts, int numIndexes);	//depracated, prepare to delete
-	bool CreateNew (const TCHAR *flName, const TCHAR *objName);
+	void Create (LPDIRECT3DDEVICE8 d3d_device, int numVerts, int numIndexes); //depracated, prepare to delete
+	
+	bool CreateFromFile (const TCHAR *flName, const TCHAR *objName);
 	void InternalDestroy ();
 
 	void Move (float, float, float);

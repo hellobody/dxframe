@@ -116,12 +116,12 @@ void SceneSaver::ProcNode(INode *node)
 	}
 
 	//export texture name
-	TCHAR *TexName = new TCHAR [nameSize];
+	TCHAR TexName [nameSize];
 	for (int i=0; i<nameSize; i++) {
 		TexName [i] = '0';
 	}
 
-	Mtl *m = node->GetMtl();
+	Mtl *m = node->GetMtl ();
 	if (!m) {
 		MessageBox (NULL, _T("Material is not found"), _T("Warning"), MB_OK);
 		fout.write (TexName, nameSize * sizeof (TCHAR));
