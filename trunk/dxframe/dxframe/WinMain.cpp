@@ -148,8 +148,10 @@ bool WindowInit (HINSTANCE hThisInst, int nCmdShow) {
 bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 
 	dxLogger Logger;
-	Logger.GetSystemInfo ();
-	Logger.LogSystemInfo ();
+	Logger.getSystemInfo ();
+	Logger.logSystemInfo ();
+
+	Logger.trace (_T("test"));
 
 	if (!WindowInit (hThisInst, nCmdShow)) return false; //init window
 
@@ -209,8 +211,8 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 				fin.read ((char *) &obj->pFaces [i], 4);
 			}
 
-			char tArr [nameSize];
-			fin.read ((char *) &tArr, nameSize);
+			TCHAR tStr [nameSize];
+			fin.read ((char *) tStr, nameSize * sizeof (TCHAR));
 
 			obj->Create (p_d3d_Device, obj->numVerts, obj->numFaces);
 

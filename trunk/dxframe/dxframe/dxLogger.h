@@ -21,8 +21,10 @@ public:
 	dxLogger ();
 	~dxLogger ();
 
-	void GetSystemInfo ();
-	bool LogSystemInfo ();
+	void getSystemInfo ();
+	void logSystemInfo ();
+
+	void trace (const TCHAR *s);
 };
 
 #endif

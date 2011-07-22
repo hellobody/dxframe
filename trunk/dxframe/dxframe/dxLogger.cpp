@@ -11,7 +11,7 @@ dxLogger::~dxLogger () {
 	
 }
 
-void dxLogger::GetSystemInfo () {
+void dxLogger::getSystemInfo () {
 
 	size_t retVal;
 
@@ -20,7 +20,7 @@ void dxLogger::GetSystemInfo () {
 	_tgetenv_s (&retVal, userName, MAX_PATH, _T("USERNAME"));
 }
 
-bool dxLogger::LogSystemInfo () {
+void dxLogger::logSystemInfo () {
 
 	dxTCHARofstream fout;
 	
@@ -28,14 +28,29 @@ bool dxLogger::LogSystemInfo () {
 	
 	if (fout.fail ()) {
 		trace (_T("Error write log file."));
-		return false;
+		return;
 	}
 
 	fout << _T("Using OS: ") << osName << endl;
 	fout << _T("Computer name: ") << compName << endl;
 	fout << _T("User name: ") << userName << endl;
+	fout << endl;
 
 	fout.close ();
+}
 
-	return true;
+void dxLogger::trace (const TCHAR *s) {
+
+	dxTCHARofstream fout;
+	
+	fout.open (_T("log.txt"), ios::out | ios::app);
+	
+	if (fout.fail ()) {
+		trace (_T("Error write log file."));
+		return;
+	}
+
+	fout << s << endl;
+
+	fout.close ();
 }
