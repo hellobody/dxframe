@@ -18,10 +18,11 @@
 
 //****************************added by me************************************/
 #include <fstream>
+#include "dxTCHARofstrem.h"
 
 using namespace std;
 
-static ofstream fout;
+static dxTCHARofstream fout;
 
 Interface * ip;
 
@@ -145,8 +146,11 @@ void SceneSaver::ProcNode(INode *node)
 
 	//Get and write texture name
 	_tcscpy_s (TexName, nameSize, bmt->GetMapName ());
+
 	fout.write (TexName,  nameSize * sizeof (TCHAR));
 	//
+
+	MCHAR
 }
 
 static SceneSaver TreeEnum;

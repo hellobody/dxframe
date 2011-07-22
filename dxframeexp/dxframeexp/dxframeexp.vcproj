@@ -164,7 +164,7 @@
 				AdditionalOptions="/LD @C:\3DSMAXSDK2009\maxsdk\ProjectSettings\AdditionalCompilerOptions.txt"
 				Optimization="0"
 				WholeProgramOptimization="false"
-				AdditionalIncludeDirectories=".\midl\Win32;C:\3DSMAXSDK2009\maxsdk\include"
+				AdditionalIncludeDirectories=".\midl\Win32;C:\3DSMAXSDK2009\maxsdk\include;D:\projects\dxframe\dxframe\dxframe"
 				PreprocessorDefinitions="_HYBRID;IS_HYBRID;_SECURE_SCL=0;WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;ISOLATION_AWARE_ENABLED=1"
 				ExceptionHandling="2"
 				BasicRuntimeChecks="3"
@@ -698,6 +698,10 @@
 			</File>
 			<File
 				RelativePath=".\dxframeexp.h"
+				>
+			</File>
+			<File
+				RelativePath=".\dxTCHARofstrem.h"
 				>
 			</File>
 			<File
