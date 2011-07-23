@@ -10,9 +10,11 @@ public:
 	static objMap objs;
 	static PDIRECT3DDEVICE8 using_d3d_Device;
 
+	LPDIRECT3DTEXTURE8 texture;
+
 	char Name [MAX_PATH];
 
-	TCHAR TexName [nameSize];
+	char TexName [nameSize];
 
 	LPDIRECT3DINDEXBUFFER8 p_IndexBuffer;
 	LPDIRECT3DVERTEXBUFFER8 p_VertexBuffer;
@@ -22,7 +24,6 @@ public:
 
 	int numVerts;	//number of vertex
 	int numFaces;	//number of primitives
-	int numTVerts;	//number of texture vertexes	//?
 	
 	D3DXMATRIX transformM;	//transformation matrix
 	D3DXMATRIX rotationM;	//rotation matrix
@@ -39,7 +40,7 @@ public:
 
 	void Create (LPDIRECT3DDEVICE8 d3d_device, int numVerts, int numIndexes); //depracated, prepare to delete
 	
-	bool CreateFromFile (const TCHAR *flName, const TCHAR *objName);
+	bool CreateFromFile (const TCHAR *flName, const char *objName);
 	void InternalDestroy ();
 
 	void Move (float, float, float);
@@ -49,7 +50,7 @@ public:
 	void RotateZ (float);
 
 	void Transform ();
-	void Render (D3DMATERIAL8 tempMtrl, LPDIRECT3DTEXTURE8 tempTex);
+	void Render ();
 };
 
 #endif

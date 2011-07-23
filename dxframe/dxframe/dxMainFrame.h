@@ -1,9 +1,14 @@
 #ifndef MAINFRAME_H_
 #define MAINFRAME_H_
 
+#include "dxObj.h"
+
 class dxMainFrame
 {
-	//todo: place any members here	
+	//todo: place any members here
+
+	dxObj *obj2;
+	dxObj *obj;
 
 public:
 	dxMainFrame ();
@@ -11,7 +16,6 @@ public:
 
 	void Create ();
 	void Update (float dt);	//dt - delta time between frames
-	void Render ();
 	void Destroy ();
 };
 
