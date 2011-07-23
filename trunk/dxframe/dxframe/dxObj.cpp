@@ -7,7 +7,7 @@ PDIRECT3DDEVICE8 dxObj::using_d3d_Device = NULL;
 
 dxObj::dxObj () {
 
-	_tcscpy_s (TexName, nameSize, _T(""));
+	strcpy_s (TexName, nameSize, "");
 
 	p_IndexBuffer = NULL;
 	p_VertexBuffer = NULL;
@@ -17,10 +17,11 @@ dxObj::dxObj () {
 
 	numVerts = 0;
 	numFaces = 0;
-	numTVerts = 0;
 	
 	pVertsWithNormals = NULL;
 	pFaces = NULL;
+
+	texture = NULL;
 }
 
 dxObj::~dxObj () {
@@ -73,7 +74,7 @@ void dxObj::Create (LPDIRECT3DDEVICE8 d3d_device, int numVerts, int numFaces) {	
 	///////////////////////////////////////////////////////////////////////////
 }
 
-bool dxObj::CreateFromFile (const TCHAR *flName, const TCHAR *objName) {
+bool dxObj::CreateFromFile (const TCHAR *flName, const char *objName) {
 
 	InternalDestroy ();
 	
@@ -91,27 +92,88 @@ bool dxObj::CreateFromFile (const TCHAR *flName, const TCHAR *objName) {
 
 	fin.open (flPath, ios::in | ios::binary);
 
-	//CA2W
-
 	if (!fin.fail ()) {
 		
-		fin.read ((char *) &Name, nameSize);
-		fin.read ((char *) &numVerts, 4);
-		fin.read ((char *) &numFaces, 4);
+		do {
 
-		pVertsWithNormals = new float [numVerts * (3 * 2 + 2)]; //because verts with normals + texture coord
+			DELA (pVertsWithNormals);
+			DELA (pFaces);
 
-		forup (numVerts * (3 * 2 + 2)) {
-			fin.read ((char *) &pVertsWithNormals [i], 4);
+			fin.read ((char *) &Name, nameSize);
+			fin.read ((char *) &numVerts, 4);
+			fin.read ((char *) &numFaces, 4);
+
+			pVertsWithNormals = new float [numVerts * (3 * 2 + 2)]; //because verts with normals + texture coord
+
+			forup (numVerts * (3 * 2 + 2)) {
+				fin.read ((char *) &pVertsWithNormals [i], 4);
+			}
+
+			pFaces = new int [numFaces * 3];
+
+			forup (numFaces * 3) {
+				fin.read ((char *) &pFaces [i], 4);
+			}
+
+			fin.read ((char *) &TexName, nameSize);
+			
+			char endByte;
+			fin.read ((char *) &endByte, 1);
+
+			if (!fin.eof ()) {
+				fin.seekg (int (fin.tellg ()) - 1);
+			}
+		} while (!fin.eof () && strcmp (Name, objName) != 0);
+
+		fin.close ();
+
+		//
+		pOriginalVerts = new VERTEX_3DPNT [numVerts];
+		pTransformedVerts = new VERTEX_3DPNT [numVerts];
+
+		using_d3d_Device->CreateVertexBuffer (numVerts * sizeof (CUSTOMVERTEX), 0, D3DFVF_CUSTOMVERTEX, D3DPOOL_MANAGED, &p_VertexBuffer);
+		using_d3d_Device->CreateIndexBuffer (numFaces * 12, 0, D3DFMT_INDEX32, D3DPOOL_MANAGED, &p_IndexBuffer);
+
+		D3DXMatrixIdentity (&transformM);
+		D3DXMatrixIdentity (&rotationM);
+		D3DXMatrixIdentity (&textureM);
+		D3DXMatrixIdentity (&scaleM);
+		D3DXMatrixIdentity (&mainM);
+		D3DXMatrixIdentity (&tempM);
+
+		///////////////////////////////////////////////////////////////////////////
+		//temporary, rewrite it////////////////////////////////////////////////////
+		forup (numVerts) {
+
+			pOriginalVerts[i].position.x = pVertsWithNormals[i*8];
+			pOriginalVerts[i].position.y = pVertsWithNormals[i*8+1];
+			pOriginalVerts[i].position.z = pVertsWithNormals[i*8+2];
+
+			pOriginalVerts[i].normal.x = pVertsWithNormals[i*8+3];
+			pOriginalVerts[i].normal.y = pVertsWithNormals[i*8+4];
+			pOriginalVerts[i].normal.z = pVertsWithNormals[i*8+5];
+
+			pOriginalVerts[i].texture.x = pVertsWithNormals[i*8+6];
+			pOriginalVerts[i].texture.y = pVertsWithNormals[i*8+7];
 		}
 
-		pFaces = new int [numFaces * 3];
+		void *tPointer;
+		p_IndexBuffer->Lock (0, numFaces * 12, (BYTE**) &tPointer, 0);
+		memcpy (tPointer, pFaces, numFaces * 12);
+		p_IndexBuffer->Unlock();
+		///////////////////////////////////////////////////////////////////////////
+		///////////////////////////////////////////////////////////////////////////
+		//
 
-		forup (numFaces * 3) {
-			fin.read ((char *) &pFaces [i], 4);
+		//load textures
+		char tStr [MAX_PATH] = "";
+		strcat_s (tStr, PATHTO_DATA_A);
+		strcat_s (tStr, TexName);
+		if (S_OK != D3DXCreateTextureFromFileA (using_d3d_Device, tStr, &texture))
+		{
+			trace (_T("Error create texture."));
 		}
-
-		fin.read ((char *) &TexName, nameSize);
+		//
 
 		objs.insert (objPair (Name, this)); //push new model to map
 	} else {
@@ -132,6 +194,8 @@ void dxObj::InternalDestroy () {
 	
 	RELEASE (p_VertexBuffer);
 	RELEASE (p_IndexBuffer);
+
+	RELEASE (texture);
 }
 
 void dxObj::RotateX (float ang) {
@@ -183,15 +247,15 @@ void dxObj::Transform () {
 	p_VertexBuffer->Unlock ();
 }
 
-void dxObj::Render (D3DMATERIAL8 tempMtrl, LPDIRECT3DTEXTURE8 tempTex) {
+void dxObj::Render () {
 
 	using_d3d_Device->SetVertexShader (D3DFVF_CUSTOMVERTEX);
 	using_d3d_Device->SetStreamSource (0, p_VertexBuffer, sizeof (CUSTOMVERTEX));
 	using_d3d_Device->SetIndices (p_IndexBuffer, 0);
 
-	using_d3d_Device->SetTexture (0, tempTex);
+	using_d3d_Device->SetTexture (0, texture);
 	using_d3d_Device->SetTextureStageState (0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-	using_d3d_Device->SetTextureStageState (0, D3DTSS_COLOROP,   D3DTOP_SELECTARG1);
+	using_d3d_Device->SetTextureStageState (0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
 	
 	using_d3d_Device->DrawIndexedPrimitive (D3DPT_TRIANGLELIST, 0, numVerts, 0, numFaces);
 }

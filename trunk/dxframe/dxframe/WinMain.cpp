@@ -29,7 +29,6 @@ D3DMATERIAL8 mtrl1;
 D3DMATERIAL8 mtrl2;
 
 LPDIRECT3DTEXTURE8 tex1 = NULL;	//the pointer to texture
-vector <LPDIRECT3DTEXTURE8> vTextures; //global textures storage 
 
 //light
 D3DLIGHT8 light;
@@ -145,6 +144,21 @@ bool WindowInit (HINSTANCE hThisInst, int nCmdShow) {
 	return true;
 }
 
+void getFileNameFromFullPath (const char *fullPath, char *fileName) {
+
+	char s0 [nameSize];
+	char s1 [nameSize] = "";
+	strcpy_s (s0, nameSize, fullPath);
+	strcpy_s (s0, nameSize, _strrev (s0));
+
+	int i = 0;
+	while (s0 [i] != '\\') {
+		s1 [i] = s0 [i];
+		i++;
+	}
+	strcpy_s (fileName, nameSize, _strrev (s1));
+}
+
 bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 
 	dxLogger Logger;
@@ -164,7 +178,7 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 
 	ZeroMemory (&d3dpp, sizeof (d3dpp));		//clear struct
 	d3dpp.Windowed = true;						//windowed mode
-	d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;	//set method of window update
+	d3dpp.SwapEffect = D3DSWAPEFFECT_FLIP;	//set method of window update
 	d3dpp.BackBufferFormat = d3ddm.Format;		//set format of surface of second buffer
 
 	//for Z-buffer
@@ -187,47 +201,55 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 	dxObj::objs.clear ();
 	dxObj::using_d3d_Device = p_d3d_Device;
 
+	//test
+	/*obj = new dxObj;
+	obj->CreateFromFile (_T("test.dxf"), "Plane01");
+
+	dxObj *obj2 = new dxObj;
+	obj2->CreateFromFile (_T("test.dxf"), "Plane02");*/
+	//
+
 	//open file with .dxf models
-	fin.open (_T("data\\test.DXF"), ios::in | ios::binary);
+	//fin.open (_T("data\\test.DXF"), ios::in | ios::binary);
 
-	if (!fin.fail ()) {
+	//if (!fin.fail ()) {
 
-		do {
-			obj = new dxObj;
+	//	do {
+	//		obj = new dxObj;
 
-			fin.read ((char *) &obj->Name, nameSize);
-			fin.read ((char *) &obj->numVerts, 4);
-			fin.read ((char *) &obj->numFaces, 4);
+	//		fin.read ((char *) &obj->Name, nameSize);
+	//		fin.read ((char *) &obj->numVerts, 4);
+	//		fin.read ((char *) &obj->numFaces, 4);
 
-			obj->pVertsWithNormals = new float [obj->numVerts * (3 * 2 + 2)]; //because verts with normals + texture coord
+	//		obj->pVertsWithNormals = new float [obj->numVerts * (3 * 2 + 2)]; //because verts with normals + texture coord
 
-			forup (obj->numVerts * (3 * 2 + 2)) {
-				fin.read ((char *) &obj->pVertsWithNormals [i], 4);
-			}
+	//		forup (obj->numVerts * (3 * 2 + 2)) {
+	//			fin.read ((char *) &obj->pVertsWithNormals [i], 4);
+	//		}
 
-			obj->pFaces = new int [obj->numFaces * 3];
+	//		obj->pFaces = new int [obj->numFaces * 3];
 
-			forup (obj->numFaces * 3) {
-				fin.read ((char *) &obj->pFaces [i], 4);
-			}
+	//		forup (obj->numFaces * 3) {
+	//			fin.read ((char *) &obj->pFaces [i], 4);
+	//		}
 
-			TCHAR tStr [nameSize];
-			fin.read ((char *) tStr, nameSize * sizeof (TCHAR));
+	//		char tStr [nameSize];
+	//		fin.read ((char *) tStr, nameSize);
 
-			obj->Create (p_d3d_Device, obj->numVerts, obj->numFaces);
+	//		obj->Create (p_d3d_Device, obj->numVerts, obj->numFaces);
 
-			dxObj::objs.insert (objPair (obj->Name, obj)); //push new model to map
+	//		dxObj::objs.insert (objPair (obj->Name, obj)); //push new model to map
 
-			char endByte;
-			fin.read ((char *) &endByte, 1);
+	//		char endByte;
+	//		fin.read ((char *) &endByte, 1);
 
-			if (!fin.eof ()) {
-				fin.seekg (int (fin.tellg ()) - 1);
-			}
-		} while (!fin.eof ());
-		
-		fin.close ();
-	}
+	//		if (!fin.eof ()) {
+	//			fin.seekg (int (fin.tellg ()) - 1);
+	//		}
+	//	} while (!fin.eof ());
+	//	
+	//	fin.close ();
+	//}
 
 	D3DXMatrixRotationY (&matWorld, 0.0f);
 
@@ -326,7 +348,7 @@ void Update () {
 		oneSec = 0;
 	}
 
-	MainFrame.Update (0);
+	MainFrame.Update (dt);
 
 	for (objMap::iterator it = dxObj::objs.begin (); it != dxObj::objs.end (); it++) {
 		it->second->Transform ();
@@ -366,11 +388,9 @@ void Render () {
 	p_d3d_Device->Clear (0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB (0, 0, 0), 1.0f, 0);
 	p_d3d_Device->BeginScene ();
 
-	MainFrame.Render ();
-
 	static bool q = true;
 	for (objMap::iterator it = dxObj::objs.begin (); it != dxObj::objs.end (); it++) {
-		it->second->Render (mtrl1, tex1);
+		it->second->Render ();
 	}
 
 	// Create a colour for the text - in this case blue

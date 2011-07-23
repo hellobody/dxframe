@@ -18,11 +18,10 @@
 
 //****************************added by me************************************/
 #include <fstream>
-#include "dxTCHARofstrem.h"
 
 using namespace std;
 
-static dxTCHARofstream fout;
+static ofstream fout;
 
 Interface * ip;
 
@@ -59,6 +58,21 @@ int SceneSaver::callback(INode *node)
 {
 	ProcNode(node);
 	return TREE_CONTINUE;
+}
+
+void getFileNameFromFullPath (const char *fullPath, char *fileName) {
+
+	char s0 [nameSize];
+	char s1 [nameSize] = "";
+	strcpy_s (s0, nameSize, fullPath);
+	strcpy_s (s0, nameSize, _strrev (s0));
+
+	int i = 0;
+	while (s0 [i] != '\\') {
+		s1 [i] = s0 [i];
+		i++;
+	}
+	strcpy_s (fileName, nameSize, _strrev (s1));
 }
 
 void SceneSaver::ProcNode(INode *node)
@@ -117,28 +131,30 @@ void SceneSaver::ProcNode(INode *node)
 	}
 
 	//export texture name
-	TCHAR TexName [nameSize];
+	char TexName [nameSize];
+	char TexShortName [nameSize];
 	for (int i=0; i<nameSize; i++) {
 		TexName [i] = '0';
+		TexShortName [i] = '0';
 	}
 
 	Mtl *m = node->GetMtl ();
 	if (!m) {
 		MessageBox (NULL, _T("Material is not found"), _T("Warning"), MB_OK);
-		fout.write (TexName, nameSize * sizeof (TCHAR));
+		fout.write (TexName, nameSize * sizeof (char));
 		return;
 	}
 
 	Texmap *tmap = m->GetSubTexmap (ID_DI); //get diffuse subtexture map
 	if (!tmap) {
 		MessageBox (NULL, _T("Texture is not found"), _T("Warning"), MB_OK);
-		fout.write (TexName, nameSize * sizeof (TCHAR));
+		fout.write (TexName, nameSize * sizeof (char));
 		return;
 	}
   
 	if (tmap->ClassID () != Class_ID (BMTEX_CLASS_ID, 0)) {
 		MessageBox (NULL, _T("Texture is not a bitmap"), _T("Warning"), MB_OK);
-		fout.write (TexName, nameSize * sizeof (TCHAR));
+		fout.write (TexName, nameSize * sizeof (char));
 		return;
 	}
 	
@@ -146,11 +162,11 @@ void SceneSaver::ProcNode(INode *node)
 
 	//Get and write texture name
 	_tcscpy_s (TexName, nameSize, bmt->GetMapName ());
+	
+	getFileNameFromFullPath (TexName, TexShortName);
 
-	fout.write (TexName,  nameSize * sizeof (TCHAR));
+	fout.write (TexShortName,  nameSize * sizeof (char));
 	//
-
-	MCHAR
 }
 
 static SceneSaver TreeEnum;
@@ -164,18 +180,18 @@ class dxframeexp : public SceneExport {
 		static HWND hParams;
 		
 		int				ExtCount();					// Number of extensions supported
-		const TCHAR *	Ext(int n);					// Extension #n (i.e. "3DS")
-		const TCHAR *	LongDesc();					// Long ASCII description (i.e. "Autodesk 3D Studio File")
-		const TCHAR *	ShortDesc();				// Short ASCII description (i.e. "3D Studio")
-		const TCHAR *	AuthorName();				// ASCII Author name
-		const TCHAR *	CopyrightMessage();			// ASCII Copyright message
-		const TCHAR *	OtherMessage1();			// Other message #1
-		const TCHAR *	OtherMessage2();			// Other message #2
+		const char *	Ext(int n);					// Extension #n (i.e. "3DS")
+		const char *	LongDesc();					// Long ASCII description (i.e. "Autodesk 3D Studio File")
+		const char *	ShortDesc();				// Short ASCII description (i.e. "3D Studio")
+		const char *	AuthorName();				// ASCII Author name
+		const char *	CopyrightMessage();			// ASCII Copyright message
+		const char *	OtherMessage1();			// Other message #1
+		const char *	OtherMessage2();			// Other message #2
 		unsigned int	Version();					// Version number * 100 (i.e. v3.01 = 301)
 		void			ShowAbout(HWND hWnd);		// Show DLL's "About..." box
 
 		BOOL SupportsOptions(int ext, DWORD options);
-		int				DoExport(const TCHAR *name,ExpInterface *ei,Interface *i, BOOL suppressPrompts=FALSE, DWORD options=0);
+		int				DoExport(const char *name,ExpInterface *ei,Interface *i, BOOL suppressPrompts=FALSE, DWORD options=0);
 
 		//Constructor/Destructor
 		dxframeexp();
@@ -187,12 +203,12 @@ class dxframeexpClassDesc : public ClassDesc2
 public:
 	virtual int IsPublic() 							{ return TRUE; }
 	virtual void* Create(BOOL /*loading = FALSE*/) 		{ return new dxframeexp(); }
-	virtual const TCHAR *	ClassName() 			{ return GetString(IDS_CLASS_NAME); }
+	virtual const char *	ClassName() 			{ return GetString(IDS_CLASS_NAME); }
 	virtual SClass_ID SuperClassID() 				{ return SCENE_EXPORT_CLASS_ID; }
 	virtual Class_ID ClassID() 						{ return dxframeexp_CLASS_ID; }
-	virtual const TCHAR* Category() 				{ return GetString(IDS_CATEGORY); }
+	virtual const char* Category() 				{ return GetString(IDS_CATEGORY); }
 
-	virtual const TCHAR* InternalName() 			{ return _T("dxframeexp"); }	// returns fixed parsable name (scripter-visible name)
+	virtual const char* InternalName() 			{ return _T("dxframeexp"); }	// returns fixed parsable name (scripter-visible name)
 	virtual HINSTANCE HInstance() 					{ return hInstance; }					// returns owning module handle
 };
 
@@ -233,44 +249,44 @@ int dxframeexp::ExtCount()
 	return 1;
 }
 
-const TCHAR *dxframeexp::Ext(int n)
+const char *dxframeexp::Ext(int n)
 {		
 	#pragma message(TODO("Return the 'i-th' file name extension (i.e. \"3DS\")."))
 	if (n==0) return _T("dxf");
 	return _T("");
 }
 
-const TCHAR *dxframeexp::LongDesc()
+const char *dxframeexp::LongDesc()
 {
 	#pragma message(TODO("Return long ASCII description (i.e. \"Targa 2.0 Image File\")"))
 	return _T("dxframe object file");
 }
 	
-const TCHAR *dxframeexp::ShortDesc() 
+const char *dxframeexp::ShortDesc() 
 {			
 	#pragma message(TODO("Return short ASCII description (i.e. \"Targa\")"))
 	return _T("dxframe");
 }
 
-const TCHAR *dxframeexp::AuthorName()
+const char *dxframeexp::AuthorName()
 {			
 	#pragma message(TODO("Return ASCII Author name"))
 	return _T("hellobody");
 }
 
-const TCHAR *dxframeexp::CopyrightMessage() 
+const char *dxframeexp::CopyrightMessage() 
 {	
 	#pragma message(TODO("Return ASCII Copyright message"))
 	return _T("");
 }
 
-const TCHAR *dxframeexp::OtherMessage1() 
+const char *dxframeexp::OtherMessage1() 
 {		
 	//TODO: Return Other message #1 if any
 	return _T("");
 }
 
-const TCHAR *dxframeexp::OtherMessage2() 
+const char *dxframeexp::OtherMessage2() 
 {		
 	//TODO: Return other message #2 in any
 	return _T("");
@@ -293,7 +309,7 @@ BOOL dxframeexp::SupportsOptions(int ext, DWORD options)
 	return TRUE;
 }
 
-int	dxframeexp::DoExport(const TCHAR *name,ExpInterface *ei,Interface *i, BOOL suppressPrompts, DWORD options)
+int	dxframeexp::DoExport(const char *name,ExpInterface *ei,Interface *i, BOOL suppressPrompts, DWORD options)
 {
 	#pragma message(TODO("Implement the actual file Export here and"))
 
