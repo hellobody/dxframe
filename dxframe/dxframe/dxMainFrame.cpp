@@ -1,7 +1,9 @@
 #include "dxMainFrame.h"
 
 dxMainFrame::dxMainFrame () {
-	
+	obj = NULL;
+	obj2 = NULL;
+	testTextField = NULL;
 }
 
 dxMainFrame::~dxMainFrame () {
@@ -18,6 +20,8 @@ void dxMainFrame::Create () {
 	DEL (obj2);
 	obj2 = new dxObj;
 	obj2->CreateFromFile (_T("test.dxf"), "Box01");
+
+	testTextField = new dxTextField (_T("Hello you!!!"), dxRect (250, 500, 50, 100));
 }
 
 void dxMainFrame::Update (float dt) {

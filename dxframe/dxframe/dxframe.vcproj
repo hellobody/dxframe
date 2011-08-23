@@ -191,6 +191,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\dxTextField.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\WinMain.cpp"
 				>
 			</File>
@@ -222,6 +226,10 @@
 			</File>
 			<File
 				RelativePath=".\dxTCHARofstrem.h"
+				>
+			</File>
+			<File
+				RelativePath=".\dxTextField.h"
 				>
 			</File>
 			<File
