@@ -138,7 +138,10 @@ bool WindowInit (HINSTANCE hThisInst, int nCmdShow) {
 
 	RegisterClass (&wcl);
 
-	hWnd = CreateWindowEx (WS_EX_OVERLAPPEDWINDOW, APPNAME, APPTITLE, WS_THICKFRAME | WS_SYSMENU, 0, 0, WIDTH, HEIGHT, NULL, NULL, hThisInst, NULL);
+	int sx = GetSystemMetrics (SM_CXSCREEN);
+	int sy = GetSystemMetrics (SM_CYSCREEN);
+
+	hWnd = CreateWindowEx (WS_EX_OVERLAPPEDWINDOW, APPNAME, APPTITLE, WS_THICKFRAME | WS_SYSMENU, sx/2-WIDTH/2, sy/2-HEIGHT/2, WIDTH, HEIGHT, NULL, NULL, hThisInst, NULL);
 
 	if (!hWnd) return false;
 	return true;
@@ -174,9 +177,36 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 		return false; 
 	}
 
+	ZeroMemory (&d3dpp, sizeof (d3dpp));		//clear struct
+
 	p_d3d->GetAdapterDisplayMode (D3DADAPTER_DEFAULT, &d3ddm); //get info about current display mode (resolution and parameters) 
 
-	ZeroMemory (&d3dpp, sizeof (d3dpp));		//clear struct
+#pragma region [test]
+	//////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////
+	//get total count of available display modes
+	int adapterModeCount = p_d3d->GetAdapterModeCount (D3DADAPTER_DEFAULT);
+
+	D3DDISPLAYMODE td3ddm;
+	vector <D3DDISPLAYMODE> vVideoModes; 
+	forup (adapterModeCount) {
+
+		p_d3d->EnumAdapterModes (D3DADAPTER_DEFAULT, i, &td3ddm);
+		vVideoModes.push_back (td3ddm);
+	}
+
+	forup (adapterModeCount) {
+		
+		if (vVideoModes [i].Width == WIDTH &&
+			vVideoModes [i].Height == HEIGHT) {
+			
+			//d3ddm = vVideoModes [i];
+			break;
+		}
+	}
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////////////////
+#pragma endregion
 	d3dpp.Windowed = true;						//windowed mode
 	d3dpp.SwapEffect = D3DSWAPEFFECT_FLIP;	//set method of window update
 	d3dpp.BackBufferFormat = d3ddm.Format;		//set format of surface of second buffer
@@ -193,7 +223,20 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 	//will be use software vertex processing D3DCREATE_SOFTWARE_VERTEXPROCESSING
 	//will be use above setted present parameters d3dpp
 	//p_d3d_Device - will be the pointer to this device
-	if (FAILED (p_d3d->CreateDevice (D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hWnd, D3DCREATE_SOFTWARE_VERTEXPROCESSING, &d3dpp, &p_d3d_Device))) {
+
+	int errorType;
+	if (FAILED (errorType = p_d3d->CreateDevice (D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hWnd,
+		D3DCREATE_SOFTWARE_VERTEXPROCESSING, &d3dpp, &p_d3d_Device))) {
+
+		switch (errorType) {
+			case D3DERR_INVALIDCALL:
+				break;
+			case D3DERR_NOTAVAILABLE:
+				break;
+			case D3DERR_OUTOFVIDEOMEMORY:
+				break;
+		}
+		
 		trace (_T("Direct3D device did not created."));
 		return false;
 	}
@@ -201,82 +244,18 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 	dxObj::objs.clear ();
 	dxObj::using_d3d_Device = p_d3d_Device;
 
-	//test
-	/*obj = new dxObj;
-	obj->CreateFromFile (_T("test.dxf"), "Plane01");
-
-	dxObj *obj2 = new dxObj;
-	obj2->CreateFromFile (_T("test.dxf"), "Plane02");*/
-	//
-
-	//open file with .dxf models
-	//fin.open (_T("data\\test.DXF"), ios::in | ios::binary);
-
-	//if (!fin.fail ()) {
-
-	//	do {
-	//		obj = new dxObj;
-
-	//		fin.read ((char *) &obj->Name, nameSize);
-	//		fin.read ((char *) &obj->numVerts, 4);
-	//		fin.read ((char *) &obj->numFaces, 4);
-
-	//		obj->pVertsWithNormals = new float [obj->numVerts * (3 * 2 + 2)]; //because verts with normals + texture coord
-
-	//		forup (obj->numVerts * (3 * 2 + 2)) {
-	//			fin.read ((char *) &obj->pVertsWithNormals [i], 4);
-	//		}
-
-	//		obj->pFaces = new int [obj->numFaces * 3];
-
-	//		forup (obj->numFaces * 3) {
-	//			fin.read ((char *) &obj->pFaces [i], 4);
-	//		}
-
-	//		char tStr [nameSize];
-	//		fin.read ((char *) tStr, nameSize);
-
-	//		obj->Create (p_d3d_Device, obj->numVerts, obj->numFaces);
-
-	//		dxObj::objs.insert (objPair (obj->Name, obj)); //push new model to map
-
-	//		char endByte;
-	//		fin.read ((char *) &endByte, 1);
-
-	//		if (!fin.eof ()) {
-	//			fin.seekg (int (fin.tellg ()) - 1);
-	//		}
-	//	} while (!fin.eof ());
-	//	
-	//	fin.close ();
-	//}
-
 	D3DXMatrixRotationY (&matWorld, 0.0f);
 
 	//if need ortographic camera
-	D3DXMatrixOrthoLH (&matProj, WIDTH, HEIGHT, -10000, 10000);	//turn on orthographic camera
+	//D3DXMatrixOrthoLH (&matProj, WIDTH, HEIGHT, -2000, 2000);	//turn on orthographic camera
 	//else
-	//D3DXMatrixPerspectiveFovLH (&matProj, D3DX_PI/2, 4.f/3.f, 1.f, 10000.f); //last two edges of drawing, do not set near val < 1.f
+	D3DXMatrixPerspectiveFovLH (&matProj, D3DX_PI/2, 4.f/3.f, 1.f, 10000.f); //last two edges of drawing, do not set near val < 1.f
 	
 	//second param - angle of view, third - aspect ratio
 
 	p_d3d_Device->SetTransform (D3DTS_WORLD, &matWorld);
 	p_d3d_Device->SetTransform (D3DTS_PROJECTION, &matProj);
-	p_d3d_Device->SetRenderState (D3DRS_CULLMODE, D3DCULL_CW);
-
-	//init materials
-	ZeroMemory (&mtrl1, sizeof (D3DMATERIAL8));
-	mtrl1.Diffuse.r = mtrl1.Ambient.r = 1.0f;
-	mtrl1.Diffuse.g = mtrl1.Ambient.g = 1.0f;
-	mtrl1.Diffuse.b = mtrl1.Ambient.b = 1.0f;
-	mtrl1.Diffuse.a = mtrl1.Ambient.a = 1.0f;
-
-	ZeroMemory (&mtrl2, sizeof (D3DMATERIAL8));
-	mtrl2.Diffuse.r = mtrl1.Ambient.r = 1.0f;
-	mtrl2.Diffuse.g = mtrl1.Ambient.g = 0.0f;
-	mtrl2.Diffuse.b = mtrl1.Ambient.b = 0.0f;
-	mtrl2.Diffuse.a = mtrl1.Ambient.a = 1.0f;
-	//
+	p_d3d_Device->SetRenderState (D3DRS_CULLMODE, D3DCULL_CCW);
 
 	//init light
 	D3DXVECTOR3 vecDir;
@@ -301,15 +280,6 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 	
 	//for Z-buffer
 	p_d3d_Device->SetRenderState (D3DRS_ZENABLE, D3DZB_TRUE);
-	//
-
-	//load textures
-	TCHAR tStr [MAX_PATH];
-	_stprintf_s (tStr, _T("%s%s"), PATHTO_DATA, _T("test.jpg"));
-	if (S_OK != D3DXCreateTextureFromFile (p_d3d_Device, tStr, &tex1))
-	{
-		int _break = 0;
-	}
 	//
 
 	// Create a D3DX font object
@@ -358,9 +328,9 @@ void Update () {
 
 	bool dik_space_pressed = false;
 
-	static float speed = 300;
+	static float speed = 100;
 
-	if (FALSE) {	//off camera move
+	if (1) {	//off camera move
 
 		if (keystate [DIK_RETURN] & 0x80) speed = 30000;
 		if (keystate [DIK_SPACE] & 0x80) {
