@@ -6,7 +6,7 @@ cCamera::cCamera () {
 	up = D3DXVECTOR3 (0,1,0);
 	look = D3DXVECTOR3 (0,0,1);
 	right = D3DXVECTOR3 (1,0,0);
-	pos = D3DXVECTOR3 (0,0,-400);
+	pos = D3DXVECTOR3 (0,0,-250);
 }
 
 cCamera::cCamera (eCameraType type) {
