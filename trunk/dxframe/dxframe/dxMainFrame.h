@@ -2,6 +2,7 @@
 #define MAINFRAME_H_
 
 #include "dxObj.h"
+#include "dxTextField.h"
 
 class dxMainFrame
 {
@@ -9,6 +10,8 @@ class dxMainFrame
 
 	dxObj *obj2;
 	dxObj *obj;
+
+	dxTextField *testTextField;
 
 public:
 	dxMainFrame ();

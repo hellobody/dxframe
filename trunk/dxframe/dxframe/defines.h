@@ -38,11 +38,37 @@
 const int nameSize = 256;
 
 class dxObj;
+class dxTextField;
 
 using namespace std;
 
 typedef pair <string, dxObj*> objPair;
 typedef map <string, dxObj*> objMap;
+
+typedef pair <string, dxTextField*> dxTextFieldPair;
+typedef map <string, dxTextField*> dxTextFieldMap;
+
+class dxRect : public RECT
+{
+public:
+	dxRect () {
+		left = 0;
+		right = 0;
+		top = 0;
+		bottom = 0;
+	}
+
+	dxRect (LONG _left, LONG _right, LONG _top, LONG _bottom) {
+		left	= _left;
+		right	= _right;
+		top		= _top;
+		bottom	= _bottom;
+	}
+
+	RECT GetRECT () {
+		return (RECT) *this;
+	}
+};
 
 struct CUSTOMVERTEX { 
 

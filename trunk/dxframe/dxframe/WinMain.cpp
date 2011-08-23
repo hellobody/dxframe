@@ -363,6 +363,10 @@ void Render () {
 		it->second->Render ();
 	}
 
+	for (dxTextFieldMap::iterator it = dxTextField::textFields.begin (); it != dxTextField::textFields.end (); it++) {
+		it->second->Draw ();
+	} 
+
 	// Create a colour for the text - in this case blue
 	D3DCOLOR fontColor = D3DCOLOR_ARGB(255,0,0,255);    
 
