@@ -1,1 +1,0 @@
-copy dxframeexp.dle D:\3dsmax2009\stdplugs /Y
