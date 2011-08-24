@@ -7,12 +7,8 @@ BOOL bActive;
 LPCWSTR APPNAME = L"dxframe";
 LPCWSTR APPTITLE = L"dxframe";
 
-LPDIRECTINPUT8 din = NULL;    // the pointer to our DirectInput interface
-LPDIRECTINPUTDEVICE8 dinkeybd = NULL;    // the pointer to the keyboard device
-LPDIRECTINPUTDEVICE8 dinmouse = NULL;    // the pointer to the mouse device
-
-DIMOUSESTATE mousestate;    // the storage for the mouse-information
-BYTE keystate [256];    // the storage for the key-information
+dxConsole console;
+dxInput input;
 
 LPDIRECT3D8 p_d3d = NULL;						//direct 3d main interface
 LPDIRECT3DDEVICE8 p_d3d_Device = NULL;			//direct 3d device
@@ -55,66 +51,37 @@ LPD3DXFONT Font = NULL;
 
 dxMainFrame MainFrame;
 
-void initDInput (HINSTANCE hInstance, HWND hWnd) {
-	// create the DirectInput interface
-	DirectInput8Create (hInstance,    // the handle to the application
-		DIRECTINPUT_VERSION,    // the compatible version
-		IID_IDirectInput8,    // the DirectInput interface version
-		(void**)&din,    // the pointer to the interface
-		NULL);    // COM stuff, so we'll set it to NULL
-
-	// create the keyboard device
-	din->CreateDevice (GUID_SysKeyboard,    // the default keyboard ID being used
-		&dinkeybd,    // the pointer to the device interface
-		NULL);    // COM stuff, so we'll set it to NULL
-
-	din->CreateDevice (GUID_SysMouse,
-		&dinmouse,
-		NULL);
-
-	// set the data format to keyboard format
-	dinkeybd->SetDataFormat (&c_dfDIKeyboard);
-	dinmouse->SetDataFormat (&c_dfDIMouse);
-
-	// set the control you will have over the keyboard
-	dinkeybd->SetCooperativeLevel (hWnd, DISCL_NONEXCLUSIVE | DISCL_FOREGROUND);
-	dinmouse->SetCooperativeLevel (hWnd, DISCL_NONEXCLUSIVE | DISCL_FOREGROUND);
-}
-
-// this is the function that closes DirectInput
-void cleanDInput () {
-	dinkeybd->Unacquire ();    // make sure the keyboard is unacquired
-	dinmouse->Unacquire ();    // make sure the mouse in unacquired
-	din->Release ();    // close DirectInput before exiting
-}
-
-// this is the function that gets the latest input data
-void updateInput () {
-	// get access if we don't have it already
-	dinkeybd->Acquire ();
-	dinmouse->Acquire ();
-
-	// get the input data
-	dinkeybd->GetDeviceState (256, (LPVOID) keystate);
-	dinmouse->GetDeviceState (sizeof (DIMOUSESTATE), (LPVOID) &mousestate);
-}
+dxLogger Logger;
 
 void Destroy ();
+
+bool enableCameraMove = false;
+
+void EnableCameraMove () {
+	enableCameraMove = true;
+}
+
+void DisableCameraMove () {
+	enableCameraMove = false;
+}
 
 LRESULT CALLBACK WindowProc (HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
 
 	switch (message) {
 
 		case WM_ACTIVATE:
+
 			bActive = LOWORD (wParam);
 			break;
 
 		case WM_DESTROY:
+
 			Destroy ();
 			PostQuitMessage (0);
 			break;
 
 		case WM_SETCURSOR:
+
 			//SetCursor (1);
 			break;
 
@@ -164,7 +131,6 @@ void getFileNameFromFullPath (const char *fullPath, char *fileName) {
 
 bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 
-	dxLogger Logger;
 	Logger.getSystemInfo ();
 	Logger.logSystemInfo ();
 
@@ -290,7 +256,7 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 
 	MainFrame.Create ();
 
-	initDInput (hThisInst, hWnd);
+	input.Initialize (hThisInst, hWnd);
 	
 	ShowWindow (hWnd, nCmdShow);
 	UpdateWindow (hWnd);
@@ -300,7 +266,8 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 
 void Update () {
 
-	updateInput ();
+	console.Update ();
+	input.Update ();
 
 	float ct = (float) clock () / CLOCKS_PER_SEC;
 	dt = ct - lt;
@@ -326,27 +293,17 @@ void Update () {
 
 	///////////////////
 
-	bool dik_space_pressed = false;
-
 	static float speed = 100;
 
-	if (1) {	//off camera move
+	if (enableCameraMove) {
 
-		if (keystate [DIK_RETURN] & 0x80) speed = 30000;
-		if (keystate [DIK_SPACE] & 0x80) {
-			if (!dik_space_pressed && speed < 3000000) {
-				speed *= 2;
-				dik_space_pressed = true;
-			}
-		} else dik_space_pressed = false;
+		if (input.IsKeyDown (DIK_W)) camera.walk (dt * speed);
+		if (input.IsKeyDown (DIK_S)) camera.walk (-dt * speed);
+		if (input.IsKeyDown (DIK_A)) camera.strafe (-dt * speed);
+		if (input.IsKeyDown (DIK_D)) camera.strafe (dt * speed);
 
-		if (keystate [DIK_W] & 0x80) camera.walk (dt * speed);
-		if (keystate [DIK_S] & 0x80) camera.walk (-dt * speed);
-		if (keystate [DIK_A] & 0x80) camera.strafe (-dt * speed);
-		if (keystate [DIK_D] & 0x80) camera.strafe (dt * speed);
-
-		camera.yaw (mousestate.lX * .01f);
-		camera.pitch (mousestate.lY * .01f);
+		camera.yaw (input.GetMouseDeltaX () * .01f);
+		camera.pitch (input.GetMouseDeltaY () * .01f);
 
 		matView = camera.getViewMatrix ();
 		p_d3d_Device->SetTransform (D3DTS_VIEW, &matView);
@@ -363,8 +320,10 @@ void Render () {
 		it->second->Render ();
 	}
 
-	for (dxTextFieldMap::iterator it = dxTextField::textFields.begin (); it != dxTextField::textFields.end (); it++) {
-		it->second->Draw ();
+	forup ((int) dxTextField::textFields.size ()) {
+		if (dxTextField::textFields [i]) {
+			dxTextField::textFields [i]->Draw ();
+		}
 	} 
 
 	// Create a colour for the text - in this case blue
@@ -397,7 +356,7 @@ void Destroy ()	{
 	RELEASE (p_d3d);
 	RELEASE (tex1);
 	
-	cleanDInput ();
+	input.Clean ();
 
 	for (objMap::iterator it = dxObj::objs.begin (); it != dxObj::objs.end (); it++)
 	{

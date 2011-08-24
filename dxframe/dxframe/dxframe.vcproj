@@ -179,6 +179,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\dxConsole.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\dxInput.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\dxLogger.cpp"
 				>
 			</File>
@@ -210,6 +218,14 @@
 			</File>
 			<File
 				RelativePath=".\defines.h"
+				>
+			</File>
+			<File
+				RelativePath=".\dxConsole.h"
+				>
+			</File>
+			<File
+				RelativePath=".\dxInput.h"
 				>
 			</File>
 			<File

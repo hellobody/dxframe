@@ -14,6 +14,7 @@
 #include "tchar.h"
 #include <io.h>
 #include <errno.h>
+#include <iostream>
 
 #include "path.h"
 
@@ -44,9 +45,6 @@ using namespace std;
 
 typedef pair <string, dxObj*> objPair;
 typedef map <string, dxObj*> objMap;
-
-typedef pair <string, dxTextField*> dxTextFieldPair;
-typedef map <string, dxTextField*> dxTextFieldMap;
 
 class dxRect : public RECT
 {
