@@ -5,6 +5,9 @@ extern dxInput input;
 
 extern void EnableCameraMove ();
 extern void DisableCameraMove ();
+extern void SwitchToOrthographicView ();
+extern void SwitchToPerspectiveView ();
+extern void ResetCameraPosition ();
 
 dxConsole::dxConsole () {
 
@@ -52,15 +55,15 @@ void dxConsole::Update () {
 void dxConsole::ProcCommand (TCHAR *Command) {
 	
 	if (_tcscmp (Command, _T("camon")) == 0) {
-		
 		EnableCameraMove ();
 	} else if (_tcscmp (Command, _T("camoff")) == 0) {
-		
 		DisableCameraMove ();
+	} else if (_tcscmp (Command, _T("rescam")) == 0) {
+		ResetCameraPosition ();
+	} else if (_tcscmp (Command, _T("2d")) == 0) {
+		SwitchToOrthographicView ();
 	} else if (_tcscmp (Command, _T("3d")) == 0) {
-		
-
-
+		SwitchToPerspectiveView ();
 	}
 }
 

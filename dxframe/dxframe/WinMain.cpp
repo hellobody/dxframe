@@ -7,9 +7,6 @@ BOOL bActive;
 LPCWSTR APPNAME = L"dxframe";
 LPCWSTR APPTITLE = L"dxframe";
 
-dxConsole console;
-dxInput input;
-
 LPDIRECT3D8 p_d3d = NULL;						//direct 3d main interface
 LPDIRECT3DDEVICE8 p_d3d_Device = NULL;			//direct 3d device
 
@@ -20,21 +17,8 @@ D3DXMATRIX matWorld;
 D3DXMATRIX matView;
 D3DXMATRIX matProj;
 
-//materials
-D3DMATERIAL8 mtrl1;
-D3DMATERIAL8 mtrl2;
-
-LPDIRECT3DTEXTURE8 tex1 = NULL;	//the pointer to texture
-
 //light
 D3DLIGHT8 light;
-
-ifstream fin;							//file input
-dxObj *obj;								//my object
-
-//camera
-cCamera camera (D3DXVECTOR3 (0, 0, -250));
-//
 
 //timer
 float lt = 0; //last clock value
@@ -42,16 +26,18 @@ float ct;	//current clock value
 float dt; //tick size in seconds
 //
 
-//fps
 int fps = 0;
-//
 
 HFONT hFont = NULL;
 LPD3DXFONT Font = NULL;
 
+cCamera camera (D3DXVECTOR3 (0, 0, -250));
+
 dxMainFrame MainFrame;
 
-dxLogger Logger;
+dxConsole console;
+dxInput input;
+dxLogger logger;
 
 void Destroy ();
 
@@ -63,6 +49,31 @@ void EnableCameraMove () {
 
 void DisableCameraMove () {
 	enableCameraMove = false;
+}
+
+void SwitchToOrthographicView () {
+	D3DXMatrixOrthoLH (&matProj, WIDTH, HEIGHT, -2000, 2000);	//turn on orthographic camera
+	if (p_d3d_Device) {
+		p_d3d_Device->SetTransform (D3DTS_PROJECTION, &matProj);
+	}
+}
+
+void SwitchToPerspectiveView () {
+	D3DXMatrixPerspectiveFovLH (&matProj, D3DX_PI/2, 4.f/3.f, 1.f, 10000.f); //last two edges of drawing, do not set near val < 1.f
+	if (p_d3d_Device) {
+		p_d3d_Device->SetTransform (D3DTS_PROJECTION, &matProj);
+	}
+}
+
+void ResetCameraPosition () {
+
+	cCamera newCamera;
+	camera = newCamera;
+
+	matView = camera.getViewMatrix ();
+	if (p_d3d_Device) {
+		p_d3d_Device->SetTransform (D3DTS_VIEW, &matView);
+	}
 }
 
 LRESULT CALLBACK WindowProc (HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
@@ -131,10 +142,10 @@ void getFileNameFromFullPath (const char *fullPath, char *fileName) {
 
 bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 
-	Logger.getSystemInfo ();
-	Logger.logSystemInfo ();
+	logger.getSystemInfo ();
+	logger.logSystemInfo ();
 
-	Logger.trace (_T("test"));
+	logger.trace (_T("test"));
 
 	if (!WindowInit (hThisInst, nCmdShow)) return false; //init window
 
@@ -147,7 +158,7 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 
 	p_d3d->GetAdapterDisplayMode (D3DADAPTER_DEFAULT, &d3ddm); //get info about current display mode (resolution and parameters) 
 
-#pragma region [test]
+#pragma region [try to work with adapter modes here]
 	//////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////
 	//get total count of available display modes
@@ -173,6 +184,7 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////
 #pragma endregion
+
 	d3dpp.Windowed = true;						//windowed mode
 	d3dpp.SwapEffect = D3DSWAPEFFECT_FLIP;	//set method of window update
 	d3dpp.BackBufferFormat = d3ddm.Format;		//set format of surface of second buffer
@@ -213,15 +225,15 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 	D3DXMatrixRotationY (&matWorld, 0.0f);
 
 	//if need ortographic camera
-	//D3DXMatrixOrthoLH (&matProj, WIDTH, HEIGHT, -2000, 2000);	//turn on orthographic camera
+	D3DXMatrixOrthoLH (&matProj, WIDTH, HEIGHT, -2000, 2000);	//turn on orthographic camera
 	//else
-	D3DXMatrixPerspectiveFovLH (&matProj, D3DX_PI/2, 4.f/3.f, 1.f, 10000.f); //last two edges of drawing, do not set near val < 1.f
+	//D3DXMatrixPerspectiveFovLH (&matProj, D3DX_PI/2, 4.f/3.f, 1.f, 10000.f); //last two edges of drawing, do not set near val < 1.f
 	
 	//second param - angle of view, third - aspect ratio
 
 	p_d3d_Device->SetTransform (D3DTS_WORLD, &matWorld);
 	p_d3d_Device->SetTransform (D3DTS_PROJECTION, &matProj);
-	p_d3d_Device->SetRenderState (D3DRS_CULLMODE, D3DCULL_CCW);
+	p_d3d_Device->SetRenderState (D3DRS_CULLMODE, D3DCULL_NONE);
 
 	//init light
 	D3DXVECTOR3 vecDir;
@@ -244,19 +256,17 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 	p_d3d_Device->SetRenderState (D3DRS_AMBIENT, 0);
 	//
 	
-	//for Z-buffer
 	p_d3d_Device->SetRenderState (D3DRS_ZENABLE, D3DZB_TRUE);
-	//
+
+	input.Initialize (hThisInst, hWnd);
 
 	// Create a D3DX font object
 	hFont = CreateFont (20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, PROOF_QUALITY, 0, _T("Comic Sans MS"));
 	if (S_OK != D3DXCreateFont (p_d3d_Device, hFont, &Font)) {
 		trace (_T ("Font did not created."));
 	}
-
+	
 	MainFrame.Create ();
-
-	input.Initialize (hThisInst, hWnd);
 	
 	ShowWindow (hWnd, nCmdShow);
 	UpdateWindow (hWnd);
@@ -308,9 +318,17 @@ void Update () {
 		matView = camera.getViewMatrix ();
 		p_d3d_Device->SetTransform (D3DTS_VIEW, &matView);
 	}
+
+	if (input.IsKeyToggledDown (DIK_ESCAPE)) {
+		SendMessage (hWnd, WM_DESTROY, 0, 0);
+	}
 }
 
 void Render () {
+
+	if (p_d3d_Device == NULL) {
+		return;
+	}
 
 	p_d3d_Device->Clear (0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB (0, 0, 0), 1.0f, 0);
 	p_d3d_Device->BeginScene ();
@@ -354,7 +372,6 @@ void Destroy ()	{
 
 	RELEASE (p_d3d_Device);
 	RELEASE (p_d3d);
-	RELEASE (tex1);
 	
 	input.Clean ();
 

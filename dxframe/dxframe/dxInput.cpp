@@ -10,7 +10,7 @@ DIMOUSESTATE mousestate;    // the storage for the mouse-information
 BYTE lstKeystate [256];    // the storage for the last key-information
 BYTE keystate [256];    // the storage for the key-information
 
-extern dxLogger Logger;
+extern dxLogger logger;
 
 dxInput::dxInput () {
 	
@@ -29,7 +29,7 @@ void dxInput::Initialize (HINSTANCE hInstance, HWND hWnd) {
 		NULL);    // COM stuff, so we'll set it to NULL
 
 	if (din == NULL) {
-		Logger.trace (_T("Error creation Direct Input interface."));
+		logger.trace (_T("Error creation Direct Input interface."));
 		return;
 	}
 
@@ -43,7 +43,7 @@ void dxInput::Initialize (HINSTANCE hInstance, HWND hWnd) {
 		NULL);
 
 	if (dinkeybd == NULL || dinmouse == NULL) {
-		Logger.trace (_T("Error creation Keyboard or Mouse devices pointers."));
+		logger.trace (_T("Error creation Keyboard or Mouse devices pointers."));
 		return;
 	}
 

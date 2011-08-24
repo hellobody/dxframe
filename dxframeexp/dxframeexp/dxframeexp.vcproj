@@ -198,7 +198,7 @@
 				Name="VCLinkerTool"
 				AdditionalOptions=" "
 				AdditionalDependencies="odbc32.lib odbccp32.lib comctl32.lib core.lib geom.lib gfx.lib mesh.lib maxutil.lib maxscrpt.lib paramblk2.lib "
-				OutputFile="D:\projects\dxframe\dxframeexp\dxframeexp.dle"
+				OutputFile="g:\projects\dxframe\dxframeexp\dxframeexp.dle"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="C:\3DSMAXSDK2009\maxsdk\lib"

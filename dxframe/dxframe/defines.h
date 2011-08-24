@@ -33,8 +33,8 @@
 #define forup(x) for (int i=0; i<x; i++)
 #define forupj(x) for (int j=0; j<x; j++)
 
-#define WIDTH 640
-#define HEIGHT 480
+#define WIDTH 1024
+#define HEIGHT 768
 
 const int nameSize = 256;
 
