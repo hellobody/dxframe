@@ -15,7 +15,7 @@ void dxMainFrame::Create () {
 	//todo: create dxObjes here
 	DEL (obj);
 	obj = new dxObj;
-	obj->CreateFromFile (_T("test.dxf"), "Plane01");
+	obj->CreateFromFile (_T("test.dxf"), "Box01");
 
 	DEL (obj2);
 	obj2 = new dxObj;
