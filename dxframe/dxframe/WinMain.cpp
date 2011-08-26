@@ -253,7 +253,7 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 	p_d3d_Device->LightEnable (0, true);
 	
 	p_d3d_Device->SetRenderState (D3DRS_LIGHTING, true);
-	p_d3d_Device->SetRenderState (D3DRS_AMBIENT, 0);
+	//p_d3d_Device->SetRenderState (D3DRS_AMBIENT, 0);
 	//
 	
 	p_d3d_Device->SetRenderState (D3DRS_ZENABLE, D3DZB_TRUE);

@@ -183,7 +183,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\dxIniFileInterface.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\dxInput.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\dxLight.cpp"
 				>
 			</File>
 			<File
@@ -225,7 +233,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\dxIniFileInterface.h"
+				>
+			</File>
+			<File
 				RelativePath=".\dxInput.h"
+				>
+			</File>
+			<File
+				RelativePath=".\dxLight.h"
 				>
 			</File>
 			<File
