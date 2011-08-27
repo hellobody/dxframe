@@ -2,6 +2,8 @@
 #define WINMAIN_H
 
 #include "defines.h"
+#include "dxEnvironmentVars.h"
+#include "dxIniFileInterface.h"
 #include "dxConsole.h"
 #include "dxInput.h"
 #include "cCamera.h"

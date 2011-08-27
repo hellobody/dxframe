@@ -5,15 +5,20 @@
 
 class dxConsole {
 
+protected:
+
+	TCHAR *buf;
+
+	HANDLE hIConsole;
+	HANDLE hOConsole;
+
 public:
 	dxConsole ();
 	~dxConsole ();
 
-	void Update ();
+	bool Update ();
 
-	void ProcCommand (TCHAR *Command);
-
-	void Close ();
+	bool ProcCommand (TCHAR *Command);
 };
 
 #endif

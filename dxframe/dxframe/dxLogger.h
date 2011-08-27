@@ -15,6 +15,7 @@ private:
 	TCHAR osName [MAX_PATH];
 	TCHAR compName [MAX_PATH];
 	TCHAR userName [MAX_PATH];
+	TCHAR appDataPath [MAX_PATH];
 
 public:
 

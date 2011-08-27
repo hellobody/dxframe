@@ -3,6 +3,7 @@
 HWND hWnd;
 
 BOOL bActive;
+BOOL bAlwaysActive = TRUE;
 
 LPCWSTR APPNAME = L"dxframe";
 LPCWSTR APPTITLE = L"dxframe";
@@ -31,13 +32,17 @@ int fps = 0;
 HFONT hFont = NULL;
 LPD3DXFONT Font = NULL;
 
-cCamera camera (D3DXVECTOR3 (0, 0, -250));
+cCamera camera (D3DXVECTOR3 (0, 0, 250));
+
+dxEnvironmentVars environmentVars;
+dxIniFileInterface iniFileInterface;
 
 dxMainFrame MainFrame;
 
-dxConsole console;
 dxInput input;
 dxLogger logger;
+
+HANDLE hThreadConsole = NULL;
 
 void Destroy ();
 
@@ -74,6 +79,15 @@ void ResetCameraPosition () {
 	if (p_d3d_Device) {
 		p_d3d_Device->SetTransform (D3DTS_VIEW, &matView);
 	}
+}
+
+DWORD WINAPI ThreadConsoleFunction (LPVOID lpParam) 
+{ 
+	dxConsole console;
+
+	while (console.Update ()) {}
+
+    return 0;
 }
 
 LRESULT CALLBACK WindowProc (HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
@@ -224,6 +238,7 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 
 	D3DXMatrixRotationY (&matWorld, 0.0f);
 
+	
 	//if need ortographic camera
 	D3DXMatrixOrthoLH (&matProj, WIDTH, HEIGHT, -2000, 2000);	//turn on orthographic camera
 	//else
@@ -276,7 +291,6 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 
 void Update () {
 
-	console.Update ();
 	input.Update ();
 
 	float ct = (float) clock () / CLOCKS_PER_SEC;
@@ -303,7 +317,7 @@ void Update () {
 
 	///////////////////
 
-	static float speed = 100;
+	static float speed = 400;
 
 	if (enableCameraMove) {
 
@@ -321,6 +335,19 @@ void Update () {
 
 	if (input.IsKeyToggledDown (DIK_ESCAPE)) {
 		SendMessage (hWnd, WM_DESTROY, 0, 0);
+	}
+
+	if (input.IsKeyToggledDown (DIK_GRAVE)) {
+
+		if (hThreadConsole) {
+
+			TerminateThread (hThreadConsole, 0);
+			hThreadConsole = NULL;
+		} else {
+
+			DWORD ThreadID;
+			hThreadConsole = CreateThread (NULL, 0, ThreadConsoleFunction, 0, 0, &ThreadID);		
+		}
 	}
 }
 
@@ -395,7 +422,7 @@ int APIENTRY WinMain (HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR lpCmdLine,
 			TranslateMessage (&msg);
 			DispatchMessage (&msg);
 
-		} else if (bActive) {
+		} else if (bActive || bAlwaysActive) {
 
 			Update ();
 			Render ();

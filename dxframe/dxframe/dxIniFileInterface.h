@@ -7,16 +7,18 @@ class dxIniFileInterface
 {
 public:
 
+	TCHAR buf [MAX_PATH];
+
 	dxIniFileInterface ();
 	~dxIniFileInterface ();
 
-	bool Set (const TCHAR *key, int val);
-	bool Set (const TCHAR *key, float val);
-	bool Set (const TCHAR *key, const TCHAR *val);
+	BOOL Set (const TCHAR *key, int val);
+	BOOL Set (const TCHAR *key, float val);
+	BOOL Set (const TCHAR *key, const TCHAR *val);
 
 	int GetInt (const TCHAR *key);
 	float GetFloat (const TCHAR *key);
-	const TCHAR *GetString (const TCHAR *key);
+	TCHAR *GetString (const TCHAR *key);
 };
 
 #endif

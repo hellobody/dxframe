@@ -46,6 +46,11 @@ using namespace std;
 typedef pair <string, dxObj*> objPair;
 typedef map <string, dxObj*> objMap;
 
+static const TCHAR *dxIniFileName = _T("dxframe.ini");
+static const TCHAR *dxIniSectionName = _T("settings");
+
+const static bool DebugCompilerMode = true;
+
 class dxRect : public RECT
 {
 public:
