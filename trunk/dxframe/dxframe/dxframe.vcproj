@@ -233,6 +233,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\dxEnvironmentVars.h"
+				>
+			</File>
+			<File
 				RelativePath=".\dxIniFileInterface.h"
 				>
 			</File>

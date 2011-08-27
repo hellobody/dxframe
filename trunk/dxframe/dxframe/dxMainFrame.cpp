@@ -1,9 +1,9 @@
 #include "dxMainFrame.h"
 
 dxMainFrame::dxMainFrame () {
-	obj = NULL;
-	obj2 = NULL;
-	testTextField = NULL;
+	
+	obj0 = NULL;
+	obj1 = NULL;
 }
 
 dxMainFrame::~dxMainFrame () {
@@ -13,15 +13,12 @@ dxMainFrame::~dxMainFrame () {
 void dxMainFrame::Create () {
 	
 	//todo: create dxObjes here
-	DEL (obj);
-	obj = new dxObj;
-	obj->CreateFromFile (_T("test.dxf"), "Box01");
 
-	DEL (obj2);
-	obj2 = new dxObj;
-	obj2->CreateFromFile (_T("test.dxf"), "M_03");
+	obj0 = new dxObj;
+	obj0->CreateFromFile (_T("test.dxf"), "Plane01");
 
-	//testTextField = new dxTextField (_T("Hello you!!!"), dxRect (250, 500, 50, 100));
+	obj1 = new dxObj;
+	obj1->CreateFromFile (_T("test.dxf"), "Plane02");
 }
 
 void dxMainFrame::Update (float dt) {
@@ -29,7 +26,7 @@ void dxMainFrame::Update (float dt) {
 	static float c = 0;
 	c += dt;
 
-	
+	//obj1->Move (dt, 10, 10);
 }
 
 void dxMainFrame::Destroy () {

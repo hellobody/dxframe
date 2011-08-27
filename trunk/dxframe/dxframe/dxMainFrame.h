@@ -8,10 +8,8 @@ class dxMainFrame
 {
 	//todo: place any members here
 
-	dxObj *obj2;
-	dxObj *obj;
-
-	dxTextField *testTextField;
+	dxObj *obj0;
+	dxObj *obj1;
 
 public:
 	dxMainFrame ();

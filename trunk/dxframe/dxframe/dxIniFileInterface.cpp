@@ -1,4 +1,7 @@
 #include "dxIniFileInterface.h"
+#include "dxEnvironmentVars.h"
+
+extern dxEnvironmentVars environmentVars;
 
 /*
 char *IniRead(char *filename, char *section, char *key){
@@ -33,19 +36,19 @@ dxIniFileInterface::~dxIniFileInterface ()
 	
 }
 
-bool dxIniFileInterface::Set (const TCHAR *key, int val)
+BOOL dxIniFileInterface::Set (const TCHAR *key, int val)
 {
 	return true;
 }
 
-bool dxIniFileInterface::Set (const TCHAR *key, float val)
+BOOL dxIniFileInterface::Set (const TCHAR *key, float val)
 {
 	return true;
 }
 
-bool dxIniFileInterface::Set (const TCHAR *key, const TCHAR *val)
+BOOL dxIniFileInterface::Set (const TCHAR *key, const TCHAR *val)
 {
-	return true;
+	return WritePrivateProfileString (dxIniSectionName, key, val, environmentVars.iniFilePath);
 }
 
 int dxIniFileInterface::GetInt (const TCHAR *key)
@@ -62,9 +65,9 @@ float dxIniFileInterface::GetFloat (const TCHAR *key)
 	return val;
 }
 
-const TCHAR *dxIniFileInterface::GetString (const TCHAR *key)
+TCHAR *dxIniFileInterface::GetString (const TCHAR *key)
 {
-	TCHAR tStr [MAX_PATH];
+	GetPrivateProfileString (dxIniSectionName, key, NULL, buf, MAX_PATH, environmentVars.iniFilePath);
 
-	return tStr;
+	return buf;
 }
