@@ -1,5 +1,8 @@
 todo:
 
+	- разобраться с ID3DXBaseMesh и D3DXIntersect
+		- http://www.toymaker.info/Games/html/picking.html
+
 	- разобраться с шейдерами
 	
 	- доработать класс для работы с .ini файлом
