@@ -1,5 +1,7 @@
 todo:
 
+	- use D3DXIntersectTri
+
 	- разобраться с ID3DXBaseMesh и D3DXIntersect
 		- http://www.toymaker.info/Games/html/picking.html
 
