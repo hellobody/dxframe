@@ -47,6 +47,7 @@ HANDLE hThreadConsole = NULL;
 void Destroy ();
 
 bool enableCameraMove = false;
+bool showFPS = false;
 
 void EnableCameraMove () {
 	enableCameraMove = true;
@@ -103,6 +104,10 @@ LRESULT CALLBACK WindowProc (HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 
 			Destroy ();
 			PostQuitMessage (0);
+			break;
+
+		case WM_CLOSE:
+
 			break;
 
 		case WM_SETCURSOR:
@@ -250,6 +255,9 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 	p_d3d_Device->SetTransform (D3DTS_PROJECTION, &matProj);
 	p_d3d_Device->SetRenderState (D3DRS_CULLMODE, D3DCULL_NONE);
 
+	matView = camera.getViewMatrix ();
+	p_d3d_Device->SetTransform (D3DTS_VIEW, &matView);
+
 	//init light
 	D3DXVECTOR3 vecDir;
 	ZeroMemory (&light, sizeof (D3DLIGHT8));
@@ -272,6 +280,12 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 	//
 	
 	p_d3d_Device->SetRenderState (D3DRS_ZENABLE, D3DZB_TRUE);
+
+	//try use alpha blend
+	p_d3d_Device->SetRenderState( D3DRS_ALPHABLENDENABLE, TRUE );
+    p_d3d_Device->SetRenderState( D3DRS_SRCBLEND, D3DBLEND_SRCALPHA );
+    p_d3d_Device->SetRenderState( D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA );
+	//
 
 	input.Initialize (hThisInst, hWnd);
 
@@ -317,7 +331,7 @@ void Update () {
 
 	///////////////////
 
-	static float speed = 400;
+	static float speed = 800;
 
 	if (enableCameraMove) {
 
@@ -326,7 +340,7 @@ void Update () {
 		if (input.IsKeyDown (DIK_A)) camera.strafe (-dt * speed);
 		if (input.IsKeyDown (DIK_D)) camera.strafe (dt * speed);
 
-		camera.yaw (input.GetMouseDeltaX () * .01f);
+		camera.yaw (input.GetMouseDeltaX () * -.01f);
 		camera.pitch (input.GetMouseDeltaY () * .01f);
 
 		matView = camera.getViewMatrix ();
@@ -371,20 +385,22 @@ void Render () {
 		}
 	} 
 
-	// Create a colour for the text - in this case blue
-	D3DCOLOR fontColor = D3DCOLOR_ARGB(255,0,0,255);    
+	if (showFPS) {
+		// Create a colour for the text - in this case blue
+		D3DCOLOR fontColor = D3DCOLOR_ARGB(255,0,0,255);    
 
-	// Create a rectangle to indicate where on the screen it should be drawn
-	RECT rct;
-	rct.left = 10;
-	rct.right = 780;
-	rct.top = 10;
-	rct.bottom = rct.top + 20;
+		// Create a rectangle to indicate where on the screen it should be drawn
+		RECT rct;
+		rct.left = 10;
+		rct.right = 780;
+		rct.top = 10;
+		rct.bottom = rct.top + 20;
 
-	if (Font) {
-		TCHAR tS [MAX_PATH];
-		_stprintf_s (tS, _T("fps: %i"), fps);
-		Font->DrawText (tS, -1, &rct, 0, fontColor);
+		if (Font) {
+			TCHAR tS [MAX_PATH];
+			_stprintf_s (tS, _T("fps: %i"), fps);
+			Font->DrawText (tS, -1, &rct, 0, fontColor);
+		}
 	}
 
 	p_d3d_Device->EndScene ();

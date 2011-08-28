@@ -1,6 +1,7 @@
 #ifndef MAINFRAME_H_
 #define MAINFRAME_H_
 
+#include "dxInput.h"
 #include "dxObj.h"
 #include "dxTextField.h"
 
@@ -8,6 +9,7 @@ class dxMainFrame
 {
 	//todo: place any members here
 
+	dxObj *obj;
 	dxObj *obj0;
 	dxObj *obj1;
 
