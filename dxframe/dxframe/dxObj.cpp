@@ -54,16 +54,16 @@ void dxObj::Create (LPDIRECT3DDEVICE8 d3d_device, int numVerts, int numFaces) {	
 	//temporary, rewrite it////////////////////////////////////////////////////
 	forup (numVerts) {
 
-		pOriginalVerts[i].position.x = pVertsWithNormals[i*8];
-		pOriginalVerts[i].position.y = pVertsWithNormals[i*8+1];
-		pOriginalVerts[i].position.z = pVertsWithNormals[i*8+2];
+		pOriginalVerts [i].position.x = pVertsWithNormals [i*8];
+		pOriginalVerts [i].position.y = pVertsWithNormals [i*8+1];
+		pOriginalVerts [i].position.z = pVertsWithNormals [i*8+2];
 
-		pOriginalVerts[i].normal.x = pVertsWithNormals[i*8+3];
-		pOriginalVerts[i].normal.y = pVertsWithNormals[i*8+4];
-		pOriginalVerts[i].normal.z = pVertsWithNormals[i*8+5];
+		pOriginalVerts [i].normal.x = pVertsWithNormals [i*8+3];
+		pOriginalVerts [i].normal.y = pVertsWithNormals [i*8+4];
+		pOriginalVerts [i].normal.z = pVertsWithNormals [i*8+5];
 
-		pOriginalVerts[i].texture.x = pVertsWithNormals[i*8+6];
-		pOriginalVerts[i].texture.y = pVertsWithNormals[i*8+7];
+		pOriginalVerts [i].texture.x = pVertsWithNormals [i*8+6];
+		pOriginalVerts [i].texture.y = pVertsWithNormals [i*8+7];
 	}
 
 	void *tPointer;
@@ -145,16 +145,16 @@ bool dxObj::CreateFromFile (const TCHAR *flName, const char *objName) {
 		//temporary, rewrite it////////////////////////////////////////////////////
 		forup (numVerts) {
 
-			pOriginalVerts[i].position.x = pVertsWithNormals[i*8];
-			pOriginalVerts[i].position.y = pVertsWithNormals[i*8+1];
-			pOriginalVerts[i].position.z = pVertsWithNormals[i*8+2];
+			pOriginalVerts [i].position.x = pVertsWithNormals [i*8];
+			pOriginalVerts [i].position.y = pVertsWithNormals [i*8+1];
+			pOriginalVerts [i].position.z = pVertsWithNormals [i*8+2];
 
-			pOriginalVerts[i].normal.x = pVertsWithNormals[i*8+3];
-			pOriginalVerts[i].normal.y = pVertsWithNormals[i*8+4];
-			pOriginalVerts[i].normal.z = pVertsWithNormals[i*8+5];
+			pOriginalVerts [i].normal.x = pVertsWithNormals [i*8+3];
+			pOriginalVerts [i].normal.y = pVertsWithNormals [i*8+4];
+			pOriginalVerts [i].normal.z = pVertsWithNormals [i*8+5];
 
-			pOriginalVerts[i].texture.x = pVertsWithNormals[i*8+6];
-			pOriginalVerts[i].texture.y = pVertsWithNormals[i*8+7];
+			pOriginalVerts [i].texture.x = pVertsWithNormals [i*8+6];
+			pOriginalVerts [i].texture.y = pVertsWithNormals [i*8+7];
 		}
 
 		void *tPointer;
@@ -258,4 +258,38 @@ void dxObj::Render () {
 	using_d3d_Device->SetTextureStageState (0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
 	
 	using_d3d_Device->DrawIndexedPrimitive (D3DPT_TRIANGLELIST, 0, numVerts, 0, numFaces);
+}
+
+bool dxObj::IsPick (LONG x, LONG y)
+{
+	D3DXVECTOR3 *PickPos = new D3DXVECTOR3;
+	D3DXVECTOR3 *PickDir = new D3DXVECTOR3;
+	
+	PickPos->x = (float) x;
+	PickPos->y = (float) y;
+	PickPos->z = 250;
+
+	PickDir->x = 0;
+	PickDir->y = 0;
+	PickDir->z = -1;
+
+	FLOAT a, b, c;
+
+	for (int i=0; i<numVerts; i+=3)
+	{
+		if (D3DXIntersectTri (	&pTransformedVerts [i].position, 
+								&pTransformedVerts [i+1].position, 
+								&pTransformedVerts [i+2].position,
+								PickPos,
+								PickDir,
+								&a, &b, &c))
+		{
+			DEL (PickPos);
+			DEL (PickDir);
+			return true;
+		}
+	}
+	DEL (PickPos);
+	DEL (PickDir);
+	return false;
 }

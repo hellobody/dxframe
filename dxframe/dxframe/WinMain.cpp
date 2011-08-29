@@ -3,7 +3,7 @@
 HWND hWnd;
 
 BOOL bActive;
-BOOL bAlwaysActive = TRUE;
+BOOL bAlwaysActive = FALSE;
 
 LPCWSTR APPNAME = L"dxframe";
 LPCWSTR APPTITLE = L"dxframe";
@@ -58,14 +58,14 @@ void DisableCameraMove () {
 }
 
 void SwitchToOrthographicView () {
-	D3DXMatrixOrthoLH (&matProj, WIDTH, HEIGHT, -2000, 2000);	//turn on orthographic camera
+	D3DXMatrixOrthoRH (&matProj, WIDTH, HEIGHT, -2000, 2000);	//turn on orthographic camera
 	if (p_d3d_Device) {
 		p_d3d_Device->SetTransform (D3DTS_PROJECTION, &matProj);
 	}
 }
 
 void SwitchToPerspectiveView () {
-	D3DXMatrixPerspectiveFovLH (&matProj, D3DX_PI/2, 4.f/3.f, 1.f, 10000.f); //last two edges of drawing, do not set near val < 1.f
+	D3DXMatrixPerspectiveFovRH (&matProj, D3DX_PI/2, 4.f/3.f, 1.f, 10000.f); //last two edges of drawing, do not set near val < 1.f
 	if (p_d3d_Device) {
 		p_d3d_Device->SetTransform (D3DTS_PROJECTION, &matProj);
 	}
@@ -241,13 +241,13 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 	dxObj::objs.clear ();
 	dxObj::using_d3d_Device = p_d3d_Device;
 
-	D3DXMatrixRotationY (&matWorld, 0.0f);
+	D3DXMatrixRotationZ (&matWorld, 0.0f);
 
 	
 	//if need ortographic camera
-	D3DXMatrixOrthoLH (&matProj, WIDTH, HEIGHT, -2000, 2000);	//turn on orthographic camera
+	D3DXMatrixOrthoRH (&matProj, WIDTH, HEIGHT, -2000, 2000);	//turn on orthographic camera
 	//else
-	//D3DXMatrixPerspectiveFovLH (&matProj, D3DX_PI/2, 4.f/3.f, 1.f, 10000.f); //last two edges of drawing, do not set near val < 1.f
+	//D3DXMatrixPerspectiveFovRH (&matProj, D3DX_PI/2, 4.f/3.f, 1.f, 10000.f); //last two edges of drawing, do not set near val < 1.f
 	
 	//second param - angle of view, third - aspect ratio
 
@@ -267,7 +267,7 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 	light.Diffuse.g  = 1.0f;
 	light.Diffuse.b  = 1.0f;
 
-	vecDir = D3DXVECTOR3 (0.0f, -1.0f, 0.0f);
+	vecDir = D3DXVECTOR3 (0.0f, 0.0f, -1.0f);
 	D3DXVec3Normalize ((D3DXVECTOR3*) &light.Direction, &vecDir);
 
 	light.Range = 10000.0f;
@@ -335,13 +335,13 @@ void Update () {
 
 	if (enableCameraMove) {
 
-		if (input.IsKeyDown (DIK_W)) camera.walk (dt * speed);
-		if (input.IsKeyDown (DIK_S)) camera.walk (-dt * speed);
+		if (input.IsKeyDown (DIK_W)) camera.walk (-dt * speed);
+		if (input.IsKeyDown (DIK_S)) camera.walk (dt * speed);
 		if (input.IsKeyDown (DIK_A)) camera.strafe (-dt * speed);
 		if (input.IsKeyDown (DIK_D)) camera.strafe (dt * speed);
 
-		camera.yaw (input.GetMouseDeltaX () * -.01f);
-		camera.pitch (input.GetMouseDeltaY () * .01f);
+		camera.yaw (input.GetMouseDeltaX () * .01f);
+		camera.pitch (input.GetMouseDeltaY () * -.01f);
 
 		matView = camera.getViewMatrix ();
 		p_d3d_Device->SetTransform (D3DTS_VIEW, &matView);
