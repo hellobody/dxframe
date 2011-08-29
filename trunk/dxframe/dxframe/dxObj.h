@@ -32,8 +32,8 @@ public:
 	D3DXMATRIX mainM;		//main model matrix
 	D3DXMATRIX tempM;       //temp matrix
 
-	float * pVertsWithNormals;	//pointer to array of vertexes and normal, like this 30,45,65,0,1,0 (first three vertex coordinates, last - normal)
-	int * pFaces;				//pointer to array of indexes
+	float *pVertsWithNormals;	//pointer to array of vertexes and normal, like this 30,45,65,0,1,0 (first three vertex coordinates, last - normal)
+	int *pFaces;				//pointer to array of indexes
 
 	dxObj ();
 	~dxObj ();
@@ -51,6 +51,8 @@ public:
 
 	void Transform ();
 	void Render ();
+
+	bool IsPick (LONG x, LONG y);
 };
 
 #endif

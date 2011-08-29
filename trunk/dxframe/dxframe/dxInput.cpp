@@ -13,10 +13,12 @@ BYTE keystate [256];    // the storage for the key-information
 extern dxLogger logger;
 
 dxInput::dxInput () {
-	
+
+	CursorPosition = new POINT;
 }
 
 dxInput::~dxInput () {
+
 	Clean ();
 }
 
@@ -88,6 +90,8 @@ void dxInput::Update () {
 
 // this is the function that closes DirectInput
 void dxInput::Clean () {
+
+	DEL (CursorPosition);
 
 	if (din == NULL || dinkeybd == NULL || dinmouse == NULL) {
 		return;
@@ -184,4 +188,12 @@ long dxInput::GetMouseDeltaY () {
 
 long dxInput::GetMouseDeltaZ () {
 	return mousestate.lZ;
+}
+
+LPPOINT dxInput::GetCursorPosition () {
+
+	GetCursorPos (CursorPosition);
+	//CursorPosition->x -= WIDTH/2;
+	//CursorPosition->y += HEIGHT/2;
+	return CursorPosition;
 }

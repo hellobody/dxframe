@@ -73,7 +73,7 @@ public:
 	}
 };
 
-struct CUSTOMVERTEX { 
+struct CUSTOMVERTEX {
 
 	float x, y, z, nx, ny, nz, tu, tv;
 	CUSTOMVERTEX ();
@@ -90,7 +90,7 @@ struct CUSTOMVERTEX {
 	}
 };
 
-struct VERTEX_3DPNT {  
+struct VERTEX_3DPNT {
 
 	D3DXVECTOR3 position; 
 	D3DXVECTOR3 normal; 
@@ -99,17 +99,17 @@ struct VERTEX_3DPNT {
 
 static void trace (TCHAR *str) {
 
-	TCHAR tStr [500] = _T("");
-	_tcscat_s (tStr, 400, str);
-	_tcscat_s (tStr, 100, _T("\n"));
+	TCHAR tStr [MAX_PATH] = _T("");
+	_tcscat_s (tStr, MAX_PATH, str);
+	_tcscat_s (tStr, MAX_PATH, _T("\n"));
 	OutputDebugString (tStr);
 }
 
 static void trace (float val) {
 
-	TCHAR tStr [500];
+	TCHAR tStr [MAX_PATH];
 	_stprintf_s (tStr, _T("%f"), val);
-	_tcscat_s (tStr, 20, _T("f\n"));
+	_tcscat_s (tStr, MAX_PATH, _T("f\n"));
 	OutputDebugString (tStr);
 }
 

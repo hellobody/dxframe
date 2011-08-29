@@ -5,6 +5,10 @@
 
 class dxInput {
 
+protected:
+
+	LPPOINT CursorPosition;
+
 public:
 
 	dxInput ();
@@ -31,6 +35,8 @@ public:
 	long GetMouseDeltaX ();
 	long GetMouseDeltaY ();
 	long GetMouseDeltaZ ();
+
+	LPPOINT GetCursorPosition ();
 };
 
 #endif

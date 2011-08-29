@@ -26,7 +26,7 @@ void dxMainFrame::Create () {
 	obj1 = new dxObj;
 	obj1->CreateFromFile (_T("test.dxf"), "Plane02");
 
-	
+	obj1->Move (100, 100, 0);
 }
 
 void dxMainFrame::Update (float dt) {
@@ -36,7 +36,16 @@ void dxMainFrame::Update (float dt) {
 
 	//obj1->Move (dt, 10, 10);
 
-	
+	if (input.IsLeftMouseKeyToggledDown ()) {
+	TCHAR tStr [MAX_PATH];
+	_stprintf (tStr, _T("%i, %i"), input.GetCursorPosition ()->x, input.GetCursorPosition ()->y);
+	trace (tStr);
+	}
+
+	if (obj1->IsPick (input.GetCursorPosition ()->x, input.GetCursorPosition ()->y))
+	{
+		int a = 0;
+	}
 }
 
 void dxMainFrame::Destroy () {
