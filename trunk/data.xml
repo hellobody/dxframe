@@ -1,7 +1,7 @@
 <Data>
 	<Copy From="C:\Documents and Settings\Admin\Мои документы\3dsmax\export\test.DXF"
-        To="g:\projects\dxframe\dxframe\dxframe\data\test.dxf" />
+        To="G:\projects\dxframe\dxframe\dxframe\data\test.dxf" />
 		
-	<Copy From="g:\projects\dxframe\dxframeexp\dxframeexp.dle"
+	<Copy From="G:\projects\dxframe\dxframeexp\dxframeexp.dle"
         To="C:\Program Files\Autodesk\3ds Max 2009\stdplugs\dxframeexp.dle" />
 </Data>

@@ -267,7 +267,7 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 	light.Diffuse.g  = 1.0f;
 	light.Diffuse.b  = 1.0f;
 
-	vecDir = D3DXVECTOR3 (0.0f, 0.0f, -1.0f);
+	vecDir = D3DXVECTOR3 (0.0f, 0.0f, 1.0f);
 	D3DXVec3Normalize ((D3DXVECTOR3*) &light.Direction, &vecDir);
 
 	light.Range = 10000.0f;
