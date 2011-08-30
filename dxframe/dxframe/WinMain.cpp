@@ -340,7 +340,7 @@ void Update () {
 		if (input.IsKeyDown (DIK_A)) camera.strafe (-dt * speed);
 		if (input.IsKeyDown (DIK_D)) camera.strafe (dt * speed);
 
-		camera.yaw (input.GetMouseDeltaX () * .01f);
+		camera.yaw (input.GetMouseDeltaX () * -.01f);
 		camera.pitch (input.GetMouseDeltaY () * -.01f);
 
 		matView = camera.getViewMatrix ();

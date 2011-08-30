@@ -254,6 +254,7 @@ void dxObj::Render () {
 	using_d3d_Device->SetIndices (p_IndexBuffer, 0);
 
 	using_d3d_Device->SetTexture (0, texture);
+	using_d3d_Device->SetTextureStageState (0, D3DTSS_COLOROP,  D3DTOP_MODULATE);
 	using_d3d_Device->SetTextureStageState (0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
 	using_d3d_Device->SetTextureStageState (0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
 	

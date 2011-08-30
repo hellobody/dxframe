@@ -79,9 +79,15 @@ void SceneSaver::ProcNode(INode *node)
 {
 	int Del;
 
+	Point3 v;
+
 	TriObject *TObj;
 	TObj = GetTriObjFromNode(node, Del);
 	if (!TObj) return;
+
+	Matrix3 tm = node->GetObjTMAfterWSM (ip->GetTime ());
+
+	TObj->mesh.buildNormals ();
 
 	//Get and write name
 	char *Name = new char [nameSize];
@@ -94,41 +100,59 @@ void SceneSaver::ProcNode(INode *node)
 
 	fout.write ((char *) &TObj->mesh.numVerts, 4);
 	fout.write ((char *) &TObj->mesh.numFaces, 4);
-	
-	Matrix3 tm = node->GetObjTMAfterWSM(ip->GetTime());
-	
-	TObj->mesh.buildNormals();
 
-	Point3 v;
+	if (TObj->mesh.numTVerts / 3 < TObj->mesh.numFaces) {	//генерятся трехмерные текстурные координаты, т.к. я юзаю только двухмерные кол-во 
+		MessageBox (NULL, _T("Try to generate texture coordinates. \n (Use UVW Map modifier for example.)"), _T("Error"), MB_OK); // текстурных координат / 3 должно быть равно кол-ву полигонов
+	}
 	
 	for (int i = 0; i < TObj->mesh.numVerts; i++)
 	{
 		//write vertexes
-		v = tm * TObj->mesh.verts[i];
+		v = tm * TObj->mesh.getVert (i);
 
 		fout.write ((char *) &v.x, 4);
 		fout.write ((char *) &v.y, 4);
 		fout.write ((char *) &v.z, 4);
 
-		//write noramals
+		//write normals
 		v = TObj->mesh.getNormal (i);
 
 		fout.write ((char *) &v.x, 4);
 		fout.write ((char *) &v.y, 4);
 		fout.write ((char *) &v.z, 4);
 
+		//But how do they fit together?
+
+		//	It is very important to note that
+
+		//	A - There can be more or less texture and color vertices than there are mesh vertices
+
+		//	B – There are always exactly as many mesh faces as there are texture and color faces!
+
+		//	So there is no one-to-one correspondence between mesh vertices and texture and color vertices. You cannot take vertex number 10 from the mesh and expect that texture vertex 10 will store the information about its texturing or color vertex 10 would define its vertex color.
+
+		//	As mentioned in B , the number of faces is always identical. Not only this, the indices of the mesh and texture resp. color faces have a one-to-one correspondence! If face 5 has 3 mesh vertices you are interested in, their corresponding texture vertices will be the 3 vertices referenced by the texture face number 5.
+
+		//	This is the key to access to texture and color information in 3ds Max!
+
 		//write texture coordinates
-		v = TObj->mesh.getTVert (i);
+		v = TObj->mesh.tVerts [i];	//читаю только UV для 2d текстурирования
 		fout.write ((char *) &v.x, 4);
 		fout.write ((char *) &v.y, 4);
 	}
-
+	
 	for (int i = 0; i < TObj->mesh.numFaces; i++)
 	{
 		fout.write ((char *) &TObj->mesh.faces [i].v [0], 4);
 		fout.write ((char *) &TObj->mesh.faces [i].v [1], 4);
 		fout.write ((char *) &TObj->mesh.faces [i].v [2], 4);
 	}
+
+	TCHAR tMess [MAX_PATH] = _T("");
+
+	_stprintf_s (tMess, _T("Model name: %s \n\n Counts: \n vertexes: %i \n faces: %i \n texture coordinates: %i"), Name, TObj->mesh.numVerts, TObj->mesh.numFaces, TObj->mesh.numTVerts);
+
+	MessageBox (NULL, tMess, _T("Info"), MB_OK);
 
 	//export texture name
 	char TexName [nameSize];
