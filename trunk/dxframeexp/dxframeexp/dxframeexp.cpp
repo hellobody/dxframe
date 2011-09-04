@@ -93,6 +93,7 @@ void SceneSaver::ProcNode(INode *node)
 
 	Matrix3 tm = node->GetObjTMAfterWSM (ip->GetTime ());	//seems like got transformation matrix here
 
+
 	/////////////////////////////////////////////////////////////////
 	int numVerts = TObj->mesh.numVerts;				//кол-во вершин
 	int numTVerts = TObj->mesh.numTVerts;			//кол-во текстурных вершин
@@ -109,7 +110,6 @@ void SceneSaver::ProcNode(INode *node)
 	int *pFaces = new int [numFaces * 3];			//массив с индексами
 	int *pTFaces = new int [numFaces * 3];			//массив с текстурными индексами
 
-	//fout.write ((char *) &numVerts, 4);
 	fout.write ((char *) &numTVerts, 4);			//новое кол-во вершин записываем в файл
 	fout.write ((char *) &numFaces, 4);
 
@@ -117,14 +117,16 @@ void SceneSaver::ProcNode(INode *node)
 	TCHAR tStr [MAX_PATH] = _T("");
 
 	_stprintf_s (tMess, _T("Model name: %s \n\n counts: \n vertexes: %i \n texture vertexes: %i \n faces: %i"), Name, numVerts, numTVerts, numFaces);
-	//MessageBox (NULL, tMess, _T("Info"), MB_OK);
+	MessageBox (NULL, tMess, _T("Info"), MB_OK);
 
 	_tcscpy_s (tMess, MAX_PATH, _T("vertexes:\n"));
 	for (int i = 0; i < numVerts; i++) {
 
-		pVerts [i * 3]	   = TObj->mesh.getVert (i).x;
-		pVerts [i * 3 + 1] = TObj->mesh.getVert (i).y;
-		pVerts [i * 3 + 2] = TObj->mesh.getVert (i).z;
+		v = tm * TObj->mesh.getVert (i);
+
+		pVerts [i * 3]	   = v.x;
+		pVerts [i * 3 + 1] = v.y;
+		pVerts [i * 3 + 2] = v.z;
 
 		/*_stprintf_s (tStr, _T(" %f,"), pVerts [i * 3]);
 		_tcscat_s (tMess, MAX_PATH, tStr);
@@ -189,8 +191,6 @@ void SceneSaver::ProcNode(INode *node)
 	}
 	//MessageBox (NULL, tMess, _T("Info"), MB_OK);
 
-	//MessageBox (NULL, _T("pTFaces ok."), _T("Info"), MB_OK);
-
 	/*for (int i = 0; i < numTVerts; i++) {
 
 		pTVerts [i * 2]	    = TObj->mesh.getTVert (i).x;
@@ -200,8 +200,6 @@ void SceneSaver::ProcNode(INode *node)
 	float *pRecomputedVerts = new float [numTVerts * 3];
 	float *pRecomputedNormals = new float [numTVerts * 3];
 
-	//MessageBox (NULL, _T("pRecomputedVerts & pRecomputedNormals created."), _T("Info"), MB_OK);
-
 	for (int i=0; i<numFaces * 3; i++) {
 		
 		pRecomputedVerts [pTFaces [i] * 3]	   = pVerts [pFaces [i] * 3];
@@ -209,7 +207,7 @@ void SceneSaver::ProcNode(INode *node)
 		pRecomputedVerts [pTFaces [i] * 3 + 2] = pVerts [pFaces [i] * 3 + 2];
 	}
 
-	_tcscpy_s (tMess, MAX_PATH, _T("recomputed vertexes:\n"));
+	//_tcscpy_s (tMess, MAX_PATH, _T("recomputed vertexes:\n"));
 	for (int i=0; i<numFaces * 3; i++) {
 
 		/*_stprintf_s (tStr, _T(" %f,"), pRecomputedVerts [i * 3]);
@@ -229,7 +227,7 @@ void SceneSaver::ProcNode(INode *node)
 		pRecomputedNormals [pTFaces [i] * 3 + 2] = pNormals [pFaces [i] * 3 + 2];
 	}
 
-	_tcscpy_s (tMess, MAX_PATH, _T("recomputed normals:\n"));
+	//_tcscpy_s (tMess, MAX_PATH, _T("recomputed normals:\n"));
 	for (int i=0; i<numFaces * 3; i++) {
 
 		/*_stprintf_s (tStr, _T(" %f,"), pRecomputedNormals [i * 3]);
@@ -256,6 +254,7 @@ void SceneSaver::ProcNode(INode *node)
 
 		//write texture coordinates
 		v = TObj->mesh.tVerts [i];	//читаю только UV для 2d текстурирования
+		v.y *= -1; //try to flip texture 
 		fout.write ((char *) &v.x, 4);
 		fout.write ((char *) &v.y, 4);
 	}
