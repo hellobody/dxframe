@@ -9,9 +9,7 @@ class dxMainFrame
 {
 	//todo: place any members here
 
-	dxObj *obj;
-	dxObj *obj0;
-	dxObj *obj1;
+	std::vector <dxObj *> objs;
 
 public:
 	dxMainFrame ();

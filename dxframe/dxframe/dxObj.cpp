@@ -283,8 +283,8 @@ bool dxObj::IsPick (LONG x, LONG y)
 
 	for (int i=0; i<numVerts; i+=3)
 	{
-		if (D3DXIntersectTri (	&pTransformedVerts [i].position, 
-								&pTransformedVerts [i+1].position, 
+		if (D3DXIntersectTri (	&pTransformedVerts [i].position,
+								&pTransformedVerts [i+1].position,
 								&pTransformedVerts [i+2].position,
 								PickPos,
 								PickDir,

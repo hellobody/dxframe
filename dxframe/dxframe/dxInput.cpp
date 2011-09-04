@@ -12,6 +12,8 @@ BYTE keystate [256];    // the storage for the key-information
 
 extern dxLogger logger;
 
+extern HWND hWnd;
+
 dxInput::dxInput () {
 
 	CursorPosition = new POINT;
@@ -193,7 +195,11 @@ long dxInput::GetMouseDeltaZ () {
 LPPOINT dxInput::GetCursorPosition () {
 
 	GetCursorPos (CursorPosition);
-	//CursorPosition->x -= WIDTH/2;
-	//CursorPosition->y += HEIGHT/2;
+
+	ScreenToClient (hWnd, CursorPosition);
+
+	CursorPosition->x -= WIDTH/2;
+	CursorPosition->y -= HEIGHT/2;
+	CursorPosition->y *= -1;
 	return CursorPosition;
 }

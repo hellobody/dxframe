@@ -47,7 +47,7 @@ HANDLE hThreadConsole = NULL;
 void Destroy ();
 
 bool enableCameraMove = false;
-bool showFPS = false;
+bool showFPS = true;
 
 void EnableCameraMove () {
 	enableCameraMove = true;
@@ -113,6 +113,7 @@ LRESULT CALLBACK WindowProc (HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 		case WM_SETCURSOR:
 
 			//SetCursor (1);
+
 			break;
 
 	} return DefWindowProc (hWnd, message, wParam, lParam);
@@ -309,7 +310,7 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 
 void Update () {
 
-	input.Update ();
+	//input.Update ();
 
 	float ct = (float) clock () / CLOCKS_PER_SEC;
 	dt = ct - lt;

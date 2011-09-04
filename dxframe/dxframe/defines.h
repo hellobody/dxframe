@@ -6,6 +6,7 @@
 #include <d3dx8.h>
 #include <dinput.h>
 #include <windows.h>
+#include <windowsx.h>
 #include <fstream>
 #include <string>
 #include <ctime>
