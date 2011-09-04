@@ -18,10 +18,10 @@ void dxMainFrame::Create () {
 	//todo: create dxObjes here
 
 	obj = new dxObj;
-	obj->CreateFromFile (_T("test.dxf"), "Plane01");
+	obj->CreateFromFile (_T("test.dxf"), "Box01");
 
-	obj0 = new dxObj;
-	obj0->CreateFromFile (_T("test.dxf"), "Box01");
+	/*obj0 = new dxObj;
+	obj0->CreateFromFile (_T("test.dxf"), "Box01");*/
 }
 
 void dxMainFrame::Update (float dt) {
