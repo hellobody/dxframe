@@ -24,3 +24,7 @@ todo:
 	баги:
 		- экспорт и загрузка модели плохие!
 			- если не назначить текстуру на модель при загрузке вылетает
+
+	usefull resourses:
+		http://www.toymaker.info
+		http://www.two-kings.de

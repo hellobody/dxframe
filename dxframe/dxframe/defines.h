@@ -27,7 +27,6 @@
 #define DELA(p) {if (p) {delete [] (p); (p) = NULL;}}
 #define DEL(p) {if (p) {delete (p); (p) = NULL;}}
 
-#define D3DFVF_3DPNT (D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1)
 #define D3DFVF_CUSTOMVERTEX (D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1)
 
 #define forup(x) for (int i=0; i<x; i++)
@@ -53,8 +52,11 @@ const static bool DebugCompilerMode = true;
 
 class dxRect : public RECT
 {
+
 public:
+
 	dxRect () {
+
 		left = 0;
 		right = 0;
 		top = 0;
@@ -62,6 +64,7 @@ public:
 	}
 
 	dxRect (LONG _left, LONG _right, LONG _top, LONG _bottom) {
+
 		left	= _left;
 		right	= _right;
 		top		= _top;

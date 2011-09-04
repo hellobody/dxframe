@@ -79,61 +79,180 @@ void SceneSaver::ProcNode(INode *node)
 {
 	int Del;
 
+	TriObject *TObj = GetTriObjFromNode (node, Del);
+	
+	if (!TObj) return;
+	
 	Point3 v;
 
-	TriObject *TObj;
-	TObj = GetTriObjFromNode(node, Del);
-	if (!TObj) return;
-
-	Matrix3 tm = node->GetObjTMAfterWSM (ip->GetTime ());
-
-	TObj->mesh.buildNormals ();
-
 	//Get and write name
-	char *Name = new char [nameSize];
-	for (int i=0; i<nameSize; i++) {
-		Name [i] = '0';
-	}
+	char Name [nameSize] = "";
 	strcpy_s (Name, nameSize, node->GetName ());
 	fout.write (Name, nameSize);
 	//
 
-	fout.write ((char *) &TObj->mesh.numVerts, 4);
-	fout.write ((char *) &TObj->mesh.numFaces, 4);
+	Matrix3 tm = node->GetObjTMAfterWSM (ip->GetTime ());	//seems like got transformation matrix here
 
-	if (TObj->mesh.numTVerts / 3 < TObj->mesh.numFaces) {	//генерятся трехмерные текстурные координаты, т.к. я юзаю только двухмерные кол-во 
-		MessageBox (NULL, _T("Try to generate texture coordinates. \n (Use UVW Map modifier for example.)"), _T("Error"), MB_OK); // текстурных координат / 3 должно быть равно кол-ву полигонов
+	/////////////////////////////////////////////////////////////////
+	int numVerts = TObj->mesh.numVerts;				//кол-во вершин
+	int numTVerts = TObj->mesh.numTVerts;			//кол-во текстурных вершин
+	int numFaces = TObj->mesh.numFaces;				//кол-во полигонов (треугольников (фейсов (граней))) == кол-во текстурных полигонов
+
+	if (numTVerts == 0) {
+		//MessageBox (NULL, _T("There is no texture co-ordinates. \n Try to generate texture co-ordinates. \n (Use UVW Map modifier for example.)"), _T("Error"), MB_OK);
+		return;
 	}
+
+	float *pVerts = new float [numVerts * 3];		//массив с вершинами
+	float *pNormals = new float [numVerts * 3];		//массив с нормалями
+	float *pTVerts = new float [numTVerts * 2];		//массив с текстурными вершинами
+	int *pFaces = new int [numFaces * 3];			//массив с индексами
+	int *pTFaces = new int [numFaces * 3];			//массив с текстурными индексами
+
+	//fout.write ((char *) &numVerts, 4);
+	fout.write ((char *) &numTVerts, 4);			//новое кол-во вершин записываем в файл
+	fout.write ((char *) &numFaces, 4);
+
+	TCHAR tMess [MAX_PATH] = _T("");
+	TCHAR tStr [MAX_PATH] = _T("");
+
+	_stprintf_s (tMess, _T("Model name: %s \n\n counts: \n vertexes: %i \n texture vertexes: %i \n faces: %i"), Name, numVerts, numTVerts, numFaces);
+	//MessageBox (NULL, tMess, _T("Info"), MB_OK);
+
+	_tcscpy_s (tMess, MAX_PATH, _T("vertexes:\n"));
+	for (int i = 0; i < numVerts; i++) {
+
+		pVerts [i * 3]	   = TObj->mesh.getVert (i).x;
+		pVerts [i * 3 + 1] = TObj->mesh.getVert (i).y;
+		pVerts [i * 3 + 2] = TObj->mesh.getVert (i).z;
+
+		/*_stprintf_s (tStr, _T(" %f,"), pVerts [i * 3]);
+		_tcscat_s (tMess, MAX_PATH, tStr);
+		_stprintf_s (tStr, _T(" %f,"), pVerts [i * 3 + 1]);
+		_tcscat_s (tMess, MAX_PATH, tStr);
+		_stprintf_s (tStr, _T(" %f,"), pVerts [i * 3 + 2]);
+		_tcscat_s (tMess, MAX_PATH, tStr);
+		_tcscat_s (tMess, MAX_PATH, _T("\n"));*/
+	}
+	//MessageBox (NULL, tMess, _T("Info"), MB_OK);
+
+	TObj->mesh.buildNormals ();
+
+	_tcscpy_s (tMess, MAX_PATH, _T("normals:\n"));
+	for (int i = 0; i < numVerts; i++) {
+
+		pNormals [i * 3]	 = TObj->mesh.getNormal (i).x;
+		pNormals [i * 3 + 1] = TObj->mesh.getNormal (i).y;
+		pNormals [i * 3 + 2] = TObj->mesh.getNormal (i).z;
+
+		/*_stprintf_s (tStr, _T(" %f,"), pNormals [i * 3]);
+		_tcscat_s (tMess, MAX_PATH, tStr);
+		_stprintf_s (tStr, _T(" %f,"), pNormals [i * 3 + 1]);
+		_tcscat_s (tMess, MAX_PATH, tStr);
+		_stprintf_s (tStr, _T(" %f,"), pNormals [i * 3 + 2]);
+		_tcscat_s (tMess, MAX_PATH, tStr);
+		_tcscat_s (tMess, MAX_PATH, _T("\n"));*/
+	}
+	//MessageBox (NULL, tMess, _T("Info"), MB_OK);
+
+	_tcscpy_s (tMess, MAX_PATH, _T("faces:\n"));
+	for (int i = 0; i < numFaces; i++) {
+
+		pFaces [i * 3]	   = TObj->mesh.faces [i].v [0];
+		pFaces [i * 3 + 1] = TObj->mesh.faces [i].v [1];
+		pFaces [i * 3 + 2] = TObj->mesh.faces [i].v [2];
+
+		/*_stprintf_s (tStr, _T(" %i,"), pFaces [i * 3]);
+		_tcscat_s (tMess, MAX_PATH, tStr);
+		_stprintf_s (tStr, _T(" %i,"), pFaces [i * 3 + 1]);
+		_tcscat_s (tMess, MAX_PATH, tStr);
+		_stprintf_s (tStr, _T(" %i,"), pFaces [i * 3 + 2]);
+		_tcscat_s (tMess, MAX_PATH, tStr);
+		_tcscat_s (tMess, MAX_PATH, _T("\n"));*/
+	}
+	//MessageBox (NULL, tMess, _T("Info"), MB_OK);
+
+	_tcscpy_s (tMess, MAX_PATH, _T("texture faces:\n"));
+	for (int i = 0; i < numFaces; i++) {
+
+		pTFaces [i * 3]	    = TObj->mesh.tvFace [i].t [0];
+		pTFaces [i * 3 + 1] = TObj->mesh.tvFace [i].t [1];
+		pTFaces [i * 3 + 2] = TObj->mesh.tvFace [i].t [2];
+
+		/*_stprintf_s (tStr, _T(" %i,"), pTFaces [i * 3]);
+		_tcscat_s (tMess, MAX_PATH, tStr);
+		_stprintf_s (tStr, _T(" %i,"), pTFaces [i * 3 + 1]);
+		_tcscat_s (tMess, MAX_PATH, tStr);
+		_stprintf_s (tStr, _T(" %i,"), pTFaces [i * 3 + 2]);
+		_tcscat_s (tMess, MAX_PATH, tStr);
+		_tcscat_s (tMess, MAX_PATH, _T("\n"));*/
+	}
+	//MessageBox (NULL, tMess, _T("Info"), MB_OK);
+
+	//MessageBox (NULL, _T("pTFaces ok."), _T("Info"), MB_OK);
+
+	/*for (int i = 0; i < numTVerts; i++) {
+
+		pTVerts [i * 2]	    = TObj->mesh.getTVert (i).x;
+		pTVerts [i * 2 + 1] = TObj->mesh.getTVert (i).y;
+	}*/
+
+	float *pRecomputedVerts = new float [numTVerts * 3];
+	float *pRecomputedNormals = new float [numTVerts * 3];
+
+	//MessageBox (NULL, _T("pRecomputedVerts & pRecomputedNormals created."), _T("Info"), MB_OK);
+
+	for (int i=0; i<numFaces * 3; i++) {
+		
+		pRecomputedVerts [pTFaces [i] * 3]	   = pVerts [pFaces [i] * 3];
+		pRecomputedVerts [pTFaces [i] * 3 + 1] = pVerts [pFaces [i] * 3 + 1];
+		pRecomputedVerts [pTFaces [i] * 3 + 2] = pVerts [pFaces [i] * 3 + 2];
+	}
+
+	_tcscpy_s (tMess, MAX_PATH, _T("recomputed vertexes:\n"));
+	for (int i=0; i<numFaces * 3; i++) {
+
+		/*_stprintf_s (tStr, _T(" %f,"), pRecomputedVerts [i * 3]);
+		_tcscat_s (tMess, MAX_PATH, tStr);
+		_stprintf_s (tStr, _T(" %f,"), pRecomputedVerts [i * 3 + 1]);
+		_tcscat_s (tMess, MAX_PATH, tStr);
+		_stprintf_s (tStr, _T(" %f,"), pRecomputedVerts [i * 3 + 2]);
+		_tcscat_s (tMess, MAX_PATH, tStr);
+		_tcscat_s (tMess, MAX_PATH, _T("\n"));*/
+	}
+	//MessageBox (NULL, tMess, _T("Info"), MB_OK);
+
+	for (int i=0; i<numFaces * 3; i++) {
+
+		pRecomputedNormals [pTFaces [i] * 3]	 = pNormals [pFaces [i] * 3];
+		pRecomputedNormals [pTFaces [i] * 3 + 1] = pNormals [pFaces [i] * 3 + 1];
+		pRecomputedNormals [pTFaces [i] * 3 + 2] = pNormals [pFaces [i] * 3 + 2];
+	}
+
+	_tcscpy_s (tMess, MAX_PATH, _T("recomputed normals:\n"));
+	for (int i=0; i<numFaces * 3; i++) {
+
+		/*_stprintf_s (tStr, _T(" %f,"), pRecomputedNormals [i * 3]);
+		_tcscat_s (tMess, MAX_PATH, tStr);
+		_stprintf_s (tStr, _T(" %f,"), pRecomputedNormals [i * 3 + 1]);
+		_tcscat_s (tMess, MAX_PATH, tStr);
+		_stprintf_s (tStr, _T(" %f,"), pRecomputedNormals [i * 3 + 2]);
+		_tcscat_s (tMess, MAX_PATH, tStr);
+		_tcscat_s (tMess, MAX_PATH, _T("\n"));*/
+	}
+	//MessageBox (NULL, tMess, _T("Info"), MB_OK);
 	
-	for (int i = 0; i < TObj->mesh.numVerts; i++)
+	for (int i = 0; i < numTVerts; i++)
 	{
 		//write vertexes
-		v = tm * TObj->mesh.getVert (i);
-
-		fout.write ((char *) &v.x, 4);
-		fout.write ((char *) &v.y, 4);
-		fout.write ((char *) &v.z, 4);
+		fout.write ((char *) &pRecomputedVerts [i * 3],		4);
+		fout.write ((char *) &pRecomputedVerts [i * 3 + 1], 4);
+		fout.write ((char *) &pRecomputedVerts [i * 3 + 2], 4);
 
 		//write normals
-		v = TObj->mesh.getNormal (i);
-
-		fout.write ((char *) &v.x, 4);
-		fout.write ((char *) &v.y, 4);
-		fout.write ((char *) &v.z, 4);
-
-		//But how do they fit together?
-
-		//	It is very important to note that
-
-		//	A - There can be more or less texture and color vertices than there are mesh vertices
-
-		//	B – There are always exactly as many mesh faces as there are texture and color faces!
-
-		//	So there is no one-to-one correspondence between mesh vertices and texture and color vertices. You cannot take vertex number 10 from the mesh and expect that texture vertex 10 will store the information about its texturing or color vertex 10 would define its vertex color.
-
-		//	As mentioned in B , the number of faces is always identical. Not only this, the indices of the mesh and texture resp. color faces have a one-to-one correspondence! If face 5 has 3 mesh vertices you are interested in, their corresponding texture vertices will be the 3 vertices referenced by the texture face number 5.
-
-		//	This is the key to access to texture and color information in 3ds Max!
+		fout.write ((char *) &pRecomputedNormals [i * 3],     4);
+		fout.write ((char *) &pRecomputedNormals [i * 3 + 1], 4);
+		fout.write ((char *) &pRecomputedNormals [i * 3 + 2], 4);
 
 		//write texture coordinates
 		v = TObj->mesh.tVerts [i];	//читаю только UV для 2d текстурирования
@@ -141,18 +260,12 @@ void SceneSaver::ProcNode(INode *node)
 		fout.write ((char *) &v.y, 4);
 	}
 	
-	for (int i = 0; i < TObj->mesh.numFaces; i++)
+	for (int i = 0; i < numFaces; i++)
 	{
-		fout.write ((char *) &TObj->mesh.faces [i].v [0], 4);
-		fout.write ((char *) &TObj->mesh.faces [i].v [1], 4);
-		fout.write ((char *) &TObj->mesh.faces [i].v [2], 4);
+		fout.write ((char *) &pTFaces [i * 3],	   4);
+		fout.write ((char *) &pTFaces [i * 3 + 1], 4);
+		fout.write ((char *) &pTFaces [i * 3 + 2], 4);
 	}
-
-	TCHAR tMess [MAX_PATH] = _T("");
-
-	_stprintf_s (tMess, _T("Model name: %s \n\n Counts: \n vertexes: %i \n faces: %i \n texture coordinates: %i"), Name, TObj->mesh.numVerts, TObj->mesh.numFaces, TObj->mesh.numTVerts);
-
-	MessageBox (NULL, tMess, _T("Info"), MB_OK);
 
 	//export texture name
 	char TexName [nameSize];
@@ -164,20 +277,20 @@ void SceneSaver::ProcNode(INode *node)
 
 	Mtl *m = node->GetMtl ();
 	if (!m) {
-		MessageBox (NULL, _T("Material is not found"), _T("Warning"), MB_OK);
+		//MessageBox (NULL, _T("Material is not found"), _T("Warning"), MB_OK);
 		fout.write (TexName, nameSize * sizeof (char));
 		return;
 	}
 
 	Texmap *tmap = m->GetSubTexmap (ID_DI); //get diffuse subtexture map
 	if (!tmap) {
-		MessageBox (NULL, _T("Texture is not found"), _T("Warning"), MB_OK);
+		//MessageBox (NULL, _T("Texture is not found"), _T("Warning"), MB_OK);
 		fout.write (TexName, nameSize * sizeof (char));
 		return;
 	}
   
 	if (tmap->ClassID () != Class_ID (BMTEX_CLASS_ID, 0)) {
-		MessageBox (NULL, _T("Texture is not a bitmap"), _T("Warning"), MB_OK);
+		//MessageBox (NULL, _T("Texture is not a bitmap"), _T("Warning"), MB_OK);
 		fout.write (TexName, nameSize * sizeof (char));
 		return;
 	}
@@ -342,7 +455,7 @@ int	dxframeexp::DoExport(const char *name,ExpInterface *ei,Interface *i, BOOL su
 	fout.open (name, ios::out | ios::binary);
 
 	if (fout.fail ()) {
-		MessageBox (NULL, _T("Failed open file"), _T("Error"), MB_OK);
+		//MessageBox (NULL, _T("Failed open file"), _T("Error"), MB_OK);
 		return FALSE;
 	}
 
@@ -350,7 +463,7 @@ int	dxframeexp::DoExport(const char *name,ExpInterface *ei,Interface *i, BOOL su
 
 	fout.close ();
 
-	MessageBox (NULL, _T("Exported"), _T("Message"), MB_OK);
+	//MessageBox (NULL, _T("Exported"), _T("Message"), MB_OK);
 
 	return TRUE;
 

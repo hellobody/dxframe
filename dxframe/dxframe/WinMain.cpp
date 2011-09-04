@@ -204,6 +204,10 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 	///////////////////////////////////////////////////////////////////////////////////////////////
 #pragma endregion
 
+	//I get frame rate fluctuations in windowed mode
+
+	//When your device is created the presentation interval is set to D3DPRESENT_INTERVAL_DEFAULT. This setting synchronises your frames to to the window rate so there is only one present allowed per frame. This prevents tearing effects (D3DPRESENT_INTERVAL_IMMEDIATE provides unlimited presents).  However if you are seeing fluctuations in frame rate you might be better to try D3DPRESENT_INTERVAL_ONE, this uses a higher resolution timer than the default setting which improves the quality of the vsync but takes up a bit more processing time. To change this value you need to alter the D3DPRESENT_PARAMETERS PresentationInterval value.
+
 	d3dpp.Windowed = true;						//windowed mode
 	d3dpp.SwapEffect = D3DSWAPEFFECT_FLIP;	//set method of window update
 	d3dpp.BackBufferFormat = d3ddm.Format;		//set format of surface of second buffer

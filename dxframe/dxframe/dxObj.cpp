@@ -245,6 +245,9 @@ void dxObj::Transform () {
 	p_VertexBuffer->Lock (0, numVerts * sizeof (CUSTOMVERTEX), (BYTE**) &tPointer, 0);
 	memcpy (tPointer, pTransformedVerts, numVerts * sizeof (CUSTOMVERTEX));
 	p_VertexBuffer->Unlock ();
+
+	//These are useful for increasing speed. e.g. if you do not want to keep existing data in the buffer but just want to overwrite it 
+		//you can specify D3DLOCK_DISCARD, this can cause a speed increase
 }
 
 void dxObj::Render () {
@@ -259,6 +262,8 @@ void dxObj::Render () {
 	using_d3d_Device->SetTextureStageState (0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
 	
 	using_d3d_Device->DrawIndexedPrimitive (D3DPT_TRIANGLELIST, 0, numVerts, 0, numFaces);
+
+	//Эффективней использовать D3DPT_TRIANGLESTRIP или D3DPT_TRIANGLEFAN, чем D3DPT_TRIANGLELIST, т.к. в данном случае не происходит дублирование вершин.
 }
 
 bool dxObj::IsPick (LONG x, LONG y)
