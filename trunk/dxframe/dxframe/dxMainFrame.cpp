@@ -4,7 +4,9 @@ extern dxInput input;
 
 dxMainFrame::dxMainFrame () {
 	
-	
+	background = NULL;
+	b_default = NULL;
+	b_selected = NULL;
 }
 
 dxMainFrame::~dxMainFrame () {
@@ -15,10 +17,13 @@ void dxMainFrame::Create () {
 	
 	//todo: create dxObjes here
 
-	objs.push_back ();
+	background = new dxObj;
+	b_default = new dxObj;
+	b_selected = new dxObj;
 
-	/*obj = new dxObj;
-	obj->CreateFromFile (_T("test.dxf"), "Plane01");*/
+	background->CreateFromFile (_T("main_menu.dxf"), "background");
+	b_default->CreateFromFile (_T("main_menu.dxf"), "button_play_default");
+	b_selected->CreateFromFile (_T("main_menu.dxf"), "button_play_selected");
 }
 
 void dxMainFrame::Update (float dt) {

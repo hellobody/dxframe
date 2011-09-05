@@ -9,7 +9,9 @@ class dxMainFrame
 {
 	//todo: place any members here
 
-	std::vector <dxObj *> objs;
+	dxObj *background;
+	dxObj *b_default;
+	dxObj *b_selected;
 
 public:
 	dxMainFrame ();

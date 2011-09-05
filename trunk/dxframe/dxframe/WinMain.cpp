@@ -310,7 +310,7 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 
 void Update () {
 
-	//input.Update ();
+	input.Update ();
 
 	float ct = (float) clock () / CLOCKS_PER_SEC;
 	dt = ct - lt;
