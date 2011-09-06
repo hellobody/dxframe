@@ -194,12 +194,16 @@ long dxInput::GetMouseDeltaZ () {
 
 LPPOINT dxInput::GetCursorPosition () {
 
-	GetCursorPos (CursorPosition);
+	if (GetCursorPos (CursorPosition) == NULL) {
+		
+		trace (_T("GetCursorPos some error."));
+	}
 
 	ScreenToClient (hWnd, CursorPosition);
 
-	CursorPosition->x -= WIDTH/2;
-	CursorPosition->y -= HEIGHT/2;
+	CursorPosition->x = CursorPosition->x - WIDTH/2;
+	CursorPosition->y = CursorPosition->y - HEIGHT/2;
 	CursorPosition->y *= -1;
+
 	return CursorPosition;
 }

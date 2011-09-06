@@ -24,6 +24,14 @@ dxObj::dxObj () {
 	texture = NULL;
 }
 
+dxObj::dxObj (const TCHAR *flName, const char *objName) {
+
+	dxObj tObj;
+	*this = tObj;
+
+	CreateFromFile (flName, objName);
+}
+
 dxObj::~dxObj () {
 
 	InternalDestroy ();
@@ -268,34 +276,29 @@ void dxObj::Render () {
 
 bool dxObj::IsPick (LONG x, LONG y)
 {
-	D3DXVECTOR3 *PickPos = new D3DXVECTOR3;
-	D3DXVECTOR3 *PickDir = new D3DXVECTOR3;
+	D3DXVECTOR3 PickPos;
+	D3DXVECTOR3 PickDir;
 	
-	PickPos->x = (float) x;
-	PickPos->y = (float) y;
-	PickPos->z = 250;
+	PickPos.x = (float) x;
+	PickPos.y = (float) y;
+	PickPos.z = 1000;
 
-	PickDir->x = 0;
-	PickDir->y = 0;
-	PickDir->z = -1;
+	PickDir.x = 0;
+	PickDir.y = 0;
+	PickDir.z = -1;
 
 	FLOAT a, b, c;
 
-	for (int i=0; i<numVerts; i+=3)
+	for (int i=0; i<numFaces; i++)
 	{
-		if (D3DXIntersectTri (	&pTransformedVerts [i].position,
-								&pTransformedVerts [i+1].position,
-								&pTransformedVerts [i+2].position,
-								PickPos,
-								PickDir,
-								&a, &b, &c))
-		{
-			DEL (PickPos);
-			DEL (PickDir);
+		if (D3DXIntersectTri (	&pTransformedVerts [pFaces [i * 3]].position,
+								&pTransformedVerts [pFaces [i * 3 + 1]].position,
+								&pTransformedVerts [pFaces [i * 3 + 2]].position,
+								&PickPos,
+								&PickDir,
+								&a, &b, &c)) {
 			return true;
 		}
 	}
-	DEL (PickPos);
-	DEL (PickDir);
 	return false;
 }
