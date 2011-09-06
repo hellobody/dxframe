@@ -4,6 +4,7 @@
 #include "dxInput.h"
 #include "dxObj.h"
 #include "dxTextField.h"
+#include "dxButton.h"
 
 class dxMainFrame
 {
@@ -13,12 +14,15 @@ class dxMainFrame
 	dxObj *b_default;
 	dxObj *b_selected;
 
+	dxButton *bPlay;
+
 public:
 	dxMainFrame ();
 	~dxMainFrame ();
 
 	void Create ();
 	void Update (float dt);	//dt - delta time between frames
+	void Render ();
 	void Destroy ();
 };
 

@@ -126,7 +126,7 @@ bool WindowInit (HINSTANCE hThisInst, int nCmdShow) {
 	wcl.hInstance = hThisInst;
 	wcl.lpszClassName = APPNAME;
 	wcl.lpfnWndProc = WindowProc;
-	wcl.style = 0;
+	wcl.style = CS_NOCLOSE;
 	wcl.hIcon = LoadIcon (hThisInst, IDC_ICON);
 	wcl.hCursor = LoadCursor (hThisInst, MAKEINTRESOURCE (IDC_POINTER));
 	wcl.lpszMenuName = NULL;
@@ -139,7 +139,7 @@ bool WindowInit (HINSTANCE hThisInst, int nCmdShow) {
 	int sx = GetSystemMetrics (SM_CXSCREEN);
 	int sy = GetSystemMetrics (SM_CYSCREEN);
 
-	hWnd = CreateWindowEx (WS_EX_OVERLAPPEDWINDOW, APPNAME, APPTITLE, WS_THICKFRAME | WS_SYSMENU, sx/2-WIDTH/2, sy/2-HEIGHT/2, WIDTH, HEIGHT, NULL, NULL, hThisInst, NULL);
+	hWnd = CreateWindowEx (0, APPNAME, APPTITLE, WS_BORDER | WS_POPUP, sx/2-WIDTH/2, sy/2-HEIGHT/2, WIDTH, HEIGHT, NULL, NULL, hThisInst, NULL);
 
 	if (!hWnd) return false;
 	return true;
@@ -380,9 +380,12 @@ void Render () {
 	p_d3d_Device->BeginScene ();
 
 	static bool q = true;
-	for (objMap::iterator it = dxObj::objs.begin (); it != dxObj::objs.end (); it++) {
+	
+	/*for (objMap::iterator it = dxObj::objs.begin (); it != dxObj::objs.end (); it++) {
 		it->second->Render ();
-	}
+	}*/
+
+	MainFrame.Render ();
 
 	forup ((int) dxTextField::textFields.size ()) {
 		if (dxTextField::textFields [i]) {

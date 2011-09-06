@@ -36,6 +36,7 @@ public:
 	int *pFaces;				//pointer to array of indexes
 
 	dxObj ();
+	dxObj (const TCHAR *flName, const char *objName);
 	~dxObj ();
 
 	void Create (LPDIRECT3DDEVICE8 d3d_device, int numVerts, int numIndexes); //depracated, prepare to delete
