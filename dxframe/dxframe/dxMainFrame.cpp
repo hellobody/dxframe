@@ -9,6 +9,9 @@ dxMainFrame::dxMainFrame () {
 	b_selected = NULL;
 
 	bPlay = NULL;
+	bOptions = NULL;
+	bScores = NULL;
+	bExit = NULL;
 }
 
 dxMainFrame::~dxMainFrame () {
@@ -26,8 +29,15 @@ void dxMainFrame::Create () {
 
 	bPlay = new dxButton (_T("main_menu.dxf"), "button_play_default", "button_play_selected", "button_play_pressed");
 
-	//b_default->CreateFromFile (_T("main_menu.dxf"), "button_play_default");
-	//b_selected->CreateFromFile (_T("main_menu.dxf"), "button_play_selected");
+	bOptions = new dxButton (_T("main_menu.dxf"), "button_play_default", "button_play_selected", "button_play_pressed");
+	bScores = new dxButton (_T("main_menu.dxf"), "button_play_default", "button_play_selected", "button_play_pressed");
+	bExit = new dxButton (_T("main_menu.dxf"), "button_play_default", "button_play_selected", "button_play_pressed");
+
+	bOptions->Move (0, -100, 0);
+	bScores->Move (0, -200, 0);
+
+	bExit->Move (0, -400, 0);
+	bExit->Scale (.5f, .5f, 1);
 }
 
 void dxMainFrame::Update (float dt) {
@@ -35,6 +45,18 @@ void dxMainFrame::Update (float dt) {
 	if (bPlay) {
 
 		bPlay->Update (dt);
+	}
+	if (bOptions) {
+
+		bOptions->Update (dt);
+	}
+	if (bScores) {
+
+		bScores->Update (dt);
+	}
+	if (bExit) {
+
+		bExit->Update (dt);
 	}
 
 	//obj->RotateZ (dt * .25f);
@@ -58,9 +80,25 @@ void dxMainFrame::Render () {
 
 		bPlay->Render ();
 	}
+	if (bOptions) {
+
+		bOptions->Render ();
+	}
+	if (bScores) {
+
+		bScores->Render ();
+	}
+	if (bExit) {
+
+		bExit->Render ();
+	}
+
 }
 
 void dxMainFrame::Destroy () {
 	
 	DEL (bPlay);
+	DEL (bOptions);
+	DEL (bScores);
+	DEL (bExit);
 }

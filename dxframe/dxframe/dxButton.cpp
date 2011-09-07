@@ -17,6 +17,28 @@ dxButton::~dxButton () {
 
 }
 
+void dxButton::Move (float x, float y, float z) {
+
+	forup (eNumOfStates) {
+
+		if (objs [i]) {
+
+			objs [i]->Move (x, y, z);
+		}
+	}
+}
+
+void dxButton::Scale (float x, float y, float z) {
+
+	forup (eNumOfStates) {
+
+		if (objs [i]) {
+
+			objs [i]->Scale (x, y, z);
+		}
+	}
+}
+
 void dxButton::Update (float dt) {
 
 	if (objs [eDefault]) {
@@ -46,14 +68,18 @@ void dxButton::Render () {
 			if (objs [eDefault]) objs [eDefault]->Render ();
 			break;
 
-		case eSelected:
-
-			if (objs [eSelected]) objs [eSelected]->Render ();
-			break;
-
 		case ePressed:
 
 			if (objs [ePressed]) objs [ePressed]->Render ();
 			break;
+
+		case eSelected:
+
+			if (objs [eSelected]) objs [eSelected]->Render ();
+			break;
 	}
+
+	/*if (objs [ePressed]) objs [ePressed]->Render ();
+	if (objs [eDefault]) objs [eDefault]->Render ();
+	if (objs [eSelected]) objs [eSelected]->Render ();*/
 }
