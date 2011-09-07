@@ -5,7 +5,8 @@ extern dxInput input;
 
 dxButton::dxButton (const TCHAR *FileName, const char *DefaultObjName, const char *SelectedObjName, const char *PressedObjName) {
 
-	state = eDefault;
+	lstState = eDefault;
+	curState = eDefault;
 
 	objs [eDefault]  = new dxObj (FileName, DefaultObjName);
 	objs [eSelected] = new dxObj (FileName, SelectedObjName);
@@ -39,29 +40,69 @@ void dxButton::Scale (float x, float y, float z) {
 	}
 }
 
+bool dxButton::IsDown () {
+
+	if (curState == ePressed) {
+		return true;
+	} else return false;
+}
+
+bool dxButton::IsUp () {
+
+	if (curState == eDefault || curState == eSelected) {
+		return true;
+	} else return false;
+}
+
+bool dxButton::IsToggledDown () {
+	
+	if (curState == ePressed && (lstState == eDefault || lstState == eSelected)) {
+		return true;
+	} else return false;
+}
+
+bool dxButton::IsToggledUp () {
+	
+	if ((curState == eDefault || curState == eSelected) && lstState == ePressed) {
+		return true;
+	} else return false;
+}
+
 void dxButton::Update (float dt) {
+
+	lstState = curState;
 
 	if (objs [eDefault]) {
 		
 		if (objs [eDefault]->IsPick (input.GetCursorPosition ()->x, input.GetCursorPosition ()->y)) {
 			
-			if (input.IsLeftMouseKeyDown ()) {
-				
-				state = ePressed;
-			} else {
-				
-				state = eSelected;
-			}
-		} else {
+			if (input.IsLeftMouseKeyToggledDown ()) {
 
-			state = eDefault;
-		}
+				curState = ePressed;
+			} else if (input.IsLeftMouseKeyToggledUp ()) {
+
+				curState = eDefault;
+			} else if (input.IsLeftMouseKeyDown ()) {
+
+				if (curState == eDefault) {
+
+					curState = eSelected;
+				}
+			} else {
+
+				curState = eSelected;
+			}
+
+		} else if (curState == ePressed) {
+
+			lstState = curState = eDefault;
+		} else curState = eDefault;
 	}
 }
 
 void dxButton::Render () {
 
-	switch (state) {
+	switch (curState) {
 
 		case eDefault:
 			
