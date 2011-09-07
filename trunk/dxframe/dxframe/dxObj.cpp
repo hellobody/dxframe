@@ -1,7 +1,7 @@
 #include "dxObj.h"
 #include "windows.h"
 
-objMap dxObj::objs;
+vector <dxObj *> dxObj::objs;
 
 PDIRECT3DDEVICE8 dxObj::using_d3d_Device = NULL;
 
@@ -183,7 +183,7 @@ bool dxObj::CreateFromFile (const TCHAR *flName, const char *objName) {
 		}
 		//
 
-		objs.insert (objPair (Name, this)); //push new model to map
+		objs.push_back (this);
 	} else {
 
 		trace (_T("File not found."));	//add here file path

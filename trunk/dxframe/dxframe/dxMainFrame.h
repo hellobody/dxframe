@@ -15,6 +15,9 @@ class dxMainFrame
 	dxObj *b_selected;
 
 	dxButton *bPlay;
+	dxButton *bOptions;
+	dxButton *bScores;
+	dxButton *bExit;
 
 public:
 	dxMainFrame ();

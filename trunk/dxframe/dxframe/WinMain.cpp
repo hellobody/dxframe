@@ -330,8 +330,12 @@ void Update () {
 
 	MainFrame.Update (dt);
 
-	for (objMap::iterator it = dxObj::objs.begin (); it != dxObj::objs.end (); it++) {
-		it->second->Transform ();
+	for (vector <dxObj *>::iterator it = dxObj::objs.begin (); it != dxObj::objs.end (); it++) {
+
+		if (*it) {
+			
+			(*it)->Transform ();
+		}
 	}
 
 	///////////////////
@@ -426,9 +430,9 @@ void Destroy ()	{
 	
 	input.Clean ();
 
-	for (objMap::iterator it = dxObj::objs.begin (); it != dxObj::objs.end (); it++)
+	for (vector <dxObj *>::iterator it = dxObj::objs.begin (); it != dxObj::objs.end (); it++)
 	{
-		DEL (it->second);
+		DEL ((*it));
 	}
 }
 

@@ -7,7 +7,7 @@ class dxObj {
 
 public:
 
-	static objMap objs;
+	static vector <dxObj *> objs;
 	static PDIRECT3DDEVICE8 using_d3d_Device;
 
 	LPDIRECT3DTEXTURE8 texture;

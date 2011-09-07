@@ -18,6 +18,9 @@ public:
 	dxButton (const TCHAR *FileName, const char *DefaultObjName, const char *SelectedObjName, const char *PressedObjName);
 	~dxButton ();
 
+	void Move (float, float, float);
+	void Scale (float, float, float);
+
 	void Update (float dt);
 	void Render ();
 };
