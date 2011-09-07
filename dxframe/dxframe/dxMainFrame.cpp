@@ -2,6 +2,8 @@
 
 extern dxInput input;
 
+extern void Exit ();
+
 dxMainFrame::dxMainFrame () {
 	
 	background = NULL;
@@ -54,9 +56,21 @@ void dxMainFrame::Update (float dt) {
 
 		bScores->Update (dt);
 	}
+
 	if (bExit) {
 
 		bExit->Update (dt);
+
+		if (bExit->IsToggledUp ()) {
+
+			trace (_T("IsToggledUp"));
+			Exit ();
+			return;
+		}
+		if (bExit->IsToggledDown ()) {
+
+			trace (_T("IsToggledDown"));
+		}
 	}
 
 	//obj->RotateZ (dt * .25f);

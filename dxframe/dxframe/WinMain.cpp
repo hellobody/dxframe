@@ -49,6 +49,11 @@ void Destroy ();
 bool enableCameraMove = false;
 bool showFPS = true;
 
+void Exit () {
+
+	SendMessage (hWnd, WM_DESTROY, 0, 0);
+}
+
 void EnableCameraMove () {
 	enableCameraMove = true;
 }

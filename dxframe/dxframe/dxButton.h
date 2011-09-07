@@ -9,7 +9,8 @@ protected:
 
 	enum eState {eDefault, eSelected, ePressed, eNumOfStates};
 
-	eState state;
+	eState lstState;
+	eState curState;
 
 	dxObj *objs [eNumOfStates];
 
@@ -20,6 +21,11 @@ public:
 
 	void Move (float, float, float);
 	void Scale (float, float, float);
+
+	bool IsDown ();
+	bool IsUp ();
+	bool IsToggledDown ();
+	bool IsToggledUp ();
 
 	void Update (float dt);
 	void Render ();
