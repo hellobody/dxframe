@@ -267,12 +267,8 @@ void SceneSaver::ProcNode(INode *node)
 	}
 
 	//export texture name
-	char TexName [nameSize];
-	char TexShortName [nameSize];
-	for (int i=0; i<nameSize; i++) {
-		TexName [i] = '0';
-		TexShortName [i] = '0';
-	}
+	char TexName [nameSize] = "";
+	char TexShortName [nameSize] = "";
 
 	Mtl *m = node->GetMtl ();
 	if (!m) {

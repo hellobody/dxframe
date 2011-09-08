@@ -7,8 +7,9 @@ extern void Exit ();
 dxMainFrame::dxMainFrame () {
 	
 	background = NULL;
-	b_default = NULL;
-	b_selected = NULL;
+
+	box = NULL;
+	sphere = NULL;
 
 	bPlay = NULL;
 	bOptions = NULL;
@@ -40,6 +41,15 @@ void dxMainFrame::Create () {
 
 	bExit->Move (0, -400, 0);
 	bExit->Scale (.5f, .5f, 1);
+
+	box = new dxObj (_T("test.dxf"), "Box01");
+	sphere = new dxObj (_T("test.dxf"), "GeoSphere01");
+
+	box->Scale (0.33f, 0.33f, 0.33f);
+	box->Move (-200, 200, 0);
+
+	sphere->Scale (0.33f, 0.33f, 0.33f);
+	sphere->Move (200, 200, 0);
 }
 
 void dxMainFrame::Update (float dt) {
@@ -107,6 +117,10 @@ void dxMainFrame::Render () {
 		bExit->Render ();
 	}
 
+	if (box) box->Render ();
+
+	if (sphere) sphere->Render ();
+
 }
 
 void dxMainFrame::Destroy () {
@@ -115,4 +129,5 @@ void dxMainFrame::Destroy () {
 	DEL (bOptions);
 	DEL (bScores);
 	DEL (bExit);
+
 }

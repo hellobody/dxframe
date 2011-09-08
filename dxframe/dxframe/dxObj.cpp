@@ -22,6 +22,12 @@ dxObj::dxObj () {
 	pFaces = NULL;
 
 	texture = NULL;
+
+	ZeroMemory (&material, sizeof(D3DMATERIAL8));
+	material.Diffuse.r = material.Ambient.r = 1.0f;
+	material.Diffuse.g = material.Ambient.g = 1.0f;
+	material.Diffuse.b = material.Ambient.b = 1.0f;
+	material.Diffuse.a = material.Ambient.a = 1.0f;
 }
 
 dxObj::dxObj (const TCHAR *flName, const char *objName) {
@@ -264,6 +270,7 @@ void dxObj::Render () {
 	using_d3d_Device->SetStreamSource (0, p_VertexBuffer, sizeof (CUSTOMVERTEX));
 	using_d3d_Device->SetIndices (p_IndexBuffer, 0);
 
+	using_d3d_Device->SetMaterial (&material);
 	using_d3d_Device->SetTexture (0, texture);
 	using_d3d_Device->SetTextureStageState (0, D3DTSS_COLOROP,  D3DTOP_MODULATE);
 	using_d3d_Device->SetTextureStageState (0, D3DTSS_COLORARG1, D3DTA_TEXTURE);

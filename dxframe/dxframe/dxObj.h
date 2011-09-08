@@ -16,6 +16,8 @@ public:
 
 	char TexName [nameSize];
 
+	D3DMATERIAL8 material;
+
 	LPDIRECT3DINDEXBUFFER8 p_IndexBuffer;
 	LPDIRECT3DVERTEXBUFFER8 p_VertexBuffer;
 
