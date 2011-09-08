@@ -11,8 +11,8 @@ class dxMainFrame
 	//todo: place any members here
 
 	dxObj *background;
-	dxObj *b_default;
-	dxObj *b_selected;
+	dxObj *box;
+	dxObj *sphere;
 
 	dxButton *bPlay;
 	dxButton *bOptions;
