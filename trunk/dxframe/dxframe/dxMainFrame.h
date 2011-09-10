@@ -10,6 +10,8 @@ class dxMainFrame
 {
 	//todo: place any members here
 
+	dxObj *skySphere;
+
 	dxObj *background;
 	dxObj *box;
 	dxObj *sphere;

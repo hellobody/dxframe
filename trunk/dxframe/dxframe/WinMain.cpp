@@ -5,11 +5,11 @@ HWND hWnd;
 BOOL bActive;
 BOOL bAlwaysActive = FALSE;
 
-LPCWSTR APPNAME = L"dxframe";
-LPCWSTR APPTITLE = L"dxframe";
+LPCWSTR APPNAME		= L"dxframe";
+LPCWSTR APPTITLE	= L"dxframe";
 
-LPDIRECT3D8 p_d3d = NULL;						//direct 3d main interface
-LPDIRECT3DDEVICE8 p_d3d_Device = NULL;			//direct 3d device
+LPDIRECT3D8			pD3DObject = NULL;			//direct 3d main interface
+LPDIRECT3DDEVICE8	pD3DDevice = NULL;			//direct 3d device
 
 D3DDISPLAYMODE d3ddm;							//display mode parameters
 D3DPRESENT_PARAMETERS d3dpp;					//present parameters
@@ -49,6 +49,11 @@ void Destroy ();
 bool enableCameraMove = false;
 bool showFPS = true;
 
+bool fullScreen = false;
+
+HINSTANCE handleThisInstance = NULL;
+int NCmdShow = 0;
+
 void Exit () {
 
 	SendMessage (hWnd, WM_DESTROY, 0, 0);
@@ -63,17 +68,25 @@ void DisableCameraMove () {
 }
 
 void SwitchToOrthographicView () {
-	D3DXMatrixOrthoRH (&matProj, WIDTH, HEIGHT, -2000, 2000);	//turn on orthographic camera
-	if (p_d3d_Device) {
-		p_d3d_Device->SetTransform (D3DTS_PROJECTION, &matProj);
+	D3DXMatrixOrthoRH (&matProj, WIDTH, HEIGHT, -10000, 10000);	//turn on orthographic camera
+	if (pD3DDevice) {
+		pD3DDevice->SetTransform (D3DTS_PROJECTION, &matProj);
 	}
 }
 
 void SwitchToPerspectiveView () {
-	D3DXMatrixPerspectiveFovRH (&matProj, D3DX_PI/2, 4.f/3.f, 1.f, 10000.f); //last two edges of drawing, do not set near val < 1.f
-	if (p_d3d_Device) {
-		p_d3d_Device->SetTransform (D3DTS_PROJECTION, &matProj);
+	D3DXMatrixPerspectiveFovRH (&matProj, D3DX_PI/2, 4.f/3.f, 1.f, 100000.f); //last two edges of drawing, do not set near val < 1.f
+	if (pD3DDevice) {
+		pD3DDevice->SetTransform (D3DTS_PROJECTION, &matProj);
 	}
+}
+
+bool InitScreen (HINSTANCE hThisInst, int nCmdShow);
+
+void SwitchScreenMode () {
+	fullScreen = !fullScreen;
+
+	InitScreen (handleThisInstance, NCmdShow);
 }
 
 void ResetCameraPosition () {
@@ -82,8 +95,8 @@ void ResetCameraPosition () {
 	camera = newCamera;
 
 	matView = camera.getViewMatrix ();
-	if (p_d3d_Device) {
-		p_d3d_Device->SetTransform (D3DTS_VIEW, &matView);
+	if (pD3DDevice) {
+		pD3DDevice->SetTransform (D3DTS_VIEW, &matView);
 	}
 }
 
@@ -111,41 +124,38 @@ LRESULT CALLBACK WindowProc (HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			PostQuitMessage (0);
 			break;
 
-		case WM_CLOSE:
-
-			break;
-
-		case WM_SETCURSOR:
-
-			//SetCursor (1);
-
-			break;
-
 	} return DefWindowProc (hWnd, message, wParam, lParam);
 }
 
 bool WindowInit (HINSTANCE hThisInst, int nCmdShow) {
 
-	WNDCLASS wcl;
+	WNDCLASS windowClass;
 
-	wcl.hInstance = hThisInst;
-	wcl.lpszClassName = APPNAME;
-	wcl.lpfnWndProc = WindowProc;
-	wcl.style = CS_NOCLOSE;
-	wcl.hIcon = LoadIcon (hThisInst, IDC_ICON);
-	wcl.hCursor = LoadCursor (hThisInst, MAKEINTRESOURCE (IDC_POINTER));
-	wcl.lpszMenuName = NULL;
-	wcl.cbClsExtra = 0;
-	wcl.cbWndExtra = 0;
-	wcl.hbrBackground = (HBRUSH) GetStockObject (BLACK_BRUSH);
+	windowClass.hInstance = hThisInst;
+	windowClass.lpszClassName = APPNAME;
+	windowClass.lpfnWndProc = WindowProc;
+	windowClass.style = 0;
+	windowClass.hIcon = LoadIcon (hThisInst, IDC_ICON);
+	windowClass.hCursor = LoadCursor (hThisInst, MAKEINTRESOURCE (IDC_POINTER));
+	windowClass.lpszMenuName = NULL;
+	windowClass.cbClsExtra = 0;
+	windowClass.cbWndExtra = 0;
+	windowClass.hbrBackground = (HBRUSH) GetStockObject (BLACK_BRUSH);
 
-	RegisterClass (&wcl);
+	RegisterClass (&windowClass);
 
-	int sx = GetSystemMetrics (SM_CXSCREEN);
-	int sy = GetSystemMetrics (SM_CYSCREEN);
+	if (fullScreen)
+	{
+		hWnd = CreateWindowEx (0, APPNAME, APPTITLE, WS_BORDER | WS_POPUP, d3ddm.Width, d3ddm.Height, WIDTH, HEIGHT, NULL, NULL, hThisInst, NULL);
+	}
+	else
+	{
+		int sx = GetSystemMetrics (SM_CXSCREEN);
+		int sy = GetSystemMetrics (SM_CYSCREEN);
 
-	hWnd = CreateWindowEx (0, APPNAME, APPTITLE, WS_BORDER | WS_POPUP, sx/2-WIDTH/2, sy/2-HEIGHT/2, WIDTH, HEIGHT, NULL, NULL, hThisInst, NULL);
-
+		hWnd = CreateWindowEx (0, APPNAME, APPTITLE, WS_BORDER | WS_POPUP, sx/2-WIDTH/2, sy/2-HEIGHT/2, WIDTH, HEIGHT, NULL, NULL, hThisInst, NULL);
+	}
+	
 	if (!hWnd) return false;
 	return true;
 }
@@ -165,150 +175,106 @@ void getFileNameFromFullPath (const char *fullPath, char *fileName) {
 	strcpy_s (fileName, nameSize, _strrev (s1));
 }
 
-bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
+void SetDeviceParameters () {
 
-	logger.getSystemInfo ();
-	logger.logSystemInfo ();
+	pD3DDevice->SetRenderState (D3DRS_CULLMODE, D3DCULL_NONE);
+	pD3DDevice->SetRenderState (D3DRS_ZENABLE, D3DZB_TRUE);
+	pD3DDevice->SetRenderState (D3DRS_ALPHABLENDENABLE, TRUE);
+	pD3DDevice->SetRenderState (D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+	pD3DDevice->SetRenderState (D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 
-	logger.trace (_T("test"));
+	matView = camera.getViewMatrix ();
+	
+	pD3DDevice->SetTransform (D3DTS_VIEW, &matView);
+	pD3DDevice->SetTransform (D3DTS_WORLD, &matWorld);
+	pD3DDevice->SetTransform (D3DTS_PROJECTION, &matProj);
+}
 
-	if (!WindowInit (hThisInst, nCmdShow)) return false; //init window
+bool InitScreen (HINSTANCE hThisInst, int nCmdShow) {
 
-	if ((p_d3d = Direct3DCreate8 (D3D_SDK_VERSION)) == NULL) {	//creating main interface
-		trace (_T("Direct3D instance did not created."));
-		return false; 
+	ZeroMemory (&d3dpp, sizeof (d3dpp));
+
+	if (fullScreen) {
+
+		SetWindowLong (hWnd, GWL_STYLE, WS_POPUP);
+		SetWindowPos (hWnd, 0, 0, 0, d3ddm.Width, d3ddm.Height, 0);
+		d3dpp.BackBufferWidth = d3ddm.Width;
+		d3dpp.BackBufferHeight = d3ddm.Height;
+		d3dpp.BackBufferCount = 1;
+		d3dpp.FullScreen_RefreshRateInHz = d3ddm.RefreshRate;
 	}
 
-	ZeroMemory (&d3dpp, sizeof (d3dpp));		//clear struct
-
-	p_d3d->GetAdapterDisplayMode (D3DADAPTER_DEFAULT, &d3ddm); //get info about current display mode (resolution and parameters) 
-
-#pragma region [try to work with adapter modes here]
-	//////////////////////////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////////////////////////
-	//get total count of available display modes
-	int adapterModeCount = p_d3d->GetAdapterModeCount (D3DADAPTER_DEFAULT);
-
-	D3DDISPLAYMODE td3ddm;
-	vector <D3DDISPLAYMODE> vVideoModes; 
-	forup (adapterModeCount) {
-
-		p_d3d->EnumAdapterModes (D3DADAPTER_DEFAULT, i, &td3ddm);
-		vVideoModes.push_back (td3ddm);
-	}
-
-	forup (adapterModeCount) {
-		
-		if (vVideoModes [i].Width == WIDTH &&
-			vVideoModes [i].Height == HEIGHT) {
-			
-			//d3ddm = vVideoModes [i];
-			break;
-		}
-	}
-	///////////////////////////////////////////////////////////////////////////////////////////////
-	///////////////////////////////////////////////////////////////////////////////////////////////
-#pragma endregion
-
-	//I get frame rate fluctuations in windowed mode
-
-	//When your device is created the presentation interval is set to D3DPRESENT_INTERVAL_DEFAULT. This setting synchronises your frames to to the window rate so there is only one present allowed per frame. This prevents tearing effects (D3DPRESENT_INTERVAL_IMMEDIATE provides unlimited presents).  However if you are seeing fluctuations in frame rate you might be better to try D3DPRESENT_INTERVAL_ONE, this uses a higher resolution timer than the default setting which improves the quality of the vsync but takes up a bit more processing time. To change this value you need to alter the D3DPRESENT_PARAMETERS PresentationInterval value.
-
-	d3dpp.Windowed = true;						//windowed mode
-	d3dpp.SwapEffect = D3DSWAPEFFECT_FLIP;	//set method of window update
-	d3dpp.BackBufferFormat = d3ddm.Format;		//set format of surface of second buffer
+	d3dpp.Windowed = !fullScreen;							//windowed mode
+	d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;			//set method of window update
+	d3dpp.BackBufferFormat = d3ddm.Format;			//set format of surface of second buffer
 
 	//for Z-buffer
 	d3dpp.EnableAutoDepthStencil = true;
 	d3dpp.AutoDepthStencilFormat = D3DFMT_D16;
 	//
 
-	//create and init d3d device
-	//it is will belonged to first video adapter D3DADAPTER_DEFAULT
-	//working with using hardware acceleration D3DDEVTYPE_HAL
-	//the window context will be hWnd
-	//will be use software vertex processing D3DCREATE_SOFTWARE_VERTEXPROCESSING
-	//will be use above setted present parameters d3dpp
-	//p_d3d_Device - will be the pointer to this device
+	if (pD3DDevice) {
+		
+		if (FAILED (pD3DDevice->Reset (&d3dpp))) {
+			
+			RELEASE (pD3DDevice);
 
-	int errorType;
-	if (FAILED (errorType = p_d3d->CreateDevice (D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hWnd,
-		D3DCREATE_SOFTWARE_VERTEXPROCESSING, &d3dpp, &p_d3d_Device))) {
-
-		switch (errorType) {
-			case D3DERR_INVALIDCALL:
-				break;
-			case D3DERR_NOTAVAILABLE:
-				break;
-			case D3DERR_OUTOFVIDEOMEMORY:
-				break;
+			if (FAILED (pD3DObject->CreateDevice (D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hWnd, D3DCREATE_SOFTWARE_VERTEXPROCESSING, &d3dpp, &pD3DDevice))) {
+				trace (_T("Direct3D device did not created."));
+				return false;
+			}
 		}
 		
+		SetDeviceParameters ();	
+	}
+
+	return true;
+}
+
+bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
+
+	if ((pD3DObject = Direct3DCreate8 (D3D_SDK_VERSION)) == NULL) {
+		trace (_T("Direct3D instance did not created."));
+		return false;
+	}
+
+	pD3DObject->GetAdapterDisplayMode (D3DADAPTER_DEFAULT, &d3ddm);
+
+	if (!WindowInit (hThisInst, nCmdShow)) {
+		trace (_T("Window initialize error."));
+		return false;
+	}
+	
+	if (!InitScreen (handleThisInstance, NCmdShow)) {
+		trace (_T("Initialize screen error."));
+		return false;
+	}
+
+	if (FAILED (pD3DObject->CreateDevice (D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hWnd, D3DCREATE_SOFTWARE_VERTEXPROCESSING, &d3dpp, &pD3DDevice))) {
 		trace (_T("Direct3D device did not created."));
 		return false;
 	}
 
+	input.Initialize (hThisInst, hWnd);
+
 	dxObj::objs.clear ();
-	dxObj::using_d3d_Device = p_d3d_Device;
+	dxObj::using_d3d_Device = pD3DDevice;
 
 	D3DXMatrixRotationZ (&matWorld, 0.0f);
-
 	
-	//if need ortographic camera
-	D3DXMatrixOrthoRH (&matProj, WIDTH, HEIGHT, -2000, 2000);	//turn on orthographic camera
-	//else
-	//D3DXMatrixPerspectiveFovRH (&matProj, D3DX_PI/2, 4.f/3.f, 1.f, 10000.f); //last two edges of drawing, do not set near val < 1.f
-	
-	//second param - angle of view, third - aspect ratio
+	D3DXMatrixOrthoRH (&matProj, WIDTH, HEIGHT, -10000, 10000);
 
-	p_d3d_Device->SetTransform (D3DTS_WORLD, &matWorld);
-	p_d3d_Device->SetTransform (D3DTS_PROJECTION, &matProj);
-	p_d3d_Device->SetRenderState (D3DRS_CULLMODE, D3DCULL_NONE);
+	SetDeviceParameters ();
 
-	matView = camera.getViewMatrix ();
-	p_d3d_Device->SetTransform (D3DTS_VIEW, &matView);
-
-	//init light
-	D3DXVECTOR3 vecDir;
-	ZeroMemory (&light, sizeof (D3DLIGHT8));
-	light.Type = D3DLIGHT_DIRECTIONAL;
-
-	light.Diffuse.r  = 1.0f;
-	light.Diffuse.g  = 1.0f;
-	light.Diffuse.b  = 1.0f;
-
-	vecDir = D3DXVECTOR3 (0.0f, 0.0f, -1.0f);
-	D3DXVec3Normalize ((D3DXVECTOR3*) &light.Direction, &vecDir);
-
-	light.Range = 10000.0f;
-
-	p_d3d_Device->SetLight (0, &light);
-	p_d3d_Device->LightEnable (0, true);
-	
-	p_d3d_Device->SetRenderState (D3DRS_LIGHTING, true);
-	//p_d3d_Device->SetRenderState (D3DRS_AMBIENT, 0);
-	//
-	
-	p_d3d_Device->SetRenderState (D3DRS_ZENABLE, D3DZB_TRUE);
-
-	//try use alpha blend
-	p_d3d_Device->SetRenderState( D3DRS_ALPHABLENDENABLE, TRUE );
-    p_d3d_Device->SetRenderState( D3DRS_SRCBLEND, D3DBLEND_SRCALPHA );
-    p_d3d_Device->SetRenderState( D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA );
-	//
-
-	input.Initialize (hThisInst, hWnd);
+	ShowWindow (hWnd, nCmdShow);
 
 	// Create a D3DX font object
 	hFont = CreateFont (20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, PROOF_QUALITY, 0, _T("Comic Sans MS"));
-	if (S_OK != D3DXCreateFont (p_d3d_Device, hFont, &Font)) {
+	if (S_OK != D3DXCreateFont (pD3DDevice, hFont, &Font)) {
 		trace (_T ("Font did not created."));
 	}
 	
 	MainFrame.Create ();
-	
-	ShowWindow (hWnd, nCmdShow);
-	UpdateWindow (hWnd);
 
 	return true;
 }
@@ -343,8 +309,6 @@ void Update () {
 		}
 	}
 
-	///////////////////
-
 	static float speed = 800;
 
 	if (enableCameraMove) {
@@ -358,7 +322,7 @@ void Update () {
 		camera.pitch (input.GetMouseDeltaY () * -.01f);
 
 		matView = camera.getViewMatrix ();
-		p_d3d_Device->SetTransform (D3DTS_VIEW, &matView);
+		pD3DDevice->SetTransform (D3DTS_VIEW, &matView);
 	}
 
 	if (input.IsKeyToggledDown (DIK_ESCAPE)) {
@@ -377,16 +341,29 @@ void Update () {
 			hThreadConsole = CreateThread (NULL, 0, ThreadConsoleFunction, 0, 0, &ThreadID);		
 		}
 	}
+
+	if ((input.IsKeyDown (DIK_LALT) || input.IsKeyDown (DIK_RALT)) && input.IsKeyToggledDown (DIK_RETURN)) {
+		SwitchScreenMode ();
+	}
 }
 
 void Render () {
 
-	if (p_d3d_Device == NULL) {
+	if (pD3DDevice == NULL) {
 		return;
 	}
 
-	p_d3d_Device->Clear (0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB (0, 0, 0), 1.0f, 0);
-	p_d3d_Device->BeginScene ();
+	HRESULT hr;
+	hr = pD3DDevice->TestCooperativeLevel ();
+	if (hr == D3DERR_DEVICELOST) 
+		return;
+	if (hr == D3DERR_DEVICENOTRESET) { 
+		pD3DDevice->Reset (&d3dpp);
+		SetDeviceParameters ();
+	}
+
+	pD3DDevice->Clear (0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB (0, 0, 0), 1.0f, 0);
+	pD3DDevice->BeginScene ();
 
 	static bool q = true;
 	
@@ -420,8 +397,8 @@ void Render () {
 		}
 	}
 
-	p_d3d_Device->EndScene ();
-	p_d3d_Device->Present (NULL, NULL, NULL, NULL);
+	pD3DDevice->EndScene ();
+	pD3DDevice->Present (NULL, NULL, NULL, NULL);
 }
 
 void Destroy ()	{
@@ -430,8 +407,8 @@ void Destroy ()	{
 
 	MainFrame.Destroy ();
 
-	RELEASE (p_d3d_Device);
-	RELEASE (p_d3d);
+	RELEASE (pD3DDevice);
+	RELEASE (pD3DObject);
 	
 	input.Clean ();
 
@@ -443,15 +420,18 @@ void Destroy ()	{
 
 int APIENTRY WinMain (HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nCmdShow) {
 
+	handleThisInstance = hThisInst;
+	NCmdShow = nCmdShow;
+
 	MSG msg;
+	ZeroMemory (&msg, sizeof (msg));
 
 	if (!AppInit (hThisInst, nCmdShow)) return false;
 
-	while (true) {
+	while (msg.message != WM_QUIT) {
 
-		if (PeekMessage (&msg, NULL, 0, 0, PM_NOREMOVE)) {
+		if (PeekMessage (&msg, NULL, 0, 0, PM_REMOVE)) {
 
-			if (!GetMessage (&msg, NULL, 0, 0)) break;
 			TranslateMessage (&msg);
 			DispatchMessage (&msg);
 
@@ -460,5 +440,22 @@ int APIENTRY WinMain (HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR lpCmdLine,
 			Update ();
 			Render ();
 		}
+
 	} return 0;
+
+	/*
+	MSG msg;
+	ZeroMemory( &msg, sizeof(msg) );
+
+	while( msg.message!=WM_QUIT )
+	{
+	while( PeekMessage( &msg, NULL, 0U, 0U, PM_REMOVE ) )
+	{
+	TranslateMessage( &msg );
+	DispatchMessage( &msg );
+	}
+
+	.. update our game, render etc. here
+	}
+	*/
 }

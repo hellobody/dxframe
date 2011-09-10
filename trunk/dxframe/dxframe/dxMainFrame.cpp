@@ -25,6 +25,9 @@ void dxMainFrame::Create () {
 	
 	//todo: create dxObjes here
 
+	//skySphere = new dxObj (_T("skyspheres.dxf"), "skysphere_deep_space");
+	//skySphere->Scale (10, 10, 10);
+
 	background = new dxObj;
 	
 
@@ -50,6 +53,7 @@ void dxMainFrame::Create () {
 
 	sphere->Scale (0.33f, 0.33f, 0.33f);
 	sphere->Move (200, 200, 0);
+
 }
 
 void dxMainFrame::Update (float dt) {
@@ -94,6 +98,11 @@ void dxMainFrame::Update (float dt) {
 }
 
 void dxMainFrame::Render () {
+
+	if (skySphere) {
+
+		skySphere->Render ();
+	}
 	
 	if (background) {
 

@@ -1,6 +1,6 @@
 #include "dxTextField.h"
 
-extern LPDIRECT3DDEVICE8 p_d3d_Device;
+extern LPDIRECT3DDEVICE8 pD3DDevice;
 
 int dxTextField::focusOnID = -1;
 
@@ -18,9 +18,9 @@ int dxTextField::GetID () {
 dxTextField::dxTextField (const TCHAR *text, dxRect _rct, D3DCOLOR _fontColor) {
 	
 	// Create a D3DX font object
-	if (p_d3d_Device) {
+	if (pD3DDevice) {
 		hFont = CreateFont (20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, PROOF_QUALITY, 0, _T("Comic Sans MS"));
-		if (S_OK != D3DXCreateFont (p_d3d_Device, hFont, &Font)) {
+		if (S_OK != D3DXCreateFont (pD3DDevice, hFont, &Font)) {
 			trace (_T ("Font did not created."));
 		}
 	} else trace (_T ("Direct3D device is bad."));
