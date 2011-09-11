@@ -121,6 +121,7 @@ LRESULT CALLBACK WindowProc (HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 		case WM_DESTROY:
 
 			Destroy ();
+			DestroyWindow (hWnd);
 			PostQuitMessage (0);
 			break;
 
@@ -177,17 +178,17 @@ void getFileNameFromFullPath (const char *fullPath, char *fileName) {
 
 void SetDeviceParameters () {
 
+	matView = camera.getViewMatrix ();
+
+	pD3DDevice->SetTransform (D3DTS_VIEW, &matView);
+	pD3DDevice->SetTransform (D3DTS_WORLD, &matWorld);
+	pD3DDevice->SetTransform (D3DTS_PROJECTION, &matProj);
+
 	pD3DDevice->SetRenderState (D3DRS_CULLMODE, D3DCULL_NONE);
 	pD3DDevice->SetRenderState (D3DRS_ZENABLE, D3DZB_TRUE);
 	pD3DDevice->SetRenderState (D3DRS_ALPHABLENDENABLE, TRUE);
 	pD3DDevice->SetRenderState (D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-	pD3DDevice->SetRenderState (D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
-
-	matView = camera.getViewMatrix ();
-	
-	pD3DDevice->SetTransform (D3DTS_VIEW, &matView);
-	pD3DDevice->SetTransform (D3DTS_WORLD, &matWorld);
-	pD3DDevice->SetTransform (D3DTS_PROJECTION, &matProj);
+	pD3DDevice->SetRenderState (D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);	
 }
 
 bool InitScreen (HINSTANCE hThisInst, int nCmdShow) {
@@ -197,23 +198,41 @@ bool InitScreen (HINSTANCE hThisInst, int nCmdShow) {
 	if (fullScreen) {
 
 		SetWindowLong (hWnd, GWL_STYLE, WS_POPUP);
-		SetWindowPos (hWnd, 0, 0, 0, d3ddm.Width, d3ddm.Height, 0);
-		d3dpp.BackBufferWidth = d3ddm.Width;
-		d3dpp.BackBufferHeight = d3ddm.Height;
-		d3dpp.BackBufferCount = 1;
-		d3dpp.FullScreen_RefreshRateInHz = d3ddm.RefreshRate;
+		SetWindowPos (hWnd, 0, 0, 0, 640, 480, 0);
+		d3dpp.BackBufferWidth = 640;
+		d3dpp.BackBufferHeight = 480;
+		d3dpp.BackBufferCount = 3;
+		d3dpp.FullScreen_RefreshRateInHz = 60;
+
+		d3dpp.BackBufferFormat = D3DFMT_R5G6B5;				//set format of surface of second buffer
+	}
+	else {
+
+		d3dpp.BackBufferFormat = d3ddm.Format;				//set format of surface of second buffer	
 	}
 
 	d3dpp.Windowed = !fullScreen;							//windowed mode
-	d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;			//set method of window update
-	d3dpp.BackBufferFormat = d3ddm.Format;			//set format of surface of second buffer
-
+	d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;					//set method of window update
+	
 	//for Z-buffer
 	d3dpp.EnableAutoDepthStencil = true;
 	d3dpp.AutoDepthStencilFormat = D3DFMT_D16;
 	//
-
+	
 	if (pD3DDevice) {
+
+		if (FAILED (pD3DDevice->Reset (&d3dpp))) {
+
+			int a = 0;
+		}
+
+		SetDeviceParameters ();
+	}
+	
+	
+	
+
+	/*if (pD3DDevice) {
 		
 		if (FAILED (pD3DDevice->Reset (&d3dpp))) {
 			
@@ -225,13 +244,15 @@ bool InitScreen (HINSTANCE hThisInst, int nCmdShow) {
 			}
 		}
 		
-		SetDeviceParameters ();	
-	}
+			
+	}*/
 
 	return true;
 }
 
 bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
+
+	srand ((int) time (0)); // randomize timer
 
 	if ((pD3DObject = Direct3DCreate8 (D3D_SDK_VERSION)) == NULL) {
 		trace (_T("Direct3D instance did not created."));
@@ -255,6 +276,11 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 		return false;
 	}
 
+	if (FAILED (pD3DDevice->Reset (&d3dpp))) {
+
+		return false;
+	}
+
 	input.Initialize (hThisInst, hWnd);
 
 	dxObj::objs.clear ();
@@ -269,10 +295,10 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 	ShowWindow (hWnd, nCmdShow);
 
 	// Create a D3DX font object
-	hFont = CreateFont (20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, PROOF_QUALITY, 0, _T("Comic Sans MS"));
+	/*hFont = CreateFont (20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, PROOF_QUALITY, 0, _T("Comic Sans MS"));
 	if (S_OK != D3DXCreateFont (pD3DDevice, hFont, &Font)) {
 		trace (_T ("Font did not created."));
-	}
+	}*/
 	
 	MainFrame.Create ();
 
@@ -342,27 +368,33 @@ void Update () {
 		}
 	}
 
-	if ((input.IsKeyDown (DIK_LALT) || input.IsKeyDown (DIK_RALT)) && input.IsKeyToggledDown (DIK_RETURN)) {
+	/*if ((input.IsKeyDown (DIK_LALT) || input.IsKeyDown (DIK_RALT)) && input.IsKeyToggledDown (DIK_RETURN)) {
+		SwitchScreenMode ();
+	}*/
+
+	if (input.IsLeftMouseKeyToggledDown ()) {
 		SwitchScreenMode ();
 	}
 }
 
 void Render () {
 
-	if (pD3DDevice == NULL) {
+	if (pD3DDevice == NULL) 
 		return;
-	}
 
 	HRESULT hr;
 	hr = pD3DDevice->TestCooperativeLevel ();
 	if (hr == D3DERR_DEVICELOST) 
 		return;
-	if (hr == D3DERR_DEVICENOTRESET) { 
+	if (hr == D3DERR_DEVICENOTRESET) {
+		
 		pD3DDevice->Reset (&d3dpp);
 		SetDeviceParameters ();
+		/*Font->OnLostDevice ();
+		Font->OnResetDevice ();*/
 	}
 
-	pD3DDevice->Clear (0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB (0, 0, 0), 1.0f, 0);
+	pD3DDevice->Clear (0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB (255, 0, 0), 1.0f, 0);
 	pD3DDevice->BeginScene ();
 
 	static bool q = true;
@@ -379,23 +411,23 @@ void Render () {
 		}
 	} 
 
-	if (showFPS) {
-		// Create a colour for the text - in this case blue
-		D3DCOLOR fontColor = D3DCOLOR_ARGB(255,0,0,255);    
+	//if (showFPS) {
+	//	// Create a colour for the text - in this case blue
+	//	D3DCOLOR fontColor = D3DCOLOR_ARGB(255,0,0,255);    
 
-		// Create a rectangle to indicate where on the screen it should be drawn
-		RECT rct;
-		rct.left = 10;
-		rct.right = 780;
-		rct.top = 10;
-		rct.bottom = rct.top + 20;
+	//	// Create a rectangle to indicate where on the screen it should be drawn
+	//	RECT rct;
+	//	rct.left = 10;
+	//	rct.right = 780;
+	//	rct.top = 10;
+	//	rct.bottom = rct.top + 20;
 
-		if (Font) {
-			TCHAR tS [MAX_PATH];
-			_stprintf_s (tS, _T("fps: %i"), fps);
-			Font->DrawText (tS, -1, &rct, 0, fontColor);
-		}
-	}
+	//	if (Font) {
+	//		TCHAR tS [MAX_PATH];
+	//		_stprintf_s (tS, _T("fps: %i"), fps);
+	//		Font->DrawText (tS, -1, &rct, 0, fontColor);
+	//	}
+	//}
 
 	pD3DDevice->EndScene ();
 	pD3DDevice->Present (NULL, NULL, NULL, NULL);
@@ -430,9 +462,10 @@ int APIENTRY WinMain (HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR lpCmdLine,
 
 	while (msg.message != WM_QUIT) {
 
-		if (PeekMessage (&msg, NULL, 0, 0, PM_REMOVE)) {
+		if (PeekMessage (&msg, NULL, 0, 0, PM_NOREMOVE)) {
 
-			TranslateMessage (&msg);
+			if(!GetMessage (&msg, NULL, 0, 0)) break;
+			TranslateMessage (&msg); 
 			DispatchMessage (&msg);
 
 		} else if (bActive || bAlwaysActive) {
