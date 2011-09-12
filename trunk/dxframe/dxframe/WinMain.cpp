@@ -196,23 +196,27 @@ bool InitScreen (HINSTANCE hThisInst, int nCmdShow) {
 	ZeroMemory (&d3dpp, sizeof (d3dpp));
 
 	if (fullScreen) {
-
-		SetWindowLong (hWnd, GWL_STYLE, WS_POPUP);
-		SetWindowPos (hWnd, 0, 0, 0, 640, 480, 0);
-		d3dpp.BackBufferWidth = 640;
-		d3dpp.BackBufferHeight = 480;
+		
+		d3dpp.BackBufferWidth = d3ddm.Width;
+		d3dpp.BackBufferHeight = d3ddm.Height;
 		d3dpp.BackBufferCount = 3;
-		d3dpp.FullScreen_RefreshRateInHz = 60;
+		d3dpp.FullScreen_RefreshRateInHz = d3ddm.RefreshRate;
+		
+	} else {
 
-		d3dpp.BackBufferFormat = D3DFMT_R5G6B5;				//set format of surface of second buffer
+		int sx = GetSystemMetrics (SM_CXSCREEN);
+		int sy = GetSystemMetrics (SM_CYSCREEN);
+
+		SetWindowLong (hWnd, 0, WS_BORDER | WS_POPUP);
+		SetWindowPos (hWnd, 0, sx/2-WIDTH/2, sy/2-HEIGHT/2, WIDTH, HEIGHT, 0);
+		d3dpp.BackBufferWidth = WIDTH;
+		d3dpp.BackBufferHeight = HEIGHT;
+
 	}
-	else {
 
-		d3dpp.BackBufferFormat = d3ddm.Format;				//set format of surface of second buffer	
-	}
-
-	d3dpp.Windowed = !fullScreen;							//windowed mode
-	d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;					//set method of window update
+	d3dpp.Windowed = !fullScreen;				//windowed mode
+	d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;		//set method of window update
+	d3dpp.BackBufferFormat = d3ddm.Format;				//set format of surface of second buffer
 	
 	//for Z-buffer
 	d3dpp.EnableAutoDepthStencil = true;
@@ -368,11 +372,7 @@ void Update () {
 		}
 	}
 
-	/*if ((input.IsKeyDown (DIK_LALT) || input.IsKeyDown (DIK_RALT)) && input.IsKeyToggledDown (DIK_RETURN)) {
-		SwitchScreenMode ();
-	}*/
-
-	if (input.IsLeftMouseKeyToggledDown ()) {
+	if ((input.IsKeyDown (DIK_LALT) || input.IsKeyDown (DIK_RALT)) && input.IsKeyToggledDown (DIK_RETURN)) {
 		SwitchScreenMode ();
 	}
 }
