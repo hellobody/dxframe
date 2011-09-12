@@ -14,6 +14,10 @@ extern dxLogger logger;
 
 extern HWND hWnd;
 
+extern D3DDISPLAYMODE d3ddm;
+
+extern bool fullScreen;
+
 dxInput::dxInput () {
 
 	CursorPosition = new POINT;
@@ -199,10 +203,12 @@ LPPOINT dxInput::GetCursorPosition () {
 		trace (_T("GetCursorPos some error."));
 	}
 
-	ScreenToClient (hWnd, CursorPosition);
+	if (!fullScreen) {
+		ScreenToClient (hWnd, CursorPosition);
+	}
 
-	CursorPosition->x = CursorPosition->x - WIDTH/2;
-	CursorPosition->y = CursorPosition->y - HEIGHT/2;
+	CursorPosition->x = CursorPosition->x - d3ddm.Width / 2;
+	CursorPosition->y = CursorPosition->y - d3ddm.Height / 2;
 	CursorPosition->y *= -1;
 
 	return CursorPosition;
