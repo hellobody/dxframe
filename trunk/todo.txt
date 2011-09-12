@@ -1,7 +1,5 @@
 todo:
 
-	
-
 	- use D3DXIntersectTri
 
 	- разобраться с ID3DXBaseMesh и D3DXIntersect

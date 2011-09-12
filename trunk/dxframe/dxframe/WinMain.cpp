@@ -11,7 +11,9 @@ LPCWSTR APPTITLE	= L"dxframe";
 LPDIRECT3D8			pD3DObject = NULL;			//direct 3d main interface
 LPDIRECT3DDEVICE8	pD3DDevice = NULL;			//direct 3d device
 
-D3DDISPLAYMODE d3ddm;							//display mode parameters
+D3DDISPLAYMODE d3ddmW;							//display mode parameters for windewed mode
+D3DDISPLAYMODE d3ddmFS;							//display mode parameters for full screen mode
+D3DDISPLAYMODE d3ddm;
 D3DPRESENT_PARAMETERS d3dpp;					//present parameters
 
 D3DXMATRIX matWorld;
@@ -49,10 +51,12 @@ void Destroy ();
 bool enableCameraMove = false;
 bool showFPS = true;
 
-bool fullScreen = false;
+bool fullScreen = true;
 
 HINSTANCE handleThisInstance = NULL;
 int NCmdShow = 0;
+
+vector <D3DDISPLAYMODE> vVideoModes;
 
 void Exit () {
 
@@ -84,7 +88,14 @@ void SwitchToPerspectiveView () {
 bool InitScreen (HINSTANCE hThisInst, int nCmdShow);
 
 void SwitchScreenMode () {
+
 	fullScreen = !fullScreen;
+
+	if (fullScreen) {
+		d3ddm = d3ddmFS;
+	} else {
+		d3ddm = d3ddmW;
+	}
 
 	InitScreen (handleThisInstance, NCmdShow);
 }
@@ -145,17 +156,11 @@ bool WindowInit (HINSTANCE hThisInst, int nCmdShow) {
 
 	RegisterClass (&windowClass);
 
-	if (fullScreen)
-	{
-		hWnd = CreateWindowEx (0, APPNAME, APPTITLE, WS_BORDER | WS_POPUP, d3ddm.Width, d3ddm.Height, WIDTH, HEIGHT, NULL, NULL, hThisInst, NULL);
-	}
-	else
-	{
-		int sx = GetSystemMetrics (SM_CXSCREEN);
-		int sy = GetSystemMetrics (SM_CYSCREEN);
-
-		hWnd = CreateWindowEx (0, APPNAME, APPTITLE, WS_BORDER | WS_POPUP, sx/2-WIDTH/2, sy/2-HEIGHT/2, WIDTH, HEIGHT, NULL, NULL, hThisInst, NULL);
-	}
+	
+	int sx = GetSystemMetrics (SM_CXSCREEN);
+	int sy = GetSystemMetrics (SM_CYSCREEN);
+	
+	hWnd = CreateWindowEx (0, APPNAME, APPTITLE, WS_BORDER | WS_POPUP, sx/2-WIDTH/2, sy/2-HEIGHT/2, d3ddm.Width, d3ddm.Height, NULL, NULL, hThisInst, NULL);
 	
 	if (!hWnd) return false;
 	return true;
@@ -197,9 +202,11 @@ bool InitScreen (HINSTANCE hThisInst, int nCmdShow) {
 
 	if (fullScreen) {
 		
+		SetWindowLong (hWnd, 0, WS_BORDER | WS_POPUP);
+		SetWindowPos (hWnd, 0, 0, 0, d3ddm.Width, d3ddm.Height, 0);
 		d3dpp.BackBufferWidth = d3ddm.Width;
 		d3dpp.BackBufferHeight = d3ddm.Height;
-		d3dpp.BackBufferCount = 3;
+		d3dpp.BackBufferCount = 1;
 		d3dpp.FullScreen_RefreshRateInHz = d3ddm.RefreshRate;
 		
 	} else {
@@ -211,7 +218,7 @@ bool InitScreen (HINSTANCE hThisInst, int nCmdShow) {
 		SetWindowPos (hWnd, 0, sx/2-WIDTH/2, sy/2-HEIGHT/2, WIDTH, HEIGHT, 0);
 		d3dpp.BackBufferWidth = WIDTH;
 		d3dpp.BackBufferHeight = HEIGHT;
-
+		
 	}
 
 	d3dpp.Windowed = !fullScreen;				//windowed mode
@@ -224,34 +231,34 @@ bool InitScreen (HINSTANCE hThisInst, int nCmdShow) {
 	//
 	
 	if (pD3DDevice) {
-
 		if (FAILED (pD3DDevice->Reset (&d3dpp))) {
-
-			int a = 0;
+			return false;
 		}
-
 		SetDeviceParameters ();
 	}
-	
-	
-	
-
-	/*if (pD3DDevice) {
-		
-		if (FAILED (pD3DDevice->Reset (&d3dpp))) {
-			
-			RELEASE (pD3DDevice);
-
-			if (FAILED (pD3DObject->CreateDevice (D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hWnd, D3DCREATE_SOFTWARE_VERTEXPROCESSING, &d3dpp, &pD3DDevice))) {
-				trace (_T("Direct3D device did not created."));
-				return false;
-			}
-		}
-		
-			
-	}*/
 
 	return true;
+}
+
+void GetAllDisplayModes () {
+
+	int adapterModeCount = pD3DObject->GetAdapterModeCount (D3DADAPTER_DEFAULT);
+
+	D3DDISPLAYMODE td3ddm;
+	 
+	forup (adapterModeCount) {
+
+		pD3DObject->EnumAdapterModes (D3DADAPTER_DEFAULT, i, &td3ddm);
+		vVideoModes.push_back (td3ddm);
+
+		if (td3ddm.Width == WIDTH &&
+			td3ddm.Height == HEIGHT) {
+
+			d3ddmW = td3ddm;	//get last mode for this window resolution
+		}
+	}
+
+	d3ddmFS = vVideoModes [vVideoModes.size () - 1];
 }
 
 bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
@@ -263,7 +270,13 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 		return false;
 	}
 
-	pD3DObject->GetAdapterDisplayMode (D3DADAPTER_DEFAULT, &d3ddm);
+	GetAllDisplayModes ();
+
+	if (fullScreen) {
+		d3ddm = d3ddmFS;
+	} else {
+		d3ddm = d3ddmW;
+	}
 
 	if (!WindowInit (hThisInst, nCmdShow)) {
 		trace (_T("Window initialize error."));
@@ -277,11 +290,6 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 
 	if (FAILED (pD3DObject->CreateDevice (D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hWnd, D3DCREATE_SOFTWARE_VERTEXPROCESSING, &d3dpp, &pD3DDevice))) {
 		trace (_T("Direct3D device did not created."));
-		return false;
-	}
-
-	if (FAILED (pD3DDevice->Reset (&d3dpp))) {
-
 		return false;
 	}
 
@@ -372,7 +380,7 @@ void Update () {
 		}
 	}
 
-	if ((input.IsKeyDown (DIK_LALT) || input.IsKeyDown (DIK_RALT)) && input.IsKeyToggledDown (DIK_RETURN)) {
+	if ((input.IsKeyDown (DIK_LALT) || input.IsKeyDown (DIK_RALT)) && (input.IsKeyToggledDown (DIK_RETURN) || input.IsKeyToggledDown (DIK_NUMPADENTER))) {
 		SwitchScreenMode ();
 	}
 }
@@ -394,7 +402,7 @@ void Render () {
 		Font->OnResetDevice ();*/
 	}
 
-	pD3DDevice->Clear (0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB (255, 0, 0), 1.0f, 0);
+	pD3DDevice->Clear (0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB (0, 0, 0), 1.0f, 0);
 	pD3DDevice->BeginScene ();
 
 	static bool q = true;
@@ -464,7 +472,8 @@ int APIENTRY WinMain (HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR lpCmdLine,
 
 		if (PeekMessage (&msg, NULL, 0, 0, PM_NOREMOVE)) {
 
-			if(!GetMessage (&msg, NULL, 0, 0)) break;
+			if (!GetMessage (&msg, NULL, 0, 0)) break;
+
 			TranslateMessage (&msg); 
 			DispatchMessage (&msg);
 
@@ -475,20 +484,4 @@ int APIENTRY WinMain (HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR lpCmdLine,
 		}
 
 	} return 0;
-
-	/*
-	MSG msg;
-	ZeroMemory( &msg, sizeof(msg) );
-
-	while( msg.message!=WM_QUIT )
-	{
-	while( PeekMessage( &msg, NULL, 0U, 0U, PM_REMOVE ) )
-	{
-	TranslateMessage( &msg );
-	DispatchMessage( &msg );
-	}
-
-	.. update our game, render etc. here
-	}
-	*/
 }
