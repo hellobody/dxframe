@@ -129,7 +129,6 @@ void dxMainFrame::Render () {
 	if (box) box->Render ();
 
 	if (sphere) sphere->Render ();
-
 }
 
 void dxMainFrame::Destroy () {
@@ -138,5 +137,4 @@ void dxMainFrame::Destroy () {
 	DEL (bOptions);
 	DEL (bScores);
 	DEL (bExit);
-
 }

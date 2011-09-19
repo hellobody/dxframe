@@ -51,7 +51,7 @@ void Destroy ();
 bool enableCameraMove = false;
 bool showFPS = true;
 
-bool fullScreen = true;
+bool fullScreen = false;
 
 HINSTANCE handleThisInstance = NULL;
 int NCmdShow = 0;
@@ -111,8 +111,7 @@ void ResetCameraPosition () {
 	}
 }
 
-DWORD WINAPI ThreadConsoleFunction (LPVOID lpParam) 
-{ 
+DWORD WINAPI ThreadConsoleFunction (LPVOID lpParam) { 
 	dxConsole console;
 
 	while (console.Update ()) {}
