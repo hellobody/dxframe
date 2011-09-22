@@ -1,6 +1,0 @@
-Using OS: Windows_NT
-Computer name: MICROSOF-CAC41F
-User name: Admin
-Application data path: C:\Documents and Settings\Admin\Application Data
-
-test
