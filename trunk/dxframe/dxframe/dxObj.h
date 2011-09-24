@@ -3,12 +3,13 @@
 
 #include "defines.h"
 
-class dxObj {
+#ifdef DXFRAME_EXPORTS
+#define DXFRAME_API __declspec(dllexport)
+#else
+#define DXFRAME_API __declspec(dllimport)
+#endif
 
-public:
-
-	static vector <dxObj *> objs;
-	static PDIRECT3DDEVICE8 using_d3d_Device;
+class DXFRAME_API dxObj {
 
 	LPDIRECT3DTEXTURE8 texture;
 
@@ -26,7 +27,7 @@ public:
 
 	int numVerts;	//number of vertex
 	int numFaces;	//number of primitives
-	
+
 	D3DXMATRIX transformM;	//transformation matrix
 	D3DXMATRIX rotationM;	//rotation matrix
 	D3DXMATRIX textureM;	//texture matrix
@@ -37,6 +38,12 @@ public:
 	float *pVertsWithNormals;	//pointer to array of vertexes and normal, like this 30,45,65,0,1,0 (first three vertex coordinates, last - normal)
 	int *pFaces;				//pointer to array of indexes
 
+public:
+
+	static vector <dxObj *> objs;
+	static PDIRECT3DDEVICE8 using_d3d_Device;
+
+	
 	dxObj ();
 	dxObj (const TCHAR *flName, const char *objName);
 	~dxObj ();

@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "dxIniFileInterface.h"
 #include "dxEnvironmentVars.h"
 

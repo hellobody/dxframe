@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "dxInput.h"
 #include "dxLogger.h"
 
@@ -12,7 +13,7 @@ BYTE keystate [256];    // the storage for the key-information
 
 extern dxLogger logger;
 
-extern HWND hWnd;
+//extern HWND hWnd;
 
 extern D3DDISPLAYMODE d3ddm;
 
@@ -196,7 +197,7 @@ long dxInput::GetMouseDeltaZ () {
 	return mousestate.lZ;
 }
 
-LPPOINT dxInput::GetCursorPosition () {
+LPPOINT dxInput::GetCursorPosition (HWND hWnd) {
 
 	if (GetCursorPos (CursorPosition) == NULL) {
 		

@@ -36,7 +36,7 @@ public:
 	long GetMouseDeltaY ();
 	long GetMouseDeltaZ ();
 
-	LPPOINT GetCursorPosition ();
+	LPPOINT GetCursorPosition (HWND hWnd = NULL);
 };
 
 #endif
