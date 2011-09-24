@@ -3,12 +3,6 @@
 
 #include "defines.h"
 
-#ifdef DXFRAME_EXPORTS
-#define DXFRAME_API __declspec(dllexport)
-#else
-#define DXFRAME_API __declspec(dllimport)
-#endif
-
 class DXFRAME_API dxObj {
 
 	LPDIRECT3DTEXTURE8 texture;

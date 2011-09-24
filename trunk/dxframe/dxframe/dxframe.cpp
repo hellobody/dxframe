@@ -1,6 +1,3 @@
-// dxframe.cpp : Defines the entry point for the DLL application.
-//
-
 #include "stdafx.h"
 #include "dxframe.h"
 
@@ -45,14 +42,10 @@ HANDLE hThreadConsole = NULL;
 
 DXFRAME_API bool fullScreen = false;
 
-void Destroy ();
-
 bool enableCameraMove = false;
 bool showFPS = true;
 
 vector <D3DDISPLAYMODE> vVideoModes;
-
-
 
 BOOL APIENTRY DllMain (HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
 	
@@ -71,23 +64,14 @@ BOOL APIENTRY DllMain (HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReser
 #pragma managed(pop)
 #endif
 
-// This is an example of an exported variable
-DXFRAME_API int ndxframe=0;
-
-// This is an example of an exported function.
-DXFRAME_API int fndxframe(void)
-{
-	return 42;
-}
-
 dxFrame::dxFrame () {
 	
-	int a = 0;
+	
 }
 
 dxFrame::~dxFrame () {
 
-
+	
 }
 
 void dxFrame::SwitchScreenMode (HINSTANCE hThisInst, int nCmdShow, HWND hWnd) {
@@ -196,8 +180,6 @@ void dxFrame::GetAllDisplayModes () {
 
 bool dxFrame::Create (HINSTANCE hThisInst, int nCmdShow, HWND hWnd) {
 
-	trace (_T("enter to dxframe create!"));
-
 	if ((pD3DObject = Direct3DCreate8 (D3D_SDK_VERSION)) == NULL) {
 		trace (_T("Direct3D instance did not created."));
 		return false;
@@ -232,12 +214,10 @@ bool dxFrame::Create (HINSTANCE hThisInst, int nCmdShow, HWND hWnd) {
 
 	SetDeviceParameters ();
 
-	trace (_T("Created!"));
-
 	return true;
 }
 
-void dxFrame::Update (HWND hWnd) {
+float dxFrame::Update (HWND hWnd) {
 
 	input.Update ();
 
@@ -286,12 +266,12 @@ void dxFrame::Update (HWND hWnd) {
 	if (input.IsKeyToggledDown (DIK_ESCAPE)) {
 		SendMessage (hWnd, WM_DESTROY, 0, 0);
 	}
-
 	
-
 	/*if ((input.IsKeyDown (DIK_LALT) || input.IsKeyDown (DIK_RALT)) && (input.IsKeyToggledDown (DIK_RETURN) || input.IsKeyToggledDown (DIK_NUMPADENTER))) {
 		SwitchScreenMode ();
 	}*/
+
+	return dt;
 }
 
 HRESULT dxFrame::RenderBegin () {
@@ -322,10 +302,6 @@ void dxFrame::RenderEnd () {
 }
 
 void dxFrame::Destroy () {
-
-	//RELEASE (Font);
-
-	//MainFrame.Destroy ();
 
 	RELEASE (pD3DDevice);
 	RELEASE (pD3DObject);

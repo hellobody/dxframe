@@ -3,7 +3,7 @@
 
 #include "dxObj.h"
 
-class dxButton {
+class DXFRAME_API dxButton {
 
 protected:
 

@@ -9,6 +9,8 @@ protected:
 
 	LPPOINT CursorPosition;
 
+	HWND hWnd;
+
 public:
 
 	dxInput ();
@@ -36,7 +38,7 @@ public:
 	long GetMouseDeltaY ();
 	long GetMouseDeltaZ ();
 
-	LPPOINT GetCursorPosition (HWND hWnd = NULL);
+	LPPOINT GetCursorPosition ();
 };
 
 #endif

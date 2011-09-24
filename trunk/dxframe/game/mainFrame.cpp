@@ -1,20 +1,18 @@
 #include "mainFrame.h"
 
-//extern dxInput input;
-
-//extern void Exit ();
+extern void Exit ();
 
 mainFrame::mainFrame () {
-	
+
 	skySphere = NULL;
 	background = NULL;
 	box = NULL;
 	sphere = NULL;
 
-	/*bPlay = NULL;
+	bPlay = NULL;
 	bOptions = NULL;
 	bScores = NULL;
-	bExit = NULL;*/
+	bExit = NULL;
 }
 
 mainFrame::~mainFrame () {
@@ -25,15 +23,10 @@ void mainFrame::Create () {
 	
 	//todo: create dxObjes here
 
-	//skySphere = new dxObj (_T("skyspheres.dxf"), "skysphere_deep_space");
-	//skySphere->Scale (10, 10, 10);
-
 	background = new dxObj;
-	
-
 	background->CreateFromFile (_T("main_menu.dxf"), "background");
 
-	/*bPlay = new dxButton (_T("main_menu.dxf"), "button_play_default", "button_play_selected", "button_play_pressed");
+	bPlay = new dxButton (_T("main_menu.dxf"), "button_play_default", "button_play_selected", "button_play_pressed");
 
 	bOptions = new dxButton (_T("main_menu.dxf"), "button_play_default", "button_play_selected", "button_play_pressed");
 	bScores = new dxButton (_T("main_menu.dxf"), "button_play_default", "button_play_selected", "button_play_pressed");
@@ -43,7 +36,7 @@ void mainFrame::Create () {
 	bScores->Move (0, -200, 0);
 
 	bExit->Move (0, -400, 0);
-	bExit->Scale (.5f, .5f, 1);*/
+	bExit->Scale (.5f, .5f, 1);
 
 	box = new dxObj (_T("test.dxf"), "Box01");
 	sphere = new dxObj (_T("test.dxf"), "GeoSphere01");
@@ -58,7 +51,7 @@ void mainFrame::Create () {
 
 void mainFrame::Update (float dt) {
 	
-	/*if (bPlay) {
+	if (bPlay) {
 
 		bPlay->Update (dt);
 	}
@@ -85,7 +78,7 @@ void mainFrame::Update (float dt) {
 
 			trace (_T("IsToggledDown"));
 		}
-	}*/
+	}
 
 	//obj->RotateZ (dt * .25f);
 
@@ -109,7 +102,7 @@ void mainFrame::Render () {
 		background->Render ();
 	}
 
-	/*if (bPlay) {
+	if (bPlay) {
 
 		bPlay->Render ();
 	}
@@ -124,7 +117,7 @@ void mainFrame::Render () {
 	if (bExit) {
 
 		bExit->Render ();
-	}*/
+	}
 
 	if (box) box->Render ();
 
@@ -134,9 +127,9 @@ void mainFrame::Render () {
 
 void mainFrame::Destroy () {
 	
-	/*DEL (bPlay);
+	DEL (bPlay);
 	DEL (bOptions);
 	DEL (bScores);
-	DEL (bExit);*/
+	DEL (bExit);
 
 }
