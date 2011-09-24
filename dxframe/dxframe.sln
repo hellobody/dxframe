@@ -1,7 +1,12 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dxframe", "dxframe\dxframe.vcproj", "{BBF17FD6-3FEC-44A0-9BAA-B4EA727181D2}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "game", "game\game.vcproj", "{547A21C1-C0D1-4F45-95CA-C06DD305B1A8}"
+	ProjectSection(ProjectDependencies) = postProject
+		{DC9F44C3-CFFA-4104-9C33-F2963CACCA1C} = {DC9F44C3-CFFA-4104-9C33-F2963CACCA1C}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dxframe", "dxframe\dxframe.vcproj", "{DC9F44C3-CFFA-4104-9C33-F2963CACCA1C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -9,10 +14,14 @@ Global
 		Release|Win32 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{BBF17FD6-3FEC-44A0-9BAA-B4EA727181D2}.Debug|Win32.ActiveCfg = Debug|Win32
-		{BBF17FD6-3FEC-44A0-9BAA-B4EA727181D2}.Debug|Win32.Build.0 = Debug|Win32
-		{BBF17FD6-3FEC-44A0-9BAA-B4EA727181D2}.Release|Win32.ActiveCfg = Release|Win32
-		{BBF17FD6-3FEC-44A0-9BAA-B4EA727181D2}.Release|Win32.Build.0 = Release|Win32
+		{547A21C1-C0D1-4F45-95CA-C06DD305B1A8}.Debug|Win32.ActiveCfg = Debug|Win32
+		{547A21C1-C0D1-4F45-95CA-C06DD305B1A8}.Debug|Win32.Build.0 = Debug|Win32
+		{547A21C1-C0D1-4F45-95CA-C06DD305B1A8}.Release|Win32.ActiveCfg = Release|Win32
+		{547A21C1-C0D1-4F45-95CA-C06DD305B1A8}.Release|Win32.Build.0 = Release|Win32
+		{DC9F44C3-CFFA-4104-9C33-F2963CACCA1C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{DC9F44C3-CFFA-4104-9C33-F2963CACCA1C}.Debug|Win32.Build.0 = Debug|Win32
+		{DC9F44C3-CFFA-4104-9C33-F2963CACCA1C}.Release|Win32.ActiveCfg = Release|Win32
+		{DC9F44C3-CFFA-4104-9C33-F2963CACCA1C}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
