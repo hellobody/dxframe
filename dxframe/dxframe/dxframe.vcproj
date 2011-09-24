@@ -203,10 +203,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\dxMainFrame.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\dxObj.cpp"
 				>
 			</File>
@@ -261,10 +257,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\dxMainFrame.h"
-				>
-			</File>
-			<File
 				RelativePath=".\dxObj.h"
 				>
 			</File>
@@ -296,6 +288,18 @@
 			>
 			<File
 				RelativePath=".\dxframe.rc"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="game"
+			>
+			<File
+				RelativePath="..\game\dxMainFrame.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\game\dxMainFrame.h"
 				>
 			</File>
 		</Filter>

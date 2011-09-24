@@ -10,7 +10,7 @@
 #include "dxObj.h"
 #include "dxTextField.h"
 #include "dxLogger.h"
-#include "dxMainFrame.h"
+#include "..\game\dxMainFrame.h"
 #include "resource.h"
 
 #endif

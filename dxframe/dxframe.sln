@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dxframe", "dxframe\dxframe.vcproj", "{BBF17FD6-3FEC-44A0-9BAA-B4EA727181D2}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "game", "game\game.vcproj", "{356C5566-1F7E-4267-81BE-F203292EE91E}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -15,10 +13,6 @@ Global
 		{BBF17FD6-3FEC-44A0-9BAA-B4EA727181D2}.Debug|Win32.Build.0 = Debug|Win32
 		{BBF17FD6-3FEC-44A0-9BAA-B4EA727181D2}.Release|Win32.ActiveCfg = Release|Win32
 		{BBF17FD6-3FEC-44A0-9BAA-B4EA727181D2}.Release|Win32.Build.0 = Release|Win32
-		{356C5566-1F7E-4267-81BE-F203292EE91E}.Debug|Win32.ActiveCfg = Debug|Win32
-		{356C5566-1F7E-4267-81BE-F203292EE91E}.Debug|Win32.Build.0 = Debug|Win32
-		{356C5566-1F7E-4267-81BE-F203292EE91E}.Release|Win32.ActiveCfg = Release|Win32
-		{356C5566-1F7E-4267-81BE-F203292EE91E}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
