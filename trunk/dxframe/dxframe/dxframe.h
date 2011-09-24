@@ -13,10 +13,10 @@ public:
 	dxFrame ();
 	~dxFrame ();
 
-	void SwitchScreenMode (HINSTANCE hThisInst, int nCmdShow, HWND hWnd);
+	void SwitchScreenMode (HWND hWnd);
 	void ResetCameraPosition ();
 	void SetDeviceParameters ();
-	bool InitScreen (HINSTANCE hThisInst, int nCmdShow, HWND hWnd);
+	bool InitScreen (HWND hWnd);
 	void GetAllDisplayModes ();
 
 	bool Create (HINSTANCE hThisInst, int nCmdShow, HWND hWnd);

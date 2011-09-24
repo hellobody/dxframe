@@ -74,7 +74,7 @@ dxFrame::~dxFrame () {
 	
 }
 
-void dxFrame::SwitchScreenMode (HINSTANCE hThisInst, int nCmdShow, HWND hWnd) {
+void dxFrame::SwitchScreenMode (HWND hWnd) {
 
 	fullScreen = !fullScreen;
 
@@ -84,7 +84,7 @@ void dxFrame::SwitchScreenMode (HINSTANCE hThisInst, int nCmdShow, HWND hWnd) {
 		d3ddm = d3ddmW;
 	}
 
-	InitScreen (hThisInst, nCmdShow, hWnd);
+	InitScreen (hWnd);
 }
 
 void dxFrame::ResetCameraPosition () {
@@ -113,7 +113,7 @@ void dxFrame::SetDeviceParameters () {
 	pD3DDevice->SetRenderState (D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);	
 }
 
-bool dxFrame::InitScreen (HINSTANCE hThisInst, int nCmdShow, HWND hWnd) {
+bool dxFrame::InitScreen (HWND hWnd) {
 
 	ZeroMemory (&d3dpp, sizeof (d3dpp));
 
@@ -193,7 +193,7 @@ bool dxFrame::Create (HINSTANCE hThisInst, int nCmdShow, HWND hWnd) {
 		d3ddm = d3ddmW;
 	}
 	
-	if (!InitScreen (hThisInst, nCmdShow, hWnd)) {
+	if (!InitScreen (hWnd)) {
 		trace (_T("Initialize screen error."));
 		return false;
 	}
@@ -267,9 +267,9 @@ float dxFrame::Update (HWND hWnd) {
 		SendMessage (hWnd, WM_DESTROY, 0, 0);
 	}
 	
-	/*if ((input.IsKeyDown (DIK_LALT) || input.IsKeyDown (DIK_RALT)) && (input.IsKeyToggledDown (DIK_RETURN) || input.IsKeyToggledDown (DIK_NUMPADENTER))) {
-		SwitchScreenMode ();
-	}*/
+	if ((input.IsKeyDown (DIK_LALT) || input.IsKeyDown (DIK_RALT)) && (input.IsKeyToggledDown (DIK_RETURN) || input.IsKeyToggledDown (DIK_NUMPADENTER))) {
+		SwitchScreenMode (hWnd);
+	}
 
 	return dt;
 }
