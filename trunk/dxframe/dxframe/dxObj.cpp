@@ -90,6 +90,8 @@ void dxObj::Create (LPDIRECT3DDEVICE8 d3d_device, int numVerts, int numFaces) {	
 
 bool dxObj::CreateFromFile (const TCHAR *flName, const char *objName) {
 
+	trace (_T("I am here!"));
+
 	InternalDestroy ();
 	
 	if (using_d3d_Device == NULL) {

@@ -310,6 +310,8 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 	if (S_OK != D3DXCreateFont (pD3DDevice, hFont, &Font)) {
 		trace (_T ("Font did not created."));
 	}*/
+
+	trace (_T("hello!"));
 	
 	MainFrame.Create ();
 
