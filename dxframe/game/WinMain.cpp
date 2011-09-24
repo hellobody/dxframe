@@ -8,9 +8,8 @@ HWND hWnd;
 BOOL bActive;
 BOOL bAlwaysActive = FALSE;
 
-LPCWSTR APPNAME		= L"dxframe";
-LPCWSTR APPTITLE	= L"dxframe";
-
+LPCWSTR APPNAME	= L"dxframe";
+LPCWSTR APPTITLE = L"dxframe";
 
 int NCmdShow = 0;
 
@@ -32,6 +31,7 @@ LRESULT CALLBACK WindowProc (HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			break;
 
 		case WM_DESTROY:
+
 			dxframe.Destroy ();
 			DestroyWindow (hWnd);
 			PostQuitMessage (0);
@@ -54,9 +54,8 @@ bool WindowInit (HINSTANCE hThisInst, int nCmdShow) {
 	windowClass.cbClsExtra = 0;
 	windowClass.cbWndExtra = 0;
 	windowClass.hbrBackground = (HBRUSH) GetStockObject (BLACK_BRUSH);
-
+	
 	RegisterClass (&windowClass);
-
 	
 	int sx = GetSystemMetrics (SM_CXSCREEN);
 	int sy = GetSystemMetrics (SM_CYSCREEN);
@@ -86,8 +85,6 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 
 int APIENTRY WinMain (HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nCmdShow) {
 
-	NCmdShow = nCmdShow;
-
 	MSG msg;
 	ZeroMemory (&msg, sizeof (msg));
 
@@ -99,7 +96,7 @@ int APIENTRY WinMain (HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR lpCmdLine,
 
 			if (!GetMessage (&msg, NULL, 0, 0)) break;
 
-			TranslateMessage (&msg); 
+			TranslateMessage (&msg);
 			DispatchMessage (&msg);
 
 		} else if (bActive || bAlwaysActive) {
