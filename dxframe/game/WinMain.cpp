@@ -17,7 +17,10 @@ int NCmdShow = 0;
 dxFrame dxframe;
 mainFrame mainframe;
 
+void Exit () {
 
+	SendMessage (hWnd, WM_DESTROY, 0, 0);
+}
 
 LRESULT CALLBACK WindowProc (HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
 
@@ -66,8 +69,10 @@ bool WindowInit (HINSTANCE hThisInst, int nCmdShow) {
 
 bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 
+	fullScreen = false;
+
 	if (!WindowInit (hThisInst, nCmdShow)) {
-		//trace (_T("Window initialize error."));
+		trace (_T("Window initialize error."));
 		return false;
 	}
 
@@ -99,7 +104,7 @@ int APIENTRY WinMain (HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR lpCmdLine,
 
 		} else if (bActive || bAlwaysActive) {
 
-			dxframe.Update (hWnd);
+			mainframe.Update (dxframe.Update (hWnd));
 			
 			if (S_OK == dxframe.RenderBegin ()) {
 

@@ -3,8 +3,7 @@
 
 //#include "dxInput.h"
 
-//#include "dxButton.h"
-
+#include "../dxframe/dxButton.h"
 #include "../dxframe/dxObj.h"
 
 class mainFrame
@@ -16,10 +15,10 @@ class mainFrame
 	dxObj *box;
 	dxObj *sphere;
 
-	/*dxButton *bPlay;
+	dxButton *bPlay;
 	dxButton *bOptions;
 	dxButton *bScores;
-	dxButton *bExit;*/
+	dxButton *bExit;
 
 public:
 	mainFrame ();

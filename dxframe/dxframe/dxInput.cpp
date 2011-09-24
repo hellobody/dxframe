@@ -13,8 +13,6 @@ BYTE keystate [256];    // the storage for the key-information
 
 extern dxLogger logger;
 
-//extern HWND hWnd;
-
 extern D3DDISPLAYMODE d3ddm;
 
 extern bool fullScreen;
@@ -30,6 +28,9 @@ dxInput::~dxInput () {
 }
 
 void dxInput::Initialize (HINSTANCE hInstance, HWND hWnd) {
+	
+	this->hWnd = hWnd;
+	
 	// create the DirectInput interface
 	DirectInput8Create (hInstance,    // the handle to the application
 		DIRECTINPUT_VERSION,    // the compatible version
@@ -197,7 +198,7 @@ long dxInput::GetMouseDeltaZ () {
 	return mousestate.lZ;
 }
 
-LPPOINT dxInput::GetCursorPosition (HWND hWnd) {
+LPPOINT dxInput::GetCursorPosition () {
 
 	if (GetCursorPos (CursorPosition) == NULL) {
 		

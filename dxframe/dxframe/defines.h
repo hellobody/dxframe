@@ -24,6 +24,12 @@
 #pragma comment (lib, "dxguid.lib")
 #pragma comment (lib, "dinput8.lib")
 
+#ifdef DXFRAME_EXPORTS
+#define DXFRAME_API __declspec(dllexport)
+#else
+#define DXFRAME_API __declspec(dllimport)
+#endif
+
 #pragma warning (disable: 4251)
 
 #define RELEASE(p) {if (p) {(p)->Release (); (p) = NULL;}}
