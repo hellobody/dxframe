@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "dxIniFileInterface.h"
 #include "dxConsole.h"
 #include "dxInput.h"

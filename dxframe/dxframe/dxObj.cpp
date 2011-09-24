@@ -1,7 +1,8 @@
+#include "stdafx.h"
 #include "dxObj.h"
 #include "windows.h"
 
-vector <dxObj *> dxObj::objs;
+DXFRAME_API vector <dxObj *> dxObj::objs;
 
 PDIRECT3DDEVICE8 dxObj::using_d3d_Device = NULL;
 

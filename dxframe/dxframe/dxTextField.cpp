@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "dxTextField.h"
 
 extern LPDIRECT3DDEVICE8 pD3DDevice;

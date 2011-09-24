@@ -3,7 +3,7 @@
 
 #include "defines.h"
 
-extern LPCWSTR APPNAME;
+//extern LPCWSTR APPNAME;
 
 class dxEnvironmentVars
 {
@@ -29,7 +29,7 @@ public:
 		_tgetenv_s (&retVal, appDataPath, MAX_PATH, _T("APPDATA"));
 
 		_tcscat_s (appDataPath, MAX_PATH, _T("\\"));
-		_tcscat_s (appDataPath, MAX_PATH, APPNAME);
+		_tcscat_s (appDataPath, MAX_PATH, _T("AppName"));
 
 		GetModuleFileName (NULL, curPath, MAX_PATH);
 

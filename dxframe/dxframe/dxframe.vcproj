@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8,00"
 	Name="dxframe"
-	ProjectGUID="{BBF17FD6-3FEC-44A0-9BAA-B4EA727181D2}"
+	ProjectGUID="{DC9F44C3-CFFA-4104-9C33-F2963CACCA1C}"
 	RootNamespace="dxframe"
 	Keyword="Win32Proj"
 	>
@@ -19,7 +19,7 @@
 			Name="Debug|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="1"
+			ConfigurationType="2"
 			CharacterSet="1"
 			>
 			<Tool
@@ -40,11 +40,11 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;DXFRAME_EXPORTS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
-				UsePrecompiledHeader="0"
+				UsePrecompiledHeader="2"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="4"
@@ -60,6 +60,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				OutputFile="../product/$(ProjectName).dll"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -94,7 +95,7 @@
 			Name="Release|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="1"
+			ConfigurationType="2"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
 			>
@@ -115,9 +116,9 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;DXFRAME_EXPORTS"
 				RuntimeLibrary="2"
-				UsePrecompiledHeader="0"
+				UsePrecompiledHeader="2"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="3"
@@ -183,7 +184,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\dxConsole.cpp"
+				RelativePath=".\dxframe.cpp"
 				>
 			</File>
 			<File
@@ -211,8 +212,24 @@
 				>
 			</File>
 			<File
-				RelativePath=".\WinMain.cpp"
+				RelativePath=".\stdafx.cpp"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"
+					/>
+				</FileConfiguration>
 			</File>
 		</Filter>
 		<Filter
@@ -233,11 +250,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\dxConsole.h"
+				RelativePath=".\dxEnvironmentVars.h"
 				>
 			</File>
 			<File
-				RelativePath=".\dxEnvironmentVars.h"
+				RelativePath=".\dxframe.h"
 				>
 			</File>
 			<File
@@ -277,7 +294,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\WinMain.h"
+				RelativePath=".\stdafx.h"
 				>
 			</File>
 		</Filter>
@@ -286,22 +303,6 @@
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
-			<File
-				RelativePath=".\dxframe.rc"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="game"
-			>
-			<File
-				RelativePath="..\game\dxMainFrame.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\game\dxMainFrame.h"
-				>
-			</File>
 		</Filter>
 	</Files>
 	<Globals>
