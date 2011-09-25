@@ -140,8 +140,4 @@ void dxButton::Render () {
 			if (objs [eSelected]) objs [eSelected]->Render ();
 			break;
 	}
-
-	/*if (objs [ePressed]) objs [ePressed]->Render ();
-	if (objs [eDefault]) objs [eDefault]->Render ();
-	if (objs [eSelected]) objs [eSelected]->Render ();*/
 }
