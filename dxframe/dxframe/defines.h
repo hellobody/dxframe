@@ -44,6 +44,8 @@
 #define WIDTH 1024
 #define HEIGHT 768
 
+#define UNDEFINED -1
+
 const int nameSize = 256;
 
 class dxObj;

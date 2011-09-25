@@ -208,6 +208,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\dxScreen.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\dxTextField.cpp"
 				>
 			</File>
@@ -275,6 +279,10 @@
 			</File>
 			<File
 				RelativePath=".\dxObj.h"
+				>
+			</File>
+			<File
+				RelativePath=".\dxScreen.h"
 				>
 			</File>
 			<File
