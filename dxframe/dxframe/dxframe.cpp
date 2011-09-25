@@ -110,7 +110,15 @@ void dxFrame::SetDeviceParameters () {
 	pD3DDevice->SetRenderState (D3DRS_ZENABLE, D3DZB_TRUE);
 	pD3DDevice->SetRenderState (D3DRS_ALPHABLENDENABLE, TRUE);
 	pD3DDevice->SetRenderState (D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-	pD3DDevice->SetRenderState (D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);	
+	pD3DDevice->SetRenderState (D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+
+	pD3DDevice->SetTextureStageState (0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+	pD3DDevice->SetTextureStageState (0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
+	pD3DDevice->SetTextureStageState (0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+
+	pD3DDevice->SetTextureStageState (0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
+	pD3DDevice->SetTextureStageState (0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
+	pD3DDevice->SetTextureStageState (0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
 }
 
 bool dxFrame::InitScreen (HWND hWnd) {
@@ -203,6 +211,27 @@ bool dxFrame::Create (HINSTANCE hThisInst, int nCmdShow, HWND hWnd) {
 		return false;
 	}
 
+	//init light
+	D3DXVECTOR3 vecDir;
+	ZeroMemory (&light, sizeof (D3DLIGHT8));
+	light.Type = D3DLIGHT_DIRECTIONAL;
+
+	light.Diffuse.r  = 1.0f;
+	light.Diffuse.g  = 1.0f;
+	light.Diffuse.b  = 1.0f;
+
+	vecDir = D3DXVECTOR3 (0.0f, 0.0f, -1.0f);
+	D3DXVec3Normalize ((D3DXVECTOR3*) &light.Direction, &vecDir);
+
+	light.Range = 10000.0f;
+
+	pD3DDevice->SetLight (0, &light);
+	pD3DDevice->LightEnable (0, true);
+
+	pD3DDevice->SetRenderState (D3DRS_LIGHTING, true);
+	pD3DDevice->SetRenderState (D3DRS_AMBIENT, 0);
+	//
+
 	input.Initialize (hThisInst, hWnd);
 
 	dxObj::objs.clear ();
@@ -246,6 +275,18 @@ float dxFrame::Update (HWND hWnd) {
 			(*it)->Transform ();
 		}
 	}
+
+	static float col = 0;
+	col += dt;
+
+	float val = abs (cos (col));
+
+	light.Diffuse.r  = val;
+	light.Diffuse.g  = val;
+	light.Diffuse.b  = val;
+	light.Diffuse.a  = val;
+
+	if (pD3DDevice) pD3DDevice->SetLight (0, &light);
 
 	static float speed = 800;
 

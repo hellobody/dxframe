@@ -8,12 +8,17 @@ std::vector <dxScreen *> dxScreen::vScreens;
 int dxScreen::currentScreen = UNDEFINED;
 int dxScreen::nextScreen = UNDEFINED;
 
+float dxScreen::switchTimer = 0;
+float dxScreen::facSwitchTimer = 1.f;
+
 dxScreen::dxScreen () {
 
 	vScreens.push_back (this);
 
 	currentScreen = 0;
 	nextScreen = UNDEFINED;
+
+	opacity = 1.f;
 }
 
 dxScreen::~dxScreen () {	//при первом вызове деструктора, уничтожаться все объекты dxScreen
@@ -37,12 +42,37 @@ bool dxScreen::SwitchTo (int id) {
 
 	if (isValidId (id) && nextScreen == UNDEFINED && id != currentScreen) {
 
+		switchTimer = .001f;
 		nextScreen = id;
 		return true;
 	} return false;
 }
 
+void dxScreen::CreateScreens () {
+
+	forup ((int) vScreens.size ()) {
+
+		if (vScreens [i]) {
+
+			vScreens [i]->Create ();
+		}
+	}
+}
+
 void dxScreen::UpdateScreens (float dt) {
+
+	if (switchTimer > 0)
+	{
+		switchTimer += dt * facSwitchTimer;
+
+		if (switchTimer >= 1) {
+
+			switchTimer = 0;
+
+			currentScreen = nextScreen;
+			nextScreen = UNDEFINED;
+		}
+	}
 
 	if (isValidId (currentScreen)) {
 
@@ -67,6 +97,7 @@ void dxScreen::RenderScreens () {
 
 		if (vScreens [currentScreen]) {
 
+			vScreens [currentScreen]->SetOpacity (1.f - switchTimer);
 			vScreens [currentScreen]->Render ();
 		}
 	}
@@ -75,7 +106,26 @@ void dxScreen::RenderScreens () {
 
 		if (vScreens [nextScreen]) {
 
+			vScreens [nextScreen]->SetOpacity (switchTimer);
 			vScreens [nextScreen]->Render ();
 		}
 	}
+}
+
+void dxScreen::SetFacSwitchTimer (float fac) {
+
+	if (fac > 0) {
+
+		facSwitchTimer = fac;
+	}
+}
+
+void dxScreen::SetOpacity (float v) {
+
+	opacity = v;
+}
+
+float dxScreen::GetOpacity () {
+
+	return opacity;
 }

@@ -24,11 +24,13 @@ dxObj::dxObj () {
 
 	texture = NULL;
 
+	opacity = 1.f;
+
 	ZeroMemory (&material, sizeof(D3DMATERIAL8));
 	material.Diffuse.r = material.Ambient.r = 1.0f;
 	material.Diffuse.g = material.Ambient.g = 1.0f;
 	material.Diffuse.b = material.Ambient.b = 1.0f;
-	material.Diffuse.a = material.Ambient.a = 1.0f;
+	material.Diffuse.a = material.Ambient.a = opacity;
 }
 
 dxObj::dxObj (const TCHAR *flName, const char *objName) {
@@ -42,51 +44,6 @@ dxObj::dxObj (const TCHAR *flName, const char *objName) {
 dxObj::~dxObj () {
 
 	InternalDestroy ();
-}
-
-void dxObj::Create (LPDIRECT3DDEVICE8 d3d_device, int numVerts, int numFaces) {	//depracated, prepare to delete
-
-	if (d3d_device == NULL) {
-		trace (_T("Direct3D device pointer is NULL."));
-		return;
-	}
-	
-	using_d3d_Device = d3d_device; //pointer to d3d device
-	pOriginalVerts = new VERTEX_3DPNT [numVerts];
-	pTransformedVerts = new VERTEX_3DPNT [numVerts];
-
-	using_d3d_Device->CreateVertexBuffer (numVerts * sizeof (CUSTOMVERTEX), 0, D3DFVF_CUSTOMVERTEX, D3DPOOL_MANAGED, &p_VertexBuffer);
-	using_d3d_Device->CreateIndexBuffer (numFaces * 12, 0, D3DFMT_INDEX32, D3DPOOL_MANAGED, &p_IndexBuffer);
-
-	D3DXMatrixIdentity (&transformM);
-	D3DXMatrixIdentity (&rotationM);
-	D3DXMatrixIdentity (&textureM);
-	D3DXMatrixIdentity (&scaleM);
-	D3DXMatrixIdentity (&mainM);
-	D3DXMatrixIdentity (&tempM);
-
-	///////////////////////////////////////////////////////////////////////////
-	//temporary, rewrite it////////////////////////////////////////////////////
-	forup (numVerts) {
-
-		pOriginalVerts [i].position.x = pVertsWithNormals [i*8];
-		pOriginalVerts [i].position.y = pVertsWithNormals [i*8+1];
-		pOriginalVerts [i].position.z = pVertsWithNormals [i*8+2];
-
-		pOriginalVerts [i].normal.x = pVertsWithNormals [i*8+3];
-		pOriginalVerts [i].normal.y = pVertsWithNormals [i*8+4];
-		pOriginalVerts [i].normal.z = pVertsWithNormals [i*8+5];
-
-		pOriginalVerts [i].texture.x = pVertsWithNormals [i*8+6];
-		pOriginalVerts [i].texture.y = pVertsWithNormals [i*8+7];
-	}
-
-	void *tPointer;
-	p_IndexBuffer->Lock (0, numFaces * 12, (BYTE**) &tPointer, 0);
-	memcpy (tPointer, pFaces, numFaces * 12);
-	p_IndexBuffer->Unlock();
-	///////////////////////////////////////////////////////////////////////////
-	///////////////////////////////////////////////////////////////////////////
 }
 
 bool dxObj::CreateFromFile (const TCHAR *flName, const char *objName) {
@@ -243,6 +200,18 @@ void dxObj::Scale (float x, float y, float z) {
 	scaleM *= tempM;
 }
 
+void dxObj::SetOpacity (float v) {
+
+	opacity = v;
+
+	holdFloatValueFromZeroToOne (opacity);
+}
+
+float dxObj::GetOpacity () {
+
+	return opacity;
+}
+
 void dxObj::Transform () {
 
 	memcpy (pTransformedVerts, pOriginalVerts, numVerts * sizeof (CUSTOMVERTEX)); //copy original coordinates to buffer for transformation
@@ -271,11 +240,10 @@ void dxObj::Render () {
 	using_d3d_Device->SetStreamSource (0, p_VertexBuffer, sizeof (CUSTOMVERTEX));
 	using_d3d_Device->SetIndices (p_IndexBuffer, 0);
 
+	material.Diffuse.a = material.Ambient.a = opacity;
+	
 	using_d3d_Device->SetMaterial (&material);
 	using_d3d_Device->SetTexture (0, texture);
-	using_d3d_Device->SetTextureStageState (0, D3DTSS_COLOROP,  D3DTOP_MODULATE);
-	using_d3d_Device->SetTextureStageState (0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-	using_d3d_Device->SetTextureStageState (0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
 	
 	using_d3d_Device->DrawIndexedPrimitive (D3DPT_TRIANGLELIST, 0, numVerts, 0, numFaces);
 
