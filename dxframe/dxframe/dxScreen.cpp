@@ -93,21 +93,25 @@ void dxScreen::UpdateScreens (float dt) {
 
 void dxScreen::RenderScreens () {
 
-	if (isValidId (currentScreen)) {
+	if (switchTimer < .5f) {
 
-		if (vScreens [currentScreen]) {
+		if (isValidId (currentScreen)) {
 
-			vScreens [currentScreen]->SetOpacity (1.f - switchTimer);
-			vScreens [currentScreen]->Render ();
+			if (vScreens [currentScreen]) {
+
+				vScreens [currentScreen]->SetOpacity (1.f - switchTimer * 2);
+				vScreens [currentScreen]->Render ();
+			}
 		}
-	}
+	} else {
 
-	if (isValidId (nextScreen)) {
+		if (isValidId (nextScreen)) {
 
-		if (vScreens [nextScreen]) {
+			if (vScreens [nextScreen]) {
 
-			vScreens [nextScreen]->SetOpacity (switchTimer);
-			vScreens [nextScreen]->Render ();
+				vScreens [nextScreen]->SetOpacity (switchTimer * 2 - 1.f);
+				vScreens [nextScreen]->Render ();
+			}
 		}
 	}
 }

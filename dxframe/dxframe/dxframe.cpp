@@ -276,7 +276,7 @@ float dxFrame::Update (HWND hWnd) {
 		}
 	}
 
-	static float col = 0;
+	/*static float col = 0;
 	col += dt;
 
 	float val = abs (cos (col));
@@ -286,7 +286,7 @@ float dxFrame::Update (HWND hWnd) {
 	light.Diffuse.b  = val;
 	light.Diffuse.a  = val;
 
-	if (pD3DDevice) pD3DDevice->SetLight (0, &light);
+	if (pD3DDevice) pD3DDevice->SetLight (0, &light);*/
 
 	static float speed = 800;
 
