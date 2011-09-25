@@ -5,11 +5,15 @@
 
 class DXFRAME_API dxObj {
 
+protected:
+
 	LPDIRECT3DTEXTURE8 texture;
 
 	char Name [MAX_PATH];
 
 	char TexName [nameSize];
+
+	float opacity;
 
 	D3DMATERIAL8 material;
 
@@ -42,8 +46,6 @@ public:
 	dxObj (const TCHAR *flName, const char *objName);
 	~dxObj ();
 
-	void Create (LPDIRECT3DDEVICE8 d3d_device, int numVerts, int numIndexes); //depracated, prepare to delete
-	
 	bool CreateFromFile (const TCHAR *flName, const char *objName);
 	void InternalDestroy ();
 
@@ -52,6 +54,9 @@ public:
 	void RotateX (float);
 	void RotateY (float);
 	void RotateZ (float);
+
+	void SetOpacity (float v);
+	float GetOpacity ();
 
 	void Transform ();
 	void Render ();

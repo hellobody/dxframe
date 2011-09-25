@@ -131,3 +131,8 @@ static void trace (int val) {
 
 	trace (float (val));
 }
+
+static void holdFloatValueFromZeroToOne (float &v) {
+
+	v = v < 0 ? 0 : v > 1 ? 1 : v;
+}

@@ -12,6 +12,8 @@ dxButton::dxButton (const TCHAR *FileName, const char *DefaultObjName, const cha
 	objs [eDefault]  = new dxObj (FileName, DefaultObjName);
 	objs [eSelected] = new dxObj (FileName, SelectedObjName);
 	objs [ePressed]  = new dxObj (FileName, PressedObjName);
+
+	opacity = 1.f;
 }
 
 dxButton::~dxButton () {
@@ -67,6 +69,24 @@ bool dxButton::IsToggledUp () {
 	if ((curState == eDefault || curState == eSelected) && lstState == ePressed) {
 		return true;
 	} else return false;
+}
+
+void dxButton::SetOpacity (float v) {
+
+	opacity = v;
+
+	forup (eNumOfStates) {
+
+		if (objs [i]) {
+
+			objs [i]->SetOpacity (opacity);
+		}
+	}
+}
+
+float dxButton::GetOpacity () {
+
+	return opacity;
 }
 
 void dxButton::Update (float dt) {
