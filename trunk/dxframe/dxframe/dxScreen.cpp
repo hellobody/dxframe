@@ -30,6 +30,14 @@ dxScreen::~dxScreen () {	//при первом вызове деструктора, уничтожаться все объек
 	}
 }
 
+void dxScreen::SetFacSwitchTimer (float fac) {
+
+	if (fac > 0) {
+
+		facSwitchTimer = fac;
+	}
+}
+
 bool dxScreen::isValidId (int id) {
 
 	if (id >= 0 && id < (int) vScreens.size ()) {
@@ -113,14 +121,6 @@ void dxScreen::RenderScreens () {
 				vScreens [nextScreen]->Render ();
 			}
 		}
-	}
-}
-
-void dxScreen::SetFacSwitchTimer (float fac) {
-
-	if (fac > 0) {
-
-		facSwitchTimer = fac;
 	}
 }
 

@@ -194,10 +194,61 @@ void dxObj::Move (float x, float y, float z) {
 	transformM *= tempM;
 }
 
+void dxObj::Move (D3DXVECTOR3 v) {
+
+	D3DXMatrixTranslation (&tempM, v.x, v.y, v.z);
+	transformM *= tempM;
+}
+
+void dxObj::MoveTo (D3DXVECTOR2 v) {
+
+	transformM._41 = v.x;
+	transformM._42 = v.y;
+}
+
+void dxObj::MoveTo (D3DXVECTOR3 v) {
+
+	transformM._41 = v.x;
+	transformM._42 = v.y;
+	transformM._43 = v.z;
+}
+
 void dxObj::Scale (float x, float y, float z) {
 
 	D3DXMatrixScaling (&tempM, x, y, z);
 	scaleM *= tempM;
+}
+
+void dxObj::SetScale (float x, float y, float z) {
+	
+	D3DXMatrixScaling (&tempM, x, y, z);
+	scaleM = tempM;
+}
+
+void dxObj::SetScale (float s) {
+
+	D3DXMatrixScaling (&tempM, s, s, s);
+	scaleM = tempM;
+}
+
+void dxObj::SetDirZ (D3DXVECTOR2 v) {
+
+	SetAngZ (atan2 (v.y, v.x));
+}
+
+void dxObj::SetAngZ (float a) {
+
+	D3DXMatrixRotationZ (&tempM, a);
+	rotationM = tempM;
+}
+
+D3DXVECTOR2 dxObj::GetPos2 () {
+
+	return D3DXVECTOR2 (transformM._41, transformM._42);
+}
+D3DXVECTOR3 dxObj::GetPos3 () {
+
+	return D3DXVECTOR3 (transformM._41, transformM._42, transformM._43);
 }
 
 void dxObj::SetOpacity (float v) {

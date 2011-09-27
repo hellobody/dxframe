@@ -35,7 +35,7 @@ dxIniFileInterface iniFileInterface;
 
 //dxMainFrame MainFrame;
 
-dxInput input;
+DXFRAME_API dxInput input;
 dxLogger logger;
 
 HANDLE hThreadConsole = NULL;
@@ -248,8 +248,6 @@ bool dxFrame::Create (HINSTANCE hThisInst, int nCmdShow, HWND hWnd) {
 
 float dxFrame::Update (HWND hWnd) {
 
-	input.Update ();
-
 	float ct = (float) clock () / CLOCKS_PER_SEC;
 	dt = ct - lt;
 	lt = ct;
@@ -304,9 +302,9 @@ float dxFrame::Update (HWND hWnd) {
 		pD3DDevice->SetTransform (D3DTS_VIEW, &matView);
 	}
 
-	if (input.IsKeyToggledDown (DIK_ESCAPE)) {
+	/*if (input.IsKeyToggledDown (DIK_ESCAPE)) {
 		SendMessage (hWnd, WM_DESTROY, 0, 0);
-	}
+	}*/
 	
 	if ((input.IsKeyDown (DIK_LALT) || input.IsKeyDown (DIK_RALT)) && (input.IsKeyToggledDown (DIK_RETURN) || input.IsKeyToggledDown (DIK_NUMPADENTER))) {
 		SwitchScreenMode (hWnd);
