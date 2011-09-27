@@ -50,10 +50,21 @@ public:
 	void InternalDestroy ();
 
 	void Move (float, float, float);
+	void Move (D3DXVECTOR3 v);
+	void MoveTo (D3DXVECTOR2 v);
+	void MoveTo (D3DXVECTOR3 v);
 	void Scale (float, float, float);
+	void SetScale (float, float, float);
+	void SetScale (float);
 	void RotateX (float);
 	void RotateY (float);
 	void RotateZ (float);
+
+	void SetDirZ (D3DXVECTOR2 v);
+	void SetAngZ (float);
+
+	D3DXVECTOR2 GetPos2 ();
+	D3DXVECTOR3 GetPos3 ();
 
 	void SetOpacity (float v);
 	float GetOpacity ();

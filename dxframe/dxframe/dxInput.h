@@ -3,7 +3,7 @@
 
 #include "defines.h"
 
-class dxInput {
+class DXFRAME_API dxInput {
 
 protected:
 
