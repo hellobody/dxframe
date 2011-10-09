@@ -5,8 +5,8 @@
 #pragma managed(push, off)
 #endif
 
-LPDIRECT3D8			pD3DObject = NULL;			//direct 3d main interface
-LPDIRECT3DDEVICE8	pD3DDevice = NULL;			//direct 3d device
+LPDIRECT3D9			pD3DObject = NULL;			//direct 3d main interface
+LPDIRECT3DDEVICE9	pD3DDevice = NULL;			//direct 3d device
 
 D3DDISPLAYMODE d3ddmW;							//display mode parameters for windewed mode
 D3DDISPLAYMODE d3ddmFS;							//display mode parameters for full screen mode
@@ -18,7 +18,7 @@ D3DXMATRIX matView;
 D3DXMATRIX matProj;
 
 //light
-D3DLIGHT8 light;
+D3DLIGHT9 light;
 
 //timer
 float lt = 0; //last clock value
@@ -46,6 +46,8 @@ bool enableCameraMove = false;
 bool showFPS = true;
 
 vector <D3DDISPLAYMODE> vVideoModes;
+
+
 
 BOOL APIENTRY DllMain (HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
 	
@@ -167,13 +169,13 @@ bool dxFrame::InitScreen (HWND hWnd) {
 
 void dxFrame::GetAllDisplayModes () {
 
-	int adapterModeCount = pD3DObject->GetAdapterModeCount (D3DADAPTER_DEFAULT);
+	int adapterModeCount = pD3DObject->GetAdapterModeCount (D3DADAPTER_DEFAULT, D3DFMT_X8R8G8B8);
 
 	D3DDISPLAYMODE td3ddm;
 
 	forup (adapterModeCount) {
 
-		pD3DObject->EnumAdapterModes (D3DADAPTER_DEFAULT, i, &td3ddm);
+		pD3DObject->EnumAdapterModes (D3DADAPTER_DEFAULT, D3DFMT_X8R8G8B8, i, &td3ddm);
 		vVideoModes.push_back (td3ddm);
 
 		if (td3ddm.Width == WIDTH &&
@@ -188,7 +190,7 @@ void dxFrame::GetAllDisplayModes () {
 
 bool dxFrame::Create (HINSTANCE hThisInst, int nCmdShow, HWND hWnd) {
 
-	if ((pD3DObject = Direct3DCreate8 (D3D_SDK_VERSION)) == NULL) {
+	if ((pD3DObject = Direct3DCreate9 (D3D_SDK_VERSION)) == NULL) {
 		trace (_T("Direct3D instance did not created."));
 		return false;
 	}
@@ -213,7 +215,7 @@ bool dxFrame::Create (HINSTANCE hThisInst, int nCmdShow, HWND hWnd) {
 
 	//init light
 	D3DXVECTOR3 vecDir;
-	ZeroMemory (&light, sizeof (D3DLIGHT8));
+	ZeroMemory (&light, sizeof (D3DLIGHT9));
 	light.Type = D3DLIGHT_DIRECTIONAL;
 
 	light.Diffuse.r  = 1.0f;

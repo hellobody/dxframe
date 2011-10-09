@@ -4,7 +4,7 @@
 
 DXFRAME_API vector <dxObj *> dxObj::objs;
 
-PDIRECT3DDEVICE8 dxObj::using_d3d_Device = NULL;
+PDIRECT3DDEVICE9 dxObj::using_d3d_Device = NULL;
 
 dxObj::dxObj () {
 
@@ -26,11 +26,16 @@ dxObj::dxObj () {
 
 	opacity = 1.f;
 
-	ZeroMemory (&material, sizeof(D3DMATERIAL8));
+	ZeroMemory (&material, sizeof(D3DMATERIAL9));
 	material.Diffuse.r = material.Ambient.r = 1.0f;
 	material.Diffuse.g = material.Ambient.g = 1.0f;
 	material.Diffuse.b = material.Ambient.b = 1.0f;
 	material.Diffuse.a = material.Ambient.a = opacity;
+
+	////shader
+	pixelShader = NULL;
+	code = NULL;
+	////
 }
 
 dxObj::dxObj (const TCHAR *flName, const char *objName) {
@@ -103,8 +108,8 @@ bool dxObj::CreateFromFile (const TCHAR *flName, const char *objName) {
 		pOriginalVerts = new VERTEX_3DPNT [numVerts];
 		pTransformedVerts = new VERTEX_3DPNT [numVerts];
 
-		using_d3d_Device->CreateVertexBuffer (numVerts * sizeof (CUSTOMVERTEX), 0, D3DFVF_CUSTOMVERTEX, D3DPOOL_MANAGED, &p_VertexBuffer);
-		using_d3d_Device->CreateIndexBuffer (numFaces * 12, 0, D3DFMT_INDEX32, D3DPOOL_MANAGED, &p_IndexBuffer);
+		using_d3d_Device->CreateVertexBuffer (numVerts * sizeof (CUSTOMVERTEX), 0, D3DFVF_CUSTOMVERTEX, D3DPOOL_MANAGED, &p_VertexBuffer, NULL);
+		using_d3d_Device->CreateIndexBuffer (numFaces * 12, 0, D3DFMT_INDEX32, D3DPOOL_MANAGED, &p_IndexBuffer, NULL);
 
 		D3DXMatrixIdentity (&transformM);
 		D3DXMatrixIdentity (&rotationM);
@@ -130,7 +135,7 @@ bool dxObj::CreateFromFile (const TCHAR *flName, const char *objName) {
 		}
 
 		void *tPointer;
-		p_IndexBuffer->Lock (0, numFaces * 12, (BYTE**) &tPointer, 0);
+		p_IndexBuffer->Lock (0, numFaces * 12, (void**) &tPointer, 0);
 		memcpy (tPointer, pFaces, numFaces * 12);
 		p_IndexBuffer->Unlock();
 		///////////////////////////////////////////////////////////////////////////
@@ -153,6 +158,23 @@ bool dxObj::CreateFromFile (const TCHAR *flName, const char *objName) {
 		trace (_T("File not found."));	//add here file path
 		return false;
 	}
+
+	////shader
+	// set up Pixel Shader (NEW)
+	HRESULT result = D3DXCompileShaderFromFile (	_T("pixel.psh"),   //filepath
+													NULL,          //macro's            
+													NULL,          //includes           
+													"ps_main",     //main function      
+													"ps_1_1",      //shader profile     
+													0,             //flags              
+													&code,         //compiled operations
+													NULL,          //errors
+													NULL	);     //constants
+
+	result = using_d3d_Device->CreatePixelShader ((DWORD *) code->GetBufferPointer (), &pixelShader);
+	if (code) code->Release();
+
+	////
 
 	return true;
 }
@@ -277,7 +299,7 @@ void dxObj::Transform () {
 	}
 
 	void *tPointer;
-	p_VertexBuffer->Lock (0, numVerts * sizeof (CUSTOMVERTEX), (BYTE**) &tPointer, 0);
+	p_VertexBuffer->Lock (0, numVerts * sizeof (CUSTOMVERTEX), (void**) &tPointer, 0);
 	memcpy (tPointer, pTransformedVerts, numVerts * sizeof (CUSTOMVERTEX));
 	p_VertexBuffer->Unlock ();
 
@@ -287,17 +309,24 @@ void dxObj::Transform () {
 
 void dxObj::Render () {
 
-	using_d3d_Device->SetVertexShader (D3DFVF_CUSTOMVERTEX);
-	using_d3d_Device->SetStreamSource (0, p_VertexBuffer, sizeof (CUSTOMVERTEX));
-	using_d3d_Device->SetIndices (p_IndexBuffer, 0);
+	HRESULT hRes;
+
+	//hRes = using_d3d_Device->SetPixelShader (g_lpPixelShader);
+	
+	hRes = using_d3d_Device->SetFVF (D3DFVF_CUSTOMVERTEX);
+
+	hRes = using_d3d_Device->SetPixelShader (pixelShader);
+
+	hRes = using_d3d_Device->SetStreamSource (0, p_VertexBuffer, 0, sizeof (CUSTOMVERTEX));
+	hRes = using_d3d_Device->SetIndices (p_IndexBuffer);
 
 	material.Diffuse.a = material.Ambient.a = opacity;
 	
-	using_d3d_Device->SetMaterial (&material);
-	using_d3d_Device->SetTexture (0, texture);
+	hRes = using_d3d_Device->SetMaterial (&material);
+	hRes = using_d3d_Device->SetTexture (0, texture);
 	
-	using_d3d_Device->DrawIndexedPrimitive (D3DPT_TRIANGLELIST, 0, numVerts, 0, numFaces);
-
+	hRes = using_d3d_Device->DrawIndexedPrimitive (D3DPT_TRIANGLELIST, 0, 0, numVerts, 0, numFaces);
+	
 	//Эффективней использовать D3DPT_TRIANGLESTRIP или D3DPT_TRIANGLEFAN, чем D3DPT_TRIANGLELIST, т.к. в данном случае не происходит дублирование вершин.
 }
 
