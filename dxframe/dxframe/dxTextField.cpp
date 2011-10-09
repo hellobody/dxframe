@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "dxTextField.h"
 
-extern LPDIRECT3DDEVICE8 pD3DDevice;
+extern LPDIRECT3DDEVICE9 pD3DDevice;
 
 int dxTextField::focusOnID = -1;
 

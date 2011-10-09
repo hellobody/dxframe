@@ -7,7 +7,7 @@ class DXFRAME_API dxObj {
 
 protected:
 
-	LPDIRECT3DTEXTURE8 texture;
+	LPDIRECT3DTEXTURE9 texture;
 
 	char Name [MAX_PATH];
 
@@ -15,10 +15,15 @@ protected:
 
 	float opacity;
 
-	D3DMATERIAL8 material;
+	D3DMATERIAL9 material;
 
-	LPDIRECT3DINDEXBUFFER8 p_IndexBuffer;
-	LPDIRECT3DVERTEXBUFFER8 p_VertexBuffer;
+	LPDIRECT3DINDEXBUFFER9 p_IndexBuffer;
+	LPDIRECT3DVERTEXBUFFER9 p_VertexBuffer;
+
+	////shader
+	LPDIRECT3DPIXELSHADER9 pixelShader;
+	LPD3DXBUFFER code;
+	////
 
 	VERTEX_3DPNT *pOriginalVerts;
 	VERTEX_3DPNT *pTransformedVerts;
@@ -39,7 +44,7 @@ protected:
 public:
 
 	static vector <dxObj *> objs;
-	static PDIRECT3DDEVICE8 using_d3d_Device;
+	static PDIRECT3DDEVICE9 using_d3d_Device;
 
 	
 	dxObj ();
