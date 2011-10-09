@@ -25,6 +25,7 @@ void mainFrame::Create () {
 
 	background = new dxObj;
 	background->CreateFromFile (_T("main_menu.dxf"), "background");
+	background->Temp_TurnOnShader ();
 
 	bPlay = new dxButton (_T("main_menu.dxf"), "button_play_default", "button_play_selected", "button_play_pressed");
 
@@ -43,6 +44,7 @@ void mainFrame::Create () {
 
 	box->Scale (0.33f, 0.33f, 0.33f);
 	box->Move (-200, 200, 0);
+	box->Temp_TurnOnShader ();
 
 	sphere->Scale (0.33f, 0.33f, 0.33f);
 	sphere->Move (200, 200, 0);
