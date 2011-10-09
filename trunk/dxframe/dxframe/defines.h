@@ -4,6 +4,7 @@
 #include <time.h>
 #include <d3d9.h>
 #include <d3dx9.h>
+#include <d3dx9shader.h>
 #include <dinput.h>
 #include <windows.h>
 #include <windowsx.h>
@@ -110,6 +111,14 @@ struct VERTEX_3DPNT {
 	D3DXVECTOR3 normal; 
 	D3DXVECTOR2 texture; 
 };
+
+static void trace (char *str) {
+
+	char tStr [MAX_PATH] = "";
+	strcat_s (tStr, MAX_PATH, str);
+	strcat_s (tStr, MAX_PATH, "\n");
+	OutputDebugStringA (tStr);
+}
 
 static void trace (TCHAR *str) {
 

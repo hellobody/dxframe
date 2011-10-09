@@ -35,6 +35,7 @@ dxObj::dxObj () {
 	////shader
 	pixelShader = NULL;
 	code = NULL;
+	ShaderOn = false;
 	////
 }
 
@@ -161,15 +162,29 @@ bool dxObj::CreateFromFile (const TCHAR *flName, const char *objName) {
 
 	////shader
 	// set up Pixel Shader (NEW)
-	HRESULT result = D3DXCompileShaderFromFile (	_T("pixel.psh"),   //filepath
-													NULL,          //macro's            
-													NULL,          //includes           
-													"ps_main",     //main function      
-													"ps_1_1",      //shader profile     
-													0,             //flags              
-													&code,         //compiled operations
-													NULL,          //errors
-													NULL	);     //constants
+
+	//D3DXGetPixelShaderProfile (using_d3d_Device);	//where is it!?
+
+	LPD3DXBUFFER pErrorMsgs = NULL;
+	
+	HRESULT result = D3DXCompileShaderFromFile (	_T("pixel.psh"),	//filepath
+													NULL,				//macro's            
+													NULL,				//includes           
+													"main",				//main function      
+													"ps_2_0",      		//shader profile     
+													D3DXSHADER_DEBUG ,  //flags              
+													&code,         		//compiled operations
+													&pErrorMsgs,   		//errors
+													NULL	);     		//constants
+
+	if ((FAILED(result)) && (pErrorMsgs != NULL))
+	{
+		char * message = (char *) pErrorMsgs->GetBufferPointer();
+
+		trace (message);
+
+		return false;
+	}
 
 	result = using_d3d_Device->CreatePixelShader ((DWORD *) code->GetBufferPointer (), &pixelShader);
 	if (code) code->Release();
@@ -190,6 +205,11 @@ void dxObj::InternalDestroy () {
 	RELEASE (p_IndexBuffer);
 
 	RELEASE (texture);
+}
+
+void dxObj::Temp_TurnOnShader ()
+{
+	ShaderOn = true;
 }
 
 void dxObj::RotateX (float ang) {
@@ -312,10 +332,18 @@ void dxObj::Render () {
 	HRESULT hRes;
 
 	//hRes = using_d3d_Device->SetPixelShader (g_lpPixelShader);
+
+	//don't working fog
+	/*hRes = using_d3d_Device->SetRenderState (D3DRS_FOGCOLOR, 0x00ffffff);
+	hRes = using_d3d_Device->SetRenderState (D3DRS_FOGENABLE, TRUE);*/
+	//
 	
 	hRes = using_d3d_Device->SetFVF (D3DFVF_CUSTOMVERTEX);
 
-	hRes = using_d3d_Device->SetPixelShader (pixelShader);
+	if (ShaderOn)
+	{
+		hRes = using_d3d_Device->SetPixelShader (pixelShader);
+	}
 
 	hRes = using_d3d_Device->SetStreamSource (0, p_VertexBuffer, 0, sizeof (CUSTOMVERTEX));
 	hRes = using_d3d_Device->SetIndices (p_IndexBuffer);
@@ -326,6 +354,8 @@ void dxObj::Render () {
 	hRes = using_d3d_Device->SetTexture (0, texture);
 	
 	hRes = using_d3d_Device->DrawIndexedPrimitive (D3DPT_TRIANGLELIST, 0, 0, numVerts, 0, numFaces);
+
+	hRes = using_d3d_Device->SetPixelShader (NULL);
 	
 	//Эффективней использовать D3DPT_TRIANGLESTRIP или D3DPT_TRIANGLEFAN, чем D3DPT_TRIANGLELIST, т.к. в данном случае не происходит дублирование вершин.
 }

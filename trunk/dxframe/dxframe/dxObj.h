@@ -23,6 +23,8 @@ protected:
 	////shader
 	LPDIRECT3DPIXELSHADER9 pixelShader;
 	LPD3DXBUFFER code;
+
+	bool ShaderOn;
 	////
 
 	VERTEX_3DPNT *pOriginalVerts;
@@ -53,6 +55,8 @@ public:
 
 	bool CreateFromFile (const TCHAR *flName, const char *objName);
 	void InternalDestroy ();
+
+	void Temp_TurnOnShader ();
 
 	void Move (float, float, float);
 	void Move (D3DXVECTOR3 v);
