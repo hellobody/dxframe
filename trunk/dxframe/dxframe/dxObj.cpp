@@ -33,6 +33,9 @@ dxObj::dxObj () {
 	material.Diffuse.a = material.Ambient.a = opacity;
 
 	////shader
+	vertexDecl = NULL;
+	constantTable = NULL;
+	vertexShader = NULL;
 	pixelShader = NULL;
 	code = NULL;
 	ShaderOn = false;
@@ -165,29 +168,57 @@ bool dxObj::CreateFromFile (const TCHAR *flName, const char *objName) {
 
 	//D3DXGetPixelShaderProfile (using_d3d_Device);	//where is it!?
 
-	LPD3DXBUFFER pErrorMsgs = NULL;
-	
-	HRESULT result = D3DXCompileShaderFromFile (	_T("pixel.psh"),	//filepath
-													NULL,				//macro's            
-													NULL,				//includes           
-													"main",				//main function      
-													"ps_2_0",      		//shader profile     
-													D3DXSHADER_DEBUG ,  //flags              
-													&code,         		//compiled operations
-													&pErrorMsgs,   		//errors
-													NULL	);     		//constants
+	//LPD3DXBUFFER pErrorMsgs = NULL;
 
-	if ((FAILED(result)) && (pErrorMsgs != NULL))
-	{
-		char * message = (char *) pErrorMsgs->GetBufferPointer();
+	//HRESULT result;
 
-		trace (message);
+	//D3DVERTEXELEMENT9 decl [] = {{0,  0, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
+	//							 {0, 16, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL,   0},
+	//							 {0, 28, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},
+	//																							D3DDECL_END ()};
 
-		return false;
-	}
+	//result = using_d3d_Device->CreateVertexDeclaration (decl, &vertexDecl);
 
-	result = using_d3d_Device->CreatePixelShader ((DWORD *) code->GetBufferPointer (), &pixelShader);
-	if (code) code->Release();
+	//result = D3DXCompileShaderFromFile (	_T("vertex.vsh"),	//filepath
+	//										NULL,            	//macro's
+	//										NULL,            	//includes
+	//										"vs_main",       	//main function
+	//										"vs_1_1",        	//shader profile
+	//										0,               	//flags
+	//										&code,           	//compiled operations
+	//										&pErrorMsgs,        //errors
+	//										&constantTable); 	//constants
+
+	//result = using_d3d_Device->CreateVertexShader ((DWORD *) code->GetBufferPointer (), &vertexShader);
+	//
+	//if (code) code->Release ();
+
+	//if ((FAILED(result)) && (pErrorMsgs != NULL))
+	//{
+	//	char * message = (char *) pErrorMsgs->GetBufferPointer();
+	//	trace (message);
+	//	return false;
+	//}
+	//
+	//result = D3DXCompileShaderFromFile (	_T("pixel.psh"),	//filepath
+	//										NULL,				//macro's            
+	//										NULL,				//includes           
+	//										"main",				//main function
+	//										"ps_2_0",      		//shader profile
+	//										D3DXSHADER_DEBUG ,  //flags
+	//										&code,         		//compiled operations
+	//										&pErrorMsgs,   		//errors
+	//										NULL	);     		//constants
+
+	//if ((FAILED(result)) && (pErrorMsgs != NULL))
+	//{
+	//	char * message = (char *) pErrorMsgs->GetBufferPointer();
+	//	trace (message);
+	//	return false;
+	//}
+
+	//result = using_d3d_Device->CreatePixelShader ((DWORD *) code->GetBufferPointer (), &pixelShader);
+	//if (code) code->Release();
 
 	////
 
@@ -338,12 +369,20 @@ void dxObj::Render () {
 	hRes = using_d3d_Device->SetRenderState (D3DRS_FOGENABLE, TRUE);*/
 	//
 	
-	hRes = using_d3d_Device->SetFVF (D3DFVF_CUSTOMVERTEX);
+	//if (ShaderOn)
+	//{
+	//	//D3DXMATRIXA16 matWorldViewProj = matWorld * matView * matProj;
+	//	//constantTable->SetMatrix (app.getDevice(), "WorldViewProj", &matWorldViewProj);
 
-	if (ShaderOn)
-	{
-		hRes = using_d3d_Device->SetPixelShader (pixelShader);
-	}
+	//	hRes = using_d3d_Device->SetVertexShader (vertexShader);
+	//	hRes = using_d3d_Device->SetPixelShader (pixelShader);
+	//}
+	//else
+	//{
+	//	
+	//}
+
+	hRes = using_d3d_Device->SetFVF (D3DFVF_CUSTOMVERTEX);
 
 	hRes = using_d3d_Device->SetStreamSource (0, p_VertexBuffer, 0, sizeof (CUSTOMVERTEX));
 	hRes = using_d3d_Device->SetIndices (p_IndexBuffer);
@@ -355,6 +394,7 @@ void dxObj::Render () {
 	
 	hRes = using_d3d_Device->DrawIndexedPrimitive (D3DPT_TRIANGLELIST, 0, 0, numVerts, 0, numFaces);
 
+	hRes = using_d3d_Device->SetVertexShader (NULL);
 	hRes = using_d3d_Device->SetPixelShader (NULL);
 	
 	//Эффективней использовать D3DPT_TRIANGLESTRIP или D3DPT_TRIANGLEFAN, чем D3DPT_TRIANGLELIST, т.к. в данном случае не происходит дублирование вершин.
