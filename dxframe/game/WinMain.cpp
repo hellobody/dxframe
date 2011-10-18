@@ -3,7 +3,7 @@
 #define WIDTH 1024
 #define HEIGHT 768
 
-HWND hWnd;
+HWND hWnd = NULL;
 
 BOOL bActive;
 BOOL bAlwaysActive = FALSE;
@@ -74,12 +74,12 @@ bool AppInit (HINSTANCE hThisInst, int nCmdShow) {
 		trace (_T("Window initialize error."));
 		return false;
 	}
-
+	
 	dxframe.Create (hThisInst, nCmdShow, hWnd);
 	mainframe.Create ();
-	
-	ShowWindow (hWnd, nCmdShow);
 
+	ShowWindow (hWnd, nCmdShow);
+	
 	return true;
 }
 
@@ -102,6 +102,7 @@ int APIENTRY WinMain (HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR lpCmdLine,
 		} else if (bActive || bAlwaysActive) {
 
 			mainframe.Update (dxframe.Update (hWnd));
+			input.Update ();
 			
 			if (S_OK == dxframe.RenderBegin ()) {
 

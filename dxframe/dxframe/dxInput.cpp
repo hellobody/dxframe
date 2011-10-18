@@ -2,14 +2,7 @@
 #include "dxInput.h"
 #include "dxLogger.h"
 
-LPDIRECTINPUT8 din = NULL;    // the pointer to our DirectInput interface
-LPDIRECTINPUTDEVICE8 dinkeybd = NULL;    // the pointer to the keyboard device
-LPDIRECTINPUTDEVICE8 dinmouse = NULL;    // the pointer to the mouse device
-
-DIMOUSESTATE lstMousestate;    // the storage for the last mouse-information
-DIMOUSESTATE mousestate;    // the storage for the mouse-information
-BYTE lstKeystate [256];    // the storage for the last key-information
-BYTE keystate [256];    // the storage for the key-information
+#define FIND_HEAP_CORRUPTION {char *tmp = new char [1]; delete tmp;};
 
 extern dxLogger logger;
 
@@ -17,13 +10,19 @@ extern D3DDISPLAYMODE d3ddm;
 
 extern bool fullScreen;
 
+static HRESULT hr;
+
 dxInput::dxInput () {
+
+	din = NULL;	
+	dinkeybd = NULL;    
+	dinmouse = NULL;
 
 	CursorPosition = new POINT;
 }
 
 dxInput::~dxInput () {
-
+	
 	Clean ();
 }
 
@@ -32,38 +31,17 @@ void dxInput::Initialize (HINSTANCE hInstance, HWND hWnd) {
 	this->hWnd = hWnd;
 	
 	// create the DirectInput interface
-	DirectInput8Create (hInstance,    // the handle to the application
-		DIRECTINPUT_VERSION,    // the compatible version
-		IID_IDirectInput8,    // the DirectInput interface version
-		(void**)&din,    // the pointer to the interface
-		NULL);    // COM stuff, so we'll set it to NULL
+	hr = DirectInput8Create (hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void **) &din, NULL);
+	
+	hr = din->CreateDevice (GUID_SysKeyboard, &dinkeybd, NULL);
+	hr = dinkeybd->SetDataFormat (&c_dfDIKeyboard);
+	hr = dinkeybd->SetCooperativeLevel (hWnd, DISCL_NONEXCLUSIVE | DISCL_BACKGROUND);
+	//hr = dinkeybd->Acquire ();
 
-	if (din == NULL) {
-		logger.trace (_T("Error creation Direct Input interface."));
-		return;
-	}
-
-	// create the keyboard device
-	din->CreateDevice (GUID_SysKeyboard,    // the default keyboard ID being used
-		&dinkeybd,    // the pointer to the device interface
-		NULL);    // COM stuff, so we'll set it to NULL
-
-	din->CreateDevice (GUID_SysMouse,
-		&dinmouse,
-		NULL);
-
-	if (dinkeybd == NULL || dinmouse == NULL) {
-		logger.trace (_T("Error creation Keyboard or Mouse devices pointers."));
-		return;
-	}
-
-	// set the data format to keyboard format
-	dinkeybd->SetDataFormat (&c_dfDIKeyboard);
-	dinmouse->SetDataFormat (&c_dfDIMouse);
-
-	// set the control you will have over the keyboard
-	dinkeybd->SetCooperativeLevel (hWnd, DISCL_NONEXCLUSIVE | DISCL_FOREGROUND);
-	dinmouse->SetCooperativeLevel (hWnd, DISCL_NONEXCLUSIVE | DISCL_FOREGROUND);
+	hr = din->CreateDevice (GUID_SysMouse, &dinmouse, NULL);
+	hr = dinmouse->SetDataFormat (&c_dfDIMouse);
+	hr = dinmouse->SetCooperativeLevel (hWnd, DISCL_NONEXCLUSIVE | DISCL_BACKGROUND);
+	//hr = dinmouse->Acquire ();
 
 	ZeroMemory (&lstMousestate, sizeof (lstMousestate));
 
@@ -79,10 +57,6 @@ void dxInput::Update () {
 		return;
 	}
 
-	// get access if we don't have it already
-	dinkeybd->Acquire ();
-	dinmouse->Acquire ();
-
 	//store last key states
 	for (int i=0; i<256; i++) {
 		lstKeystate [i] = keystate [i];
@@ -91,9 +65,88 @@ void dxInput::Update () {
 	//store last mouse states
 	lstMousestate = mousestate;
 
-	// get the input data
-	dinkeybd->GetDeviceState (256, (LPVOID) keystate);
-	dinmouse->GetDeviceState (sizeof (DIMOUSESTATE), (LPVOID) &mousestate);
+	////get the input data
+
+	trace (_T("0"));
+
+	hr = dinkeybd->GetDeviceState (256, (LPVOID) keystate);
+
+	trace (_T("1"));
+
+	if (FAILED (hr)) {
+
+		int a;
+
+		switch (hr) {
+			case DIERR_INPUTLOST:
+				a = 0;
+				break;
+			case DIERR_INVALIDPARAM: 
+				a = 0;
+				break;
+			case DIERR_NOTACQUIRED: 
+				// If input is lost then acquire and keep trying until we get it back 
+				trace (_T("2"));
+
+				/*do {
+					hr = dinkeybd->Unacquire ();
+					trace (_T("2.1"));
+					hr = dinkeybd->Acquire ();
+				} while (hr == DIERR_INPUTLOST || hr == DIERR_NOTACQUIRED);*/
+
+				trace (_T("3"));
+				break;
+			case DIERR_NOTINITIALIZED: 
+				a = 0;
+				break;
+			case E_PENDING: 
+				a = 0;
+				break;
+		}
+
+		
+
+		// Could be we failed for some other reason
+		if (FAILED (hr)) {
+			return;
+		}
+		// Now read the state again
+		dinkeybd->GetDeviceState (256, (LPVOID) keystate);
+
+		trace (_T("4"));
+	}
+
+	hr = dinmouse->GetDeviceState (sizeof (DIMOUSESTATE), (LPVOID) &mousestate);
+
+	trace (_T("5"));
+
+	if (FAILED (hr)) {
+		// If input is lost then acquire and keep trying until we get it back 
+		hr = dinmouse->Acquire ();
+
+		trace (_T("6"));
+
+		/*while (hr == DIERR_INPUTLOST) {          
+			hr = dinmouse->Acquire ();
+		}*/
+
+		trace (_T("7"));
+
+		// Could be we failed for some other reason
+		if (FAILED (hr)) {
+			return;
+		}
+		// Now read the state again
+		dinmouse->GetDeviceState (sizeof (DIMOUSESTATE), (LPVOID) &mousestate);
+
+		trace (_T("8"));
+	}
+
+	trace (_T("exit"));
+
+	//dinkeybd->GetDeviceState (256, (LPVOID) keystate);
+	//dinmouse->GetDeviceState (sizeof (DIMOUSESTATE), (LPVOID) &mousestate);
+	////
 }
 
 // this is the function that closes DirectInput
