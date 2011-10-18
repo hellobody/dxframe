@@ -4,7 +4,7 @@
 
 DXFRAME_API vector <dxObj *> dxObj::objs;
 
-PDIRECT3DDEVICE9 dxObj::using_d3d_Device = NULL;
+PDIRECT3DDEVICE8 dxObj::using_d3d_Device = NULL;
 
 dxObj::dxObj () {
 
@@ -26,19 +26,19 @@ dxObj::dxObj () {
 
 	opacity = 1.f;
 
-	ZeroMemory (&material, sizeof(D3DMATERIAL9));
+	ZeroMemory (&material, sizeof(D3DMATERIAL8));
 	material.Diffuse.r = material.Ambient.r = 1.0f;
 	material.Diffuse.g = material.Ambient.g = 1.0f;
 	material.Diffuse.b = material.Ambient.b = 1.0f;
 	material.Diffuse.a = material.Ambient.a = opacity;
 
 	////shader
-	vertexDecl = NULL;
+	/*vertexDecl = NULL;
 	constantTable = NULL;
 	vertexShader = NULL;
 	pixelShader = NULL;
 	code = NULL;
-	ShaderOn = false;
+	ShaderOn = false;*/
 	////
 }
 
@@ -112,8 +112,11 @@ bool dxObj::CreateFromFile (const TCHAR *flName, const char *objName) {
 		pOriginalVerts = new VERTEX_3DPNT [numVerts];
 		pTransformedVerts = new VERTEX_3DPNT [numVerts];
 
-		using_d3d_Device->CreateVertexBuffer (numVerts * sizeof (CUSTOMVERTEX), 0, D3DFVF_CUSTOMVERTEX, D3DPOOL_MANAGED, &p_VertexBuffer, NULL);
-		using_d3d_Device->CreateIndexBuffer (numFaces * 12, 0, D3DFMT_INDEX32, D3DPOOL_MANAGED, &p_IndexBuffer, NULL);
+		//using_d3d_Device->CreateVertexBuffer (numVerts * sizeof (CUSTOMVERTEX), 0, D3DFVF_CUSTOMVERTEX, D3DPOOL_MANAGED, &p_VertexBuffer, NULL);	//ver 9
+		//using_d3d_Device->CreateIndexBuffer (numFaces * 12, 0, D3DFMT_INDEX32, D3DPOOL_MANAGED, &p_IndexBuffer, NULL);	//ver 9
+
+		using_d3d_Device->CreateVertexBuffer (numVerts * sizeof (CUSTOMVERTEX), 0, D3DFVF_CUSTOMVERTEX, D3DPOOL_MANAGED, &p_VertexBuffer);
+		using_d3d_Device->CreateIndexBuffer (numFaces * 12, 0, D3DFMT_INDEX32, D3DPOOL_MANAGED, &p_IndexBuffer);
 
 		D3DXMatrixIdentity (&transformM);
 		D3DXMatrixIdentity (&rotationM);
@@ -139,7 +142,8 @@ bool dxObj::CreateFromFile (const TCHAR *flName, const char *objName) {
 		}
 
 		void *tPointer;
-		p_IndexBuffer->Lock (0, numFaces * 12, (void**) &tPointer, 0);
+		//p_IndexBuffer->Lock (0, numFaces * 12, (void **) &tPointer, 0);	//ver 9
+		p_IndexBuffer->Lock (0, numFaces * 12, (BYTE **) &tPointer, 0);
 		memcpy (tPointer, pFaces, numFaces * 12);
 		p_IndexBuffer->Unlock();
 		///////////////////////////////////////////////////////////////////////////
@@ -240,7 +244,7 @@ void dxObj::InternalDestroy () {
 
 void dxObj::Temp_TurnOnShader ()
 {
-	ShaderOn = true;
+	//ShaderOn = true;
 }
 
 void dxObj::RotateX (float ang) {
@@ -350,7 +354,8 @@ void dxObj::Transform () {
 	}
 
 	void *tPointer;
-	p_VertexBuffer->Lock (0, numVerts * sizeof (CUSTOMVERTEX), (void**) &tPointer, 0);
+	//p_VertexBuffer->Lock (0, numVerts * sizeof (CUSTOMVERTEX), (void**) &tPointer, 0);	//ver 9
+	p_VertexBuffer->Lock (0, numVerts * sizeof (CUSTOMVERTEX), (BYTE **) &tPointer, 0);
 	memcpy (tPointer, pTransformedVerts, numVerts * sizeof (CUSTOMVERTEX));
 	p_VertexBuffer->Unlock ();
 
@@ -382,20 +387,24 @@ void dxObj::Render () {
 	//	
 	//}
 
-	hRes = using_d3d_Device->SetFVF (D3DFVF_CUSTOMVERTEX);
+	//hRes = using_d3d_Device->SetFVF (D3DFVF_CUSTOMVERTEX);	//ver 9
 
-	hRes = using_d3d_Device->SetStreamSource (0, p_VertexBuffer, 0, sizeof (CUSTOMVERTEX));
-	hRes = using_d3d_Device->SetIndices (p_IndexBuffer);
+	//hRes = using_d3d_Device->SetStreamSource (0, p_VertexBuffer, 0, sizeof (CUSTOMVERTEX));	//ver 9
+	//hRes = using_d3d_Device->SetIndices (p_IndexBuffer); //ver 9
+
+	hRes = using_d3d_Device->SetStreamSource (0, p_VertexBuffer, sizeof (CUSTOMVERTEX));
+	hRes = using_d3d_Device->SetIndices (p_IndexBuffer, 0);
 
 	material.Diffuse.a = material.Ambient.a = opacity;
 	
 	hRes = using_d3d_Device->SetMaterial (&material);
 	hRes = using_d3d_Device->SetTexture (0, texture);
 	
-	hRes = using_d3d_Device->DrawIndexedPrimitive (D3DPT_TRIANGLELIST, 0, 0, numVerts, 0, numFaces);
+	//hRes = using_d3d_Device->DrawIndexedPrimitive (D3DPT_TRIANGLELIST, 0, 0, numVerts, 0, numFaces);	//ver 9
+	hRes = using_d3d_Device->DrawIndexedPrimitive (D3DPT_TRIANGLELIST, 0, numVerts, 0, numFaces);
 
-	hRes = using_d3d_Device->SetVertexShader (NULL);
-	hRes = using_d3d_Device->SetPixelShader (NULL);
+	//hRes = using_d3d_Device->SetVertexShader (NULL);
+	//hRes = using_d3d_Device->SetPixelShader (NULL);
 	
 	//Эффективней использовать D3DPT_TRIANGLESTRIP или D3DPT_TRIANGLEFAN, чем D3DPT_TRIANGLELIST, т.к. в данном случае не происходит дублирование вершин.
 }

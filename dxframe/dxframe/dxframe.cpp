@@ -5,8 +5,8 @@
 #pragma managed(push, off)
 #endif
 
-LPDIRECT3D9			pD3DObject = NULL;			//direct 3d main interface
-LPDIRECT3DDEVICE9	pD3DDevice = NULL;			//direct 3d device
+LPDIRECT3D8			pD3DObject = NULL;			//direct 3d main interface
+LPDIRECT3DDEVICE8	pD3DDevice = NULL;			//direct 3d device
 
 D3DDISPLAYMODE d3ddmW;							//display mode parameters for windewed mode
 D3DDISPLAYMODE d3ddmFS;							//display mode parameters for full screen mode
@@ -18,7 +18,7 @@ D3DXMATRIX matView;
 D3DXMATRIX matProj;
 
 //light
-D3DLIGHT9 light;
+D3DLIGHT8 light;
 
 //timer
 float lt = 0; //last clock value
@@ -121,6 +121,8 @@ void dxFrame::SetDeviceParameters () {
 	pD3DDevice->SetTextureStageState (0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
 	pD3DDevice->SetTextureStageState (0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
 	pD3DDevice->SetTextureStageState (0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
+
+	pD3DDevice->SetVertexShader (D3DFVF_CUSTOMVERTEX);	//for ver 8
 }
 
 bool dxFrame::InitScreen (HWND hWnd) {
@@ -169,13 +171,15 @@ bool dxFrame::InitScreen (HWND hWnd) {
 
 void dxFrame::GetAllDisplayModes () {
 
-	int adapterModeCount = pD3DObject->GetAdapterModeCount (D3DADAPTER_DEFAULT, D3DFMT_X8R8G8B8);
+	//int adapterModeCount = pD3DObject->GetAdapterModeCount (D3DADAPTER_DEFAULT, D3DFMT_X8R8G8B8);	//ver 9
+	int adapterModeCount = pD3DObject->GetAdapterModeCount (D3DADAPTER_DEFAULT);
 
 	D3DDISPLAYMODE td3ddm;
 
 	forup (adapterModeCount) {
 
-		pD3DObject->EnumAdapterModes (D3DADAPTER_DEFAULT, D3DFMT_X8R8G8B8, i, &td3ddm);
+		//pD3DObject->EnumAdapterModes (D3DADAPTER_DEFAULT, D3DFMT_X8R8G8B8, i, &td3ddm);	//ver 9
+		pD3DObject->EnumAdapterModes (D3DADAPTER_DEFAULT, i, &td3ddm);
 		vVideoModes.push_back (td3ddm);
 
 		if (td3ddm.Width == WIDTH &&
@@ -190,7 +194,7 @@ void dxFrame::GetAllDisplayModes () {
 
 bool dxFrame::Create (HINSTANCE hThisInst, int nCmdShow, HWND hWnd) {
 
-	if ((pD3DObject = Direct3DCreate9 (D3D_SDK_VERSION)) == NULL) {
+	if ((pD3DObject = Direct3DCreate8 (D3D_SDK_VERSION)) == NULL) {
 		trace (_T("Direct3D instance did not created."));
 		return false;
 	}
@@ -215,7 +219,7 @@ bool dxFrame::Create (HINSTANCE hThisInst, int nCmdShow, HWND hWnd) {
 
 	//init light
 	D3DXVECTOR3 vecDir;
-	ZeroMemory (&light, sizeof (D3DLIGHT9));
+	ZeroMemory (&light, sizeof (D3DLIGHT8));
 	light.Type = D3DLIGHT_DIRECTIONAL;
 
 	light.Diffuse.r  = 1.0f;
