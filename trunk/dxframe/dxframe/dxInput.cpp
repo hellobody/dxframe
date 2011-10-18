@@ -66,71 +66,31 @@ void dxInput::Update () {
 	lstMousestate = mousestate;
 
 	////get the input data
-
-	trace (_T("0"));
-
 	hr = dinkeybd->GetDeviceState (256, (LPVOID) keystate);
 
-	trace (_T("1"));
-
 	if (FAILED (hr)) {
-
-		int a;
-
-		switch (hr) {
-			case DIERR_INPUTLOST:
-				a = 0;
-				break;
-			case DIERR_INVALIDPARAM: 
-				a = 0;
-				break;
-			case DIERR_NOTACQUIRED: 
-				// If input is lost then acquire and keep trying until we get it back 
-				trace (_T("2"));
-
-				/*do {
-					hr = dinkeybd->Unacquire ();
-					trace (_T("2.1"));
-					hr = dinkeybd->Acquire ();
-				} while (hr == DIERR_INPUTLOST || hr == DIERR_NOTACQUIRED);*/
-
-				trace (_T("3"));
-				break;
-			case DIERR_NOTINITIALIZED: 
-				a = 0;
-				break;
-			case E_PENDING: 
-				a = 0;
-				break;
-		}
-
-		
-
+		do {
+			hr = dinkeybd->Acquire ();
+		} while (hr == DIERR_INPUTLOST || hr == DIERR_NOTACQUIRED);
+	
+	
 		// Could be we failed for some other reason
 		if (FAILED (hr)) {
 			return;
 		}
+
 		// Now read the state again
 		dinkeybd->GetDeviceState (256, (LPVOID) keystate);
-
-		trace (_T("4"));
 	}
+
 
 	hr = dinmouse->GetDeviceState (sizeof (DIMOUSESTATE), (LPVOID) &mousestate);
 
-	trace (_T("5"));
-
 	if (FAILED (hr)) {
-		// If input is lost then acquire and keep trying until we get it back 
-		hr = dinmouse->Acquire ();
-
-		trace (_T("6"));
-
-		/*while (hr == DIERR_INPUTLOST) {          
+		
+		do {
 			hr = dinmouse->Acquire ();
-		}*/
-
-		trace (_T("7"));
+		} while (hr == DIERR_INPUTLOST || hr == DIERR_NOTACQUIRED);
 
 		// Could be we failed for some other reason
 		if (FAILED (hr)) {
@@ -138,15 +98,7 @@ void dxInput::Update () {
 		}
 		// Now read the state again
 		dinmouse->GetDeviceState (sizeof (DIMOUSESTATE), (LPVOID) &mousestate);
-
-		trace (_T("8"));
 	}
-
-	trace (_T("exit"));
-
-	//dinkeybd->GetDeviceState (256, (LPVOID) keystate);
-	//dinmouse->GetDeviceState (sizeof (DIMOUSESTATE), (LPVOID) &mousestate);
-	////
 }
 
 // this is the function that closes DirectInput
