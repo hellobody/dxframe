@@ -47,6 +47,8 @@
 
 #define WIDTH 1024
 #define HEIGHT 768
+#define HALFWIDTH WIDTH/2
+#define HALFHEIGHT HEIGHT/2
 
 #define UNDEFINED -1
 
