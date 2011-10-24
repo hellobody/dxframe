@@ -209,6 +209,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\dxPhysPoint.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\dxPhysUpdater.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\dxScreen.cpp"
 				>
 			</File>
@@ -280,6 +288,14 @@
 			</File>
 			<File
 				RelativePath=".\dxObj.h"
+				>
+			</File>
+			<File
+				RelativePath=".\dxPhysPoint.h"
+				>
+			</File>
+			<File
+				RelativePath=".\dxPhysUpdater.h"
 				>
 			</File>
 			<File
