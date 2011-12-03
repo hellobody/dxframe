@@ -21,13 +21,9 @@ dxScreen::dxScreen () {
 	opacity = 1.f;
 }
 
-dxScreen::~dxScreen () {	//при первом вызове деструктора, уничтожаться все объекты dxScreen
+dxScreen::~dxScreen () {
+	
 
-	while (vScreens.size ()) {
-
-		DEL (vScreens [0]);
-		vScreens.erase (vScreens.begin ());
-	}
 }
 
 void dxScreen::SetFacSwitchTimer (float fac) {
@@ -122,6 +118,11 @@ void dxScreen::RenderScreens () {
 			}
 		}
 	}
+}
+
+void dxScreen::DestroyScreens () {
+
+	RELEASE_VECTOR (vScreens);
 }
 
 void dxScreen::SetOpacity (float v) {
