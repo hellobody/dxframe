@@ -1,25 +1,31 @@
 #ifndef DXPHYSPOINT
 #define DXPHYSPOINT
 
-class dxPhysPoint {
+class DXFRAME_API dxPhysPoint {
 
 protected:
 
 	D3DXVECTOR2 P;
 	D3DXVECTOR2 V;
+	D3DXVECTOR2 A;
 
 public:
 	
 	dxPhysPoint ();
 	~dxPhysPoint ();
 
-	void Reset ();
+	virtual void Reset ();
 
-	void SetPos (D3DXVECTOR2 v);
-	D3DXVECTOR2 GetPos ();
+	virtual void Update (float dt);
 
-	void SetVel (D3DXVECTOR2 v);
-	D3DXVECTOR2 GetVel ();
+	virtual void SetPos (D3DXVECTOR2 v);
+	virtual D3DXVECTOR2 GetPos ();
+
+	virtual void SetVel (D3DXVECTOR2 v);
+	virtual D3DXVECTOR2 GetVel ();
+
+	virtual void SetAcl (D3DXVECTOR2 v);
+	virtual D3DXVECTOR2 GetAcl ();
 };
 
 #endif
