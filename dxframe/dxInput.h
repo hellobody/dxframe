@@ -5,8 +5,6 @@
 
 class DXFRAME_API dxInput {
 
-protected:
-
 	LPDIRECTINPUT8 din;				// the pointer to our DirectInput interface
 	LPDIRECTINPUTDEVICE8 dinkeybd;    // the pointer to the keyboard device
 	LPDIRECTINPUTDEVICE8 dinmouse;    // the pointer to the mouse device

@@ -36,6 +36,8 @@
 #include "dxIniFileInterface.h"
 //#include "dxConsole.h"
 #include "dxInput.h"
+#include "dxAudio.h"
+#include "dxSound.h"
 #include "cCamera.h"
 #include "dxObj.h"
 #include "dxTextField.h"

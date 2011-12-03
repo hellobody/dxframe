@@ -36,6 +36,7 @@ dxIniFileInterface iniFileInterface;
 //dxMainFrame MainFrame;
 
 DXFRAME_API dxInput input;
+DXFRAME_API dxAudio audio;
 dxLogger logger;
 
 HANDLE hThreadConsole = NULL;
@@ -46,8 +47,6 @@ bool enableCameraMove = false;
 bool showFPS = true;
 
 vector <D3DDISPLAYMODE> vVideoModes;
-
-
 
 BOOL APIENTRY DllMain (HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
 	
@@ -239,6 +238,9 @@ bool dxFrame::Create (HINSTANCE hThisInst, int nCmdShow, HWND hWnd) {
 	//
 
 	input.Initialize (hThisInst, hWnd);
+
+	audio.Initialize ();
+	audio.SetAudioFilesDirectory (_T("data\\sounds\\"));
 
 	dxObj::objs.clear ();
 	dxObj::using_d3d_Device = pD3DDevice;

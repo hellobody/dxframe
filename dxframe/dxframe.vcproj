@@ -181,6 +181,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\dxAudio.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\dxButton.cpp"
 				>
 			</File>
@@ -221,6 +225,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\dxSound.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\dxTextField.cpp"
 				>
 			</File>
@@ -256,6 +264,10 @@
 			</File>
 			<File
 				RelativePath=".\defines.h"
+				>
+			</File>
+			<File
+				RelativePath=".\dxAudio.h"
 				>
 			</File>
 			<File
@@ -300,6 +312,10 @@
 			</File>
 			<File
 				RelativePath=".\dxScreen.h"
+				>
+			</File>
+			<File
+				RelativePath=".\dxSound.h"
 				>
 			</File>
 			<File
