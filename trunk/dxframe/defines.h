@@ -8,6 +8,7 @@
 #include <d3dx8.h>
 //#include <d3dx9shader.h>
 #include <dinput.h>
+#include <dmusici.h>
 #include <windows.h>
 #include <windowsx.h>
 #include <fstream>
