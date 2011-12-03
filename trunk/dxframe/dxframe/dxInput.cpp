@@ -214,9 +214,11 @@ LPPOINT dxInput::GetCursorPosition () {
 		ScreenToClient (hWnd, CursorPosition);
 	}
 
-	CursorPosition->x = CursorPosition->x - d3ddm.Width / 2;
-	CursorPosition->y = CursorPosition->y - d3ddm.Height / 2;
-	CursorPosition->y *= -1;
+	if (CursorPosition) {
+		CursorPosition->x = CursorPosition->x - d3ddm.Width / 2;
+		CursorPosition->y = CursorPosition->y - d3ddm.Height / 2;
+		CursorPosition->y *= -1;
+	}
 
 	return CursorPosition;
 }

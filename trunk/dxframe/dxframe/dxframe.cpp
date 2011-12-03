@@ -312,7 +312,8 @@ float dxFrame::Update (HWND hWnd) {
 		SendMessage (hWnd, WM_DESTROY, 0, 0);
 	}*/
 	
-	if ((input.IsKeyDown (DIK_LALT) || input.IsKeyDown (DIK_RALT)) && (input.IsKeyToggledDown (DIK_RETURN) || input.IsKeyToggledDown (DIK_NUMPADENTER))) {
+	if ((input.IsKeyDown (DIK_LALT) || input.IsKeyDown (DIK_RALT)) && 
+		(input.IsKeyToggledDown (DIK_RETURN) || input.IsKeyToggledDown (DIK_NUMPADENTER))) {
 		SwitchScreenMode (hWnd);
 	}
 

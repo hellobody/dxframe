@@ -33,6 +33,7 @@ public:
 	static void CreateScreens ();
 	static void UpdateScreens (float dt);
 	static void RenderScreens ();
+	static void DestroyScreens ();
 	
 	void SetOpacity (float v);
 	float GetOpacity ();
