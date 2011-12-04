@@ -16,6 +16,7 @@ public:
 
 	static void Play (const TCHAR *key);
 	static void PlayLoop (const TCHAR *key);
+	static bool IsPlaying (const TCHAR *key);
 	static void Stop (const TCHAR *key);
 
 	dxSound (const TCHAR *name);

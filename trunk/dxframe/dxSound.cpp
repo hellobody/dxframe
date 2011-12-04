@@ -49,11 +49,31 @@ void dxSound::Play (const TCHAR *key) {
 
 void dxSound::PlayLoop (const TCHAR *key) {
 
+	it = mSounds.find (key);
+	if (it->second) {
 
+		it->second->SetRepeats (DMUS_SEG_REPEAT_INFINITE);
+		it->second->Play ();
+	}
 }
+
+bool dxSound::IsPlaying (const TCHAR *key) {
+
+	it = mSounds.find (key);
+	if (it->second) {
+
+		return it->second->IsPlaying ();
+	}
+	return false;
+}
+
 void dxSound::Stop (const TCHAR *key) {
 
+	it = mSounds.find (key);
+	if (it->second) {
 
+		it->second->Stop ();
+	}
 }
 
 dxSound::dxSound (const TCHAR *name) {
