@@ -42,3 +42,6 @@
 #include "dxObj.h"
 #include "dxTextField.h"
 #include "dxLogger.h"
+#include "pugixml.hpp"
+
+using namespace pugi;

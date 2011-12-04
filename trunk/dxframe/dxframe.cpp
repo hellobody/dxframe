@@ -241,6 +241,7 @@ bool dxFrame::Create (HINSTANCE hThisInst, int nCmdShow, HWND hWnd) {
 
 	audio.Initialize ();
 	audio.SetAudioFilesDirectory (_T("data\\sounds\\"));
+	dxSound::CreateSounds ();
 
 	dxObj::objs.clear ();
 	dxObj::using_d3d_Device = pD3DDevice;
@@ -355,6 +356,7 @@ void dxFrame::Destroy () {
 	RELEASE (pD3DObject);
 
 	input.Clean ();
+	dxSound::CreateSounds ();
 
 	for (vector <dxObj *>::iterator it = dxObj::objs.begin (); it != dxObj::objs.end (); it++)
 	{
