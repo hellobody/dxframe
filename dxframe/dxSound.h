@@ -9,7 +9,16 @@ class DXFRAME_API dxSound {
 
 public:
 
-	dxSound (TCHAR *name);
+	static map <std::basic_string <TCHAR>, dxSound *> mSounds;
+
+	static void CreateSounds ();
+	static void DestroySounds ();
+
+	static void Play (const TCHAR *key);
+	static void PlayLoop (const TCHAR *key);
+	static void Stop (const TCHAR *key);
+
+	dxSound (const TCHAR *name);
 	~dxSound ();
 
 	void Play ();

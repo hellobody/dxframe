@@ -37,7 +37,7 @@
 
 #pragma warning (disable: 4251)
 
-#define RELEASE_VECTOR(v) {while ((v).size ()) {DEL ((v)[0]); (v).erase ((v).begin ());};}
+#define RELEASE_VECTOR_OR_MAP(v) {while ((v).size ()) {DEL ((v)[0]); (v).erase ((v).begin ());};}
 #define RELEASE(p) {if (p) {(p)->Release (); (p) = NULL;}}
 #define DELA(p) {if (p) {delete [] (p); (p) = NULL;}}
 #define DEL(p) {if (p) {delete (p); (p) = NULL;}}

@@ -5,7 +5,58 @@ extern dxAudio audio;
 
 extern HRESULT hr;
 
-dxSound::dxSound (TCHAR *name) {
+map <std::basic_string <TCHAR>, dxSound *> dxSound::mSounds;
+
+map <std::basic_string <TCHAR>, dxSound *>::iterator it;
+
+void dxSound::CreateSounds () {
+
+	xml_document doc;
+
+	xml_parse_result result = doc.load_file (PATHTO_SOUNDS_XML);
+
+	if (result) {
+
+		xml_node tagRoot = doc.child (_T("sounds"));
+		
+		for (xml_node tagSound = tagRoot.child (_T("sound")); tagSound; tagSound = tagSound.next_sibling (_T("sound")))
+		{
+			const TCHAR *key = (TCHAR *) tagSound.attribute (_T("key")).value ();
+
+			const TCHAR *file = (TCHAR *) tagSound.attribute (_T("file")).value ();
+			
+			dxSound *snd = new dxSound (file);
+			
+			mSounds [key] = snd;
+		}
+	
+	}
+}
+
+void dxSound::DestroySounds () {
+
+	RELEASE_VECTOR_OR_MAP (mSounds);
+}
+
+void dxSound::Play (const TCHAR *key) {
+
+	it = mSounds.find (key);
+	if (it->second) {
+
+		it->second->Play ();
+	}
+}
+
+void dxSound::PlayLoop (const TCHAR *key) {
+
+
+}
+void dxSound::Stop (const TCHAR *key) {
+
+
+}
+
+dxSound::dxSound (const TCHAR *name) {
 
 	m_pSegment = NULL;
 
@@ -17,7 +68,7 @@ dxSound::dxSound (TCHAR *name) {
 
 	if (m_pLoader) {
 
-		hr = m_pLoader->LoadObjectFromFile (CLSID_DirectMusicSegment, IID_IDirectMusicSegment8, name, (void **) &m_pSegment);
+		hr = m_pLoader->LoadObjectFromFile (CLSID_DirectMusicSegment, IID_IDirectMusicSegment8, (TCHAR *) name, (void **) &m_pSegment);
 	}
 
 	if (m_pSegment) {

@@ -233,6 +233,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\pugixml.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\stdafx.cpp"
 				>
 				<FileConfiguration
@@ -328,6 +332,14 @@
 			</File>
 			<File
 				RelativePath=".\path.h"
+				>
+			</File>
+			<File
+				RelativePath=".\pugiconfig.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\pugixml.hpp"
 				>
 			</File>
 			<File
