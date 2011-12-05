@@ -35,7 +35,7 @@ void dxSound::CreateSounds () {
 
 void dxSound::DestroySounds () {
 
-	RELEASE_VECTOR_OR_MAP (mSounds);
+	//RELEASE_VECTOR_OR_MAP (mSounds);
 }
 
 void dxSound::Play (const TCHAR *key) {
