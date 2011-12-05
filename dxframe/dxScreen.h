@@ -4,6 +4,7 @@
 #include "dxObj.h"
 #include "dxButton.h"
 #include "dxInput.h"
+#include "cCamera.h"
 
 class DXFRAME_API dxScreen {
 

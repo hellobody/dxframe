@@ -1,8 +1,9 @@
-#pragma once
+#ifndef DXCAMERA_H
+#define DXCAMERA_H
 
 #include "defines.h"
 
-class cCamera {
+class DXFRAME_API cCamera {
 	
 public:
 
@@ -37,3 +38,5 @@ public:
 	D3DXVECTOR3 getLook ();
 	D3DXVECTOR3 getRight ();
 };
+
+#endif

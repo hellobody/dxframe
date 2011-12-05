@@ -28,13 +28,12 @@ float dt; //tick size in seconds
 
 int fps = 0;
 
-cCamera camera (D3DXVECTOR3 (0, 0, 250));
-
 dxEnvironmentVars environmentVars;
 dxIniFileInterface iniFileInterface;
 
 //dxMainFrame MainFrame;
 
+DXFRAME_API cCamera camera (D3DXVECTOR3 (0, 0, 250));
 DXFRAME_API dxInput input;
 DXFRAME_API dxAudio audio;
 dxLogger logger;
@@ -318,6 +317,10 @@ float dxFrame::Update (HWND hWnd) {
 	if ((input.IsKeyDown (DIK_LALT) || input.IsKeyDown (DIK_RALT)) && 
 		(input.IsKeyToggledDown (DIK_RETURN) || input.IsKeyToggledDown (DIK_NUMPADENTER))) {
 		SwitchScreenMode (hWnd);
+	}
+
+	if (pD3DDevice) {
+		pD3DDevice->SetTransform (D3DTS_VIEW, &matView);
 	}
 
 	return dt;

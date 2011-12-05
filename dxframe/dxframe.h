@@ -1,4 +1,5 @@
 #include "dxInput.h"
+#include "cCamera.h"
 
 #ifdef DXFRAME_EXPORTS
 #define DXFRAME_API __declspec(dllexport)
@@ -9,6 +10,8 @@
 extern DXFRAME_API bool fullScreen;
 
 extern DXFRAME_API dxInput input;
+
+extern DXFRAME_API cCamera camera;
 
 class DXFRAME_API dxFrame {
 
