@@ -1,8 +1,11 @@
 #include "stdafx.h"
 #include "dxButton.h"
 #include "dxInput.h"
+#include "cCamera.h"
 
 extern dxInput input;
+
+extern cCamera camera;
 
 dxButton::dxButton (const TCHAR *FileName, const char *DefaultObjName, const char *SelectedObjName, const char *PressedObjName) {
 
