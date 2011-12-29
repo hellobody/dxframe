@@ -37,7 +37,9 @@ protected:
 	int numFaces;	//number of primitives
 
 	D3DXMATRIX transformM;	//transformation matrix
-	D3DXMATRIX rotationM;	//rotation matrix
+	D3DXMATRIX rotationXM;	//rotation matrix
+	D3DXMATRIX rotationYM;	//rotation matrix
+	D3DXMATRIX rotationZM;	//rotation matrix
 	D3DXMATRIX textureM;	//texture matrix
 	D3DXMATRIX scaleM;		//scale matrix
 	D3DXMATRIX mainM;		//main model matrix
@@ -73,6 +75,8 @@ public:
 	void RotateZ (float);
 
 	void SetDirZ (D3DXVECTOR2 v);
+	void SetAngX (float);
+	void SetAngY (float);
 	void SetAngZ (float);
 
 	D3DXVECTOR2 GetPos2 ();
