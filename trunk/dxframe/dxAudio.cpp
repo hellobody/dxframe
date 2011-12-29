@@ -49,11 +49,11 @@ void dxAudio::Destroy () {
 
 	if (m_pPerformance) {
 
-		m_pPerformance->Stop (NULL, NULL, 0, 0);
+		//m_pPerformance->Stop (NULL, NULL, 0, 0);
 	}
 
 	if (m_pLoader) m_pLoader->Release ();
-	if (m_pPerformance) m_pPerformance->CloseDown ();
+	//if (m_pPerformance) m_pPerformance->CloseDown ();
     
 	CoUninitialize ();
 }

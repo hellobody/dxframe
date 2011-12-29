@@ -359,7 +359,7 @@ void dxFrame::Destroy () {
 	RELEASE (pD3DObject);
 
 	input.Clean ();
-	dxSound::CreateSounds ();
+	dxSound::DestroySounds ();
 
 	for (vector <dxObj *>::iterator it = dxObj::objs.begin (); it != dxObj::objs.end (); it++)
 	{

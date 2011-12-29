@@ -122,7 +122,7 @@ void dxScreen::RenderScreens () {
 
 void dxScreen::DestroyScreens () {
 
-	RELEASE_VECTOR_OR_MAP (vScreens);
+	RELEASE_VECTOR (vScreens);
 }
 
 void dxScreen::SetOpacity (float v) {

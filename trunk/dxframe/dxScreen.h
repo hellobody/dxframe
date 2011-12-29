@@ -25,7 +25,7 @@ protected:
 public:
 	
 	dxScreen ();
-	~dxScreen ();
+	virtual ~dxScreen ();
 
 	static void SetFacSwitchTimer (float fac);
 	static bool isValidId (int id);
