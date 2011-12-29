@@ -35,6 +35,14 @@ void dxSound::CreateSounds () {
 
 void dxSound::DestroySounds () {
 
+	map <std::basic_string <TCHAR>, dxSound *>::iterator it = mSounds.begin ();
+
+	while (it != mSounds.end ()) {
+
+		DEL (it->second);
+		it++;
+	}
+	
 	//RELEASE_VECTOR_OR_MAP (mSounds);
 }
 

@@ -233,6 +233,18 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Link.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Net.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Neuron.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\pugixml.cpp"
 				>
 			</File>
@@ -328,6 +340,18 @@
 			</File>
 			<File
 				RelativePath=".\dxTextField.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Link.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Net.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Neuron.h"
 				>
 			</File>
 			<File
