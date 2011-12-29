@@ -119,7 +119,9 @@ bool dxObj::CreateFromFile (const TCHAR *flName, const char *objName) {
 		using_d3d_Device->CreateIndexBuffer (numFaces * 12, 0, D3DFMT_INDEX32, D3DPOOL_MANAGED, &p_IndexBuffer);
 
 		D3DXMatrixIdentity (&transformM);
-		D3DXMatrixIdentity (&rotationM);
+		D3DXMatrixIdentity (&rotationXM);
+		D3DXMatrixIdentity (&rotationYM);
+		D3DXMatrixIdentity (&rotationZM);
 		D3DXMatrixIdentity (&textureM);
 		D3DXMatrixIdentity (&scaleM);
 		D3DXMatrixIdentity (&mainM);
@@ -250,19 +252,19 @@ void dxObj::Temp_TurnOnShader ()
 void dxObj::RotateX (float ang) {
 
 	D3DXMatrixRotationX (&tempM, ang);
-	rotationM *= tempM;
+	rotationXM *= tempM;
 }
 
 void dxObj::RotateY (float ang) {
 
 	D3DXMatrixRotationY (&tempM, ang);
-	rotationM *= tempM;
+	rotationYM *= tempM;
 }
 
 void dxObj::RotateZ (float ang) {
 
 	D3DXMatrixRotationZ (&tempM, ang);
-	rotationM *= tempM;
+	rotationZM *= tempM;
 }
 
 void dxObj::Move (float x, float y, float z) {
@@ -313,10 +315,22 @@ void dxObj::SetDirZ (D3DXVECTOR2 v) {
 	SetAngZ (atan2 (v.y, v.x));
 }
 
+void dxObj::SetAngX (float a) {
+
+	D3DXMatrixRotationX (&tempM, a);
+	rotationXM = tempM;
+}
+
+void dxObj::SetAngY (float a) {
+
+	D3DXMatrixRotationY (&tempM, a);
+	rotationYM = tempM;
+}
+
 void dxObj::SetAngZ (float a) {
 
 	D3DXMatrixRotationZ (&tempM, a);
-	rotationM = tempM;
+	rotationZM = tempM;
 }
 
 D3DXVECTOR2 dxObj::GetPos2 () {
@@ -344,7 +358,7 @@ void dxObj::Transform () {
 
 	memcpy (pTransformedVerts, pOriginalVerts, numVerts * sizeof (CUSTOMVERTEX)); //copy original coordinates to buffer for transformation
 
-	mainM = scaleM * rotationM * transformM;			//computing eventual outcome matrix
+	mainM = scaleM * rotationXM * rotationYM * rotationZM * transformM;			//computing eventual outcome matrix
 
 	forup (numVerts) {
 
