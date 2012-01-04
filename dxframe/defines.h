@@ -52,6 +52,11 @@
 #define HALFWIDTH WIDTH/2
 #define HALFHEIGHT HEIGHT/2
 
+#define MAP_WIDTH 2500
+#define MAP_HEIGHT 2500
+#define MAP_HALFWIDTH MAP_WIDTH/2
+#define MAP_HALFHEIGHT MAP_HEIGHT/2
+
 #define UNDEFINED -1
 
 const int nameSize = 256;

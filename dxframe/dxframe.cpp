@@ -319,6 +319,7 @@ float dxFrame::Update (HWND hWnd) {
 		SwitchScreenMode (hWnd);
 	}
 
+	matView = camera.getViewMatrix ();
 	if (pD3DDevice) {
 		pD3DDevice->SetTransform (D3DTS_VIEW, &matView);
 	}

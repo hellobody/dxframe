@@ -35,6 +35,17 @@ void dxButton::Move (float x, float y, float z) {
 	}
 }
 
+void dxButton::MoveTo (D3DXVECTOR3 v) {
+
+	forup (eNumOfStates) {
+
+		if (objs [i]) {
+
+			objs [i]->MoveTo (v);
+		}
+	}
+}
+
 void dxButton::Scale (float x, float y, float z) {
 
 	forup (eNumOfStates) {

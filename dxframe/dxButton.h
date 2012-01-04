@@ -22,6 +22,7 @@ public:
 	~dxButton ();
 
 	void Move (float, float, float);
+	void MoveTo (D3DXVECTOR3 v);
 	void Scale (float, float, float);
 
 	bool IsDown ();
