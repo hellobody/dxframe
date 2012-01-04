@@ -20,6 +20,8 @@ protected:
 	static float switchTimer;
 	static float facSwitchTimer;
 
+	static bool needToReset;
+
 	float opacity;
 
 public:

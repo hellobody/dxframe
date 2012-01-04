@@ -11,6 +11,8 @@ int dxScreen::nextScreen = UNDEFINED;
 float dxScreen::switchTimer = 0;
 float dxScreen::facSwitchTimer = 1.f;
 
+bool dxScreen::needToReset = false;
+
 dxScreen::dxScreen () {
 
 	vScreens.push_back (this);
@@ -48,6 +50,7 @@ bool dxScreen::SwitchTo (int id) {
 
 		switchTimer = .001f;
 		nextScreen = id;
+		needToReset = true;
 		return true;
 	} return false;
 }
@@ -82,8 +85,10 @@ void dxScreen::UpdateScreens (float dt) {
 
 		if (vScreens [currentScreen]) {
 
-			if (switchTimer < .5f) vScreens [currentScreen]->UpdateCamera (dt);
-			vScreens [currentScreen]->Update (dt);
+			if (switchTimer < .5f) {
+				vScreens [currentScreen]->UpdateCamera (dt);
+				vScreens [currentScreen]->Update (dt);
+			}
 		}
 	}
 
@@ -91,8 +96,17 @@ void dxScreen::UpdateScreens (float dt) {
 
 		if (vScreens [nextScreen]) {
 
-			if (switchTimer >= .5f) vScreens [nextScreen]->UpdateCamera (dt);
-			vScreens [nextScreen]->Update (dt);
+			if (switchTimer >= .5f) {
+
+				if (needToReset) {
+					needToReset = false;
+
+					vScreens [nextScreen]->Reset ();
+				}
+
+				vScreens [nextScreen]->UpdateCamera (dt);
+				vScreens [nextScreen]->Update (dt);
+			}
 		}
 	}
 }

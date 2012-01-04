@@ -22,6 +22,12 @@ public:
 
 	void SwitchScreenMode (HWND hWnd);
 	void ResetCameraPosition ();
+
+	void SwitchToPerspMode ();
+	void SwitchToOrthoMode ();
+
+	void SetAmbientLight (DWORD color);
+
 	void SetDeviceParameters ();
 	bool InitScreen (HWND hWnd);
 	void GetAllDisplayModes ();
