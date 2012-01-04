@@ -5,17 +5,17 @@
 
 class DXFRAME_API cCamera {
 	
-public:
-
-	enum eCameraType { LANDOBJECT, AIRCRAFT };
-
-	eCameraType type;
-
 	D3DXVECTOR3 up;
 	D3DXVECTOR3 look;
 	D3DXVECTOR3 right;
 	D3DXVECTOR3 pos;
 
+public:
+
+	enum eCameraType { LANDOBJECT, AIRCRAFT };
+
+	eCameraType type;
+	
 	cCamera ();
 	cCamera (eCameraType);
 	cCamera (D3DXVECTOR3);
@@ -31,7 +31,7 @@ public:
 
 	D3DXMATRIX getViewMatrix ();
 	D3DXVECTOR3 getPos ();
-	void setPos (D3DXVECTOR3*);
+	void setPos (D3DXVECTOR3 *);
 	void setType (eCameraType);
 
 	D3DXVECTOR3 getUp ();

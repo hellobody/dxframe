@@ -98,6 +98,26 @@ void dxFrame::ResetCameraPosition () {
 	}
 }
 
+void dxFrame::SwitchToPerspMode () {
+
+	D3DXMatrixPerspectiveFovRH (&matProj, D3DX_PI/2, 4.f/3.f, 1.f, 10000.f); //last two edges of drawing, do not set near val < 1.f
+	SetDeviceParameters ();
+}
+
+void dxFrame::SwitchToOrthoMode () {
+
+	D3DXMatrixOrthoRH (&matProj, WIDTH, HEIGHT, -10000, 10000);
+	SetDeviceParameters ();
+}
+
+void dxFrame::SetAmbientLight (DWORD color) {
+
+	if (pD3DDevice) {
+
+		pD3DDevice->SetRenderState (D3DRS_AMBIENT, color);
+	}
+}
+
 void dxFrame::SetDeviceParameters () {
 
 	matView = camera.getViewMatrix ();
@@ -233,7 +253,7 @@ bool dxFrame::Create (HINSTANCE hThisInst, int nCmdShow, HWND hWnd) {
 	pD3DDevice->LightEnable (0, true);
 
 	pD3DDevice->SetRenderState (D3DRS_LIGHTING, true);
-	pD3DDevice->SetRenderState (D3DRS_AMBIENT, 0);
+	pD3DDevice->SetRenderState (D3DRS_AMBIENT, RGB (0, 0, 0));
 	//
 
 	input.Initialize (hThisInst, hWnd);
@@ -247,8 +267,11 @@ bool dxFrame::Create (HINSTANCE hThisInst, int nCmdShow, HWND hWnd) {
 
 	D3DXMatrixRotationZ (&matWorld, 0.0f);
 	
+	//2d
 	D3DXMatrixOrthoRH (&matProj, WIDTH, HEIGHT, -10000, 10000);
-
+	//3d
+	//D3DXMatrixPerspectiveFovRH (&matProj, D3DX_PI/2, 4.f/3.f, 1.f, 10000.f); //last two edges of drawing, do not set near val < 1.f
+	
 	SetDeviceParameters ();
 
 	return true;
