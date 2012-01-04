@@ -111,7 +111,8 @@ D3DXVECTOR3 cCamera::getPos () {
 }
 
 void cCamera::setPos (D3DXVECTOR3* pos) {
-
+	
+	this->pos = *pos;
 }
 
 void cCamera::setType (eCameraType type) {

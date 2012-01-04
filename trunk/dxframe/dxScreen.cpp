@@ -82,6 +82,7 @@ void dxScreen::UpdateScreens (float dt) {
 
 		if (vScreens [currentScreen]) {
 
+			if (switchTimer < .5f) vScreens [currentScreen]->UpdateCamera (dt);
 			vScreens [currentScreen]->Update (dt);
 		}
 	}
@@ -90,6 +91,7 @@ void dxScreen::UpdateScreens (float dt) {
 
 		if (vScreens [nextScreen]) {
 
+			if (switchTimer >= .5f) vScreens [nextScreen]->UpdateCamera (dt);
 			vScreens [nextScreen]->Update (dt);
 		}
 	}
