@@ -31,7 +31,13 @@ public:
 
 	D3DXMATRIX getViewMatrix ();
 	D3DXVECTOR3 getPos ();
+	
 	void setPos (D3DXVECTOR3 *);
+
+	void AddPosX (float v);
+	void AddPosY (float v);
+	void AddPosZ (float v);
+
 	void setType (eCameraType);
 
 	D3DXVECTOR3 getUp ();
