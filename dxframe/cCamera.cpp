@@ -115,6 +115,21 @@ void cCamera::setPos (D3DXVECTOR3* v) {
 	pos = *v;
 }
 
+void cCamera::AddPosX (float v) {
+
+	pos.x += v;
+}
+
+void cCamera::AddPosY (float v) {
+
+	pos.y += v;
+}
+
+void cCamera::AddPosZ (float v) {
+
+	pos.z += v;
+}
+
 void cCamera::setType (eCameraType type) {
 	this->type = type;
 }
