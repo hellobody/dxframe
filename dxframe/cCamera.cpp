@@ -54,6 +54,10 @@ void cCamera::pitch (float angle) {
 
 void cCamera::roll (float angle) {
 
+	D3DXMATRIX T;
+	D3DXMatrixRotationAxis (&T, &look, angle);
+	D3DXVec3TransformCoord (&right, &right, &T);
+	D3DXVec3TransformCoord (&up, &up, &T);
 }
 
 void cCamera::yaw (float angle) {
@@ -61,7 +65,7 @@ void cCamera::yaw (float angle) {
 	D3DXMATRIX T;
 	/*if (type == LANDOBJECT) D3DXMatrixRotationY (&T, angle);
 	else if (type == AIRCRAFT) D3DXMatrixRotationAxis (&T, &up, angle);*/
-	D3DXMatrixRotationY (&T, angle);
+	D3DXMatrixRotationZ (&T, angle);
 	D3DXVec3TransformCoord (&right, &right, &T);
 	D3DXVec3TransformCoord (&look, &look, &T);
 }
@@ -106,8 +110,8 @@ D3DXMATRIX cCamera::getViewMatrix () {
 }
 
 D3DXVECTOR3 cCamera::getPos () {
-	D3DXVECTOR3 V;
-	return V;
+	
+	return pos;
 }
 
 void cCamera::setPos (D3DXVECTOR3* v) {
@@ -131,20 +135,21 @@ void cCamera::AddPosZ (float v) {
 }
 
 void cCamera::setType (eCameraType type) {
+
 	this->type = type;
 }
 
 D3DXVECTOR3 cCamera::getUp () {
-	D3DXVECTOR3 V;
-	return V;
+	
+	return up;
 }
 
 D3DXVECTOR3 cCamera::getLook () {
-	D3DXVECTOR3 V;
-	return V;
+	
+	return look;
 }
 
 D3DXVECTOR3 cCamera::getRight () {
-	D3DXVECTOR3 V;
-	return V; 
+	
+	return right;
 }

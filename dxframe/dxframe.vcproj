@@ -193,6 +193,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\dxHeightMap.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\dxIniFileInterface.cpp"
 				>
 			</File>
@@ -296,6 +300,10 @@
 			</File>
 			<File
 				RelativePath=".\dxframe.h"
+				>
+			</File>
+			<File
+				RelativePath=".\dxHeightMap.h"
 				>
 			</File>
 			<File
