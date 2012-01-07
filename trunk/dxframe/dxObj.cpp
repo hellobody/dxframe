@@ -292,6 +292,11 @@ void dxObj::MoveTo (D3DXVECTOR3 v) {
 	transformM._43 = v.z;
 }
 
+void dxObj::MoveToZ (float v) {
+
+	transformM._43 = v;
+}
+
 void dxObj::Scale (float x, float y, float z) {
 
 	D3DXMatrixScaling (&tempM, x, y, z);

@@ -67,6 +67,9 @@ public:
 	void Move (D3DXVECTOR3 v);
 	void MoveTo (D3DXVECTOR2 v);
 	void MoveTo (D3DXVECTOR3 v);
+
+	void MoveToZ (float v);
+
 	void Scale (float, float, float);
 	void SetScale (float, float, float);
 	void SetScale (float);

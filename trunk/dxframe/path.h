@@ -11,4 +11,6 @@
 
 #define PATHTO_SOUNDS_XML _T("data\\sounds\\sounds.xml")
 
+#define PATHTO_HEIGHTMAPS _T("data\\heightmaps\\")
+
 #endif
