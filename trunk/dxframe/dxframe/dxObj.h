@@ -7,6 +7,8 @@ class DXFRAME_API dxObj {
 
 protected:
 
+	D3DXFRAME
+
 	LPDIRECT3DTEXTURE8 texture;
 
 	char Name [MAX_PATH];

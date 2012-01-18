@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CodeSnippets  xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+	<CodeSnippet Format="1.0.0">
+		<Header>
+			<Title>dx_class_cpp</Title>
+			<Shortcut>dx_class_cpp</Shortcut>
+			<Description>Code snippet for class source file</Description>
+			<Author>hellobody</Author>
+			<SnippetTypes>
+				<SnippetType>Expansion</SnippetType>
+				<SnippetType>SurroundsWith</SnippetType>
+			</SnippetTypes>
+		</Header>
+		<Snippet>
+			<Declarations>
+				<Literal>
+					<ID>name</ID>
+					<ToolTip>Class name</ToolTip>
+					<Default>MyClass</Default>
+				</Literal>
+			</Declarations>
+			<Code Language="cpp">
+			<![CDATA[#include "stdafx.h"
+			#include "$name$.h"
+			
+			$name$::$name$ ()
+			{
+				body = NULL;
+			}
+			
+			$name$::~$name$ ()
+			{
+				Destroy ();
+			}
+			
+			void $name$::Create ()
+			{
+				DEL (body);
+				body = new dxObj (_T("file_name.dxf"), "model_name");
+			}
+			
+			void $name$::Reset ()
+			{
+				
+			}
+			
+			void $name$::Update ()
+			{
+				
+			}
+			
+			void $name$::Render ()
+			{
+				
+			}
+			
+			void $name$::Destroy ()
+			{
+				
+			}
+			]]>
+			</Code>
+		</Snippet>
+	</CodeSnippet>
+</CodeSnippets>
