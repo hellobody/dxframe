@@ -205,6 +205,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\dxLandObj.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\dxLight.cpp"
 				>
 			</File>
@@ -312,6 +316,10 @@
 			</File>
 			<File
 				RelativePath=".\dxInput.h"
+				>
+			</File>
+			<File
+				RelativePath=".\dxLandObj.h"
 				>
 			</File>
 			<File
