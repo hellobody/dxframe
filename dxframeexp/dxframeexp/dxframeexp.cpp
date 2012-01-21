@@ -85,6 +85,10 @@ void SceneSaver::ProcNode(INode *node)
 	
 	Point3 v;
 
+	//temp test
+	//node->Ge
+	//
+
 	//Get and write name
 	char Name [nameSize] = "";
 	strcpy_s (Name, nameSize, node->GetName ());
