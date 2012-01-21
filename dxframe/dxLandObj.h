@@ -19,6 +19,8 @@ public:
 	void Update ();
 	void Render ();
 	void Destroy ();
+
+	void SetPosZ (float v);
 };
 
 #endif

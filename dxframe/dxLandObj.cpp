@@ -1,38 +1,39 @@
 #include "stdafx.h"
 #include "dxLandObj.h"
 
-dxLandObj::dxLandObj ()
-{
+dxLandObj::dxLandObj () {
 	body = NULL;
 }
 
-dxLandObj::~dxLandObj ()
-{
+dxLandObj::~dxLandObj () {
 	Destroy ();
 }
 
-void dxLandObj::Create ()
-{
+void dxLandObj::Create () {
 	DEL (body);
-	body = new dxObj (_T("file_name.dxf"), "model_name");
+	body = new dxObj (_T("palm_tree.dxf"), "palm_tree");
 }
 
-void dxLandObj::Reset ()
-{
-
-}
-
-void dxLandObj::Update ()
-{
+void dxLandObj::Reset () {
 
 }
 
-void dxLandObj::Render ()
-{
-
+void dxLandObj::Update () {
+	
 }
 
-void dxLandObj::Destroy ()
-{
+void dxLandObj::Render () {
+	if (body) body->Render ();
+}
 
+void dxLandObj::Destroy () {
+	
+}
+
+void dxLandObj::SetPosZ (float v) {
+
+	if (body) {
+
+		body->MoveToZ (v);
+	}
 }
