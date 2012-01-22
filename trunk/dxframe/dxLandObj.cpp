@@ -19,6 +19,20 @@ void dxLandObj::Create (const TCHAR *fName, const char *mName) {
 	Reset ();
 }
 
+void dxLandObj::ReCreate (const TCHAR *fName, const char *mName) {
+	
+	D3DXVECTOR2 p;
+	if (body) {
+		p = body->GetPos2 ();
+	}
+	
+	//DEL (body);	//here not smart memory using
+	body = new dxObj (fName, mName);
+	body->MoveToX (p.x);
+	body->MoveToY (p.y);
+	Reset ();
+}
+
 void dxLandObj::Reset () {
 	
 }

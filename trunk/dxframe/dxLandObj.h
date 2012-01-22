@@ -18,6 +18,7 @@ public:
 	~dxLandObj ();
 
 	void Create (const TCHAR *fName, const char *mName);
+	void ReCreate (const TCHAR *fName, const char *mName);
 	void Reset ();
 	void Update (float dt);
 	void Render ();
