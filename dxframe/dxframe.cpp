@@ -126,7 +126,7 @@ void dxFrame::SetDeviceParameters () {
 	pD3DDevice->SetTransform (D3DTS_WORLD, &matWorld);
 	pD3DDevice->SetTransform (D3DTS_PROJECTION, &matProj);
 
-	pD3DDevice->SetRenderState (D3DRS_CULLMODE, D3DCULL_NONE);
+	pD3DDevice->SetRenderState (D3DRS_CULLMODE, D3DCULL_CW);
 	pD3DDevice->SetRenderState (D3DRS_ZENABLE, D3DZB_TRUE);
 	pD3DDevice->SetRenderState (D3DRS_ALPHABLENDENABLE, TRUE);
 	pD3DDevice->SetRenderState (D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);

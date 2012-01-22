@@ -64,6 +64,15 @@ bool dxObj::CreateFromFile (const TCHAR *flName, const char *objName) {
 		return false;
 	}
 
+	_tcscpy_s (FileName, MAX_PATH, flName);
+
+	char chStr [MAX_PATH];
+	strcpy_s (chStr, MAX_PATH, objName);
+	ZeroMemory (&ObjName, sizeof (TCHAR) * MAX_PATH);
+	forup (MAX_PATH) {
+		ObjName [i] = (TCHAR) chStr [i];
+	}
+
 	TCHAR flPath [MAX_PATH];
 	_tcscpy_s (flPath, MAX_PATH, _T("data\\"));
 	_tcscat_s (flPath, MAX_PATH, flName);
@@ -292,6 +301,16 @@ void dxObj::MoveTo (D3DXVECTOR3 v) {
 	transformM._43 = v.z;
 }
 
+void dxObj::MoveToX (float v) {
+
+	transformM._41 = v;
+}
+
+void dxObj::MoveToY (float v) {
+
+	transformM._42 = v;
+}
+
 void dxObj::MoveToZ (float v) {
 
 	transformM._43 = v;
@@ -455,4 +474,12 @@ bool dxObj::IsPick (LONG x, LONG y)
 		}
 	}
 	return false;
+}
+
+const TCHAR *dxObj::GetFileName () {
+	return FileName;
+}
+
+const TCHAR *dxObj::GetObjName () {
+	return ObjName;
 }

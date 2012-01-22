@@ -9,6 +9,8 @@ protected:
 
 	LPDIRECT3DTEXTURE8 texture;
 
+	TCHAR FileName [MAX_PATH];
+	TCHAR ObjName [MAX_PATH];
 	char Name [MAX_PATH];
 
 	char TexName [nameSize];
@@ -68,6 +70,8 @@ public:
 	void MoveTo (D3DXVECTOR2 v);
 	void MoveTo (D3DXVECTOR3 v);
 
+	void MoveToX (float v);
+	void MoveToY (float v);
 	void MoveToZ (float v);
 
 	void Scale (float, float, float);
@@ -92,6 +96,9 @@ public:
 	void Render ();
 
 	bool IsPick (LONG x, LONG y);
+
+	const TCHAR *GetFileName ();
+	const TCHAR *GetObjName ();
 };
 
 #endif
