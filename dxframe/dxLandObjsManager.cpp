@@ -52,3 +52,31 @@ void dxLandObjsManager::SaveLandObjs (const TCHAR *pathToLandObjXML, vector <dxL
 
 	doc.save_file (pathToLandObjXML);
 }
+
+void dxLandObjsManager::LoadAvailableObjTypes (const TCHAR *pathToLandObjsTypeXML, vector <dxLandObjTypeInfo> &vLandObjTypes) {
+	xml_document doc;
+
+	xml_parse_result result = doc.load_file (pathToLandObjsTypeXML);
+
+	if (result) {
+
+		xml_node tagRoot = doc.child (_T("ObjTypes"));
+
+		for (xml_node tag = tagRoot.child (_T("ObjType")); tag; tag = tag.next_sibling (_T("ObjType")))
+		{
+			dxLandObjTypeInfo LandObjTypeInfo;
+
+			_tcscpy_s (LandObjTypeInfo.fName, MAX_PATH, (TCHAR *) tag.attribute (_T("file")).value ());
+
+			TCHAR tStr [MAX_PATH];
+			ZeroMemory (&LandObjTypeInfo.oName, MAX_PATH);
+			_tcscpy_s (tStr, MAX_PATH, (TCHAR *) tag.attribute (_T("obj")).value ());
+			forup (MAX_PATH) {
+				LandObjTypeInfo.oName [i] = (char) tStr [i];
+			}
+			
+			vLandObjTypes.push_back (LandObjTypeInfo);
+		}
+	}
+
+}
