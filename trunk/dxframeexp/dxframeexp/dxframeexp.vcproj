@@ -278,7 +278,7 @@
 				AdditionalOptions="/LD @C:\3DSMAXSDK2009\maxsdk\ProjectSettings\AdditionalCompilerOptions.txt"
 				Optimization="0"
 				WholeProgramOptimization="false"
-				AdditionalIncludeDirectories=".\midl\Win32;C:\3DSMAXSDK2009\maxsdk\include;D:\projects\dxframe\dxframe\dxframe"
+				AdditionalIncludeDirectories="C:\3DSMAXSDK2009\maxsdk\include\IGame;.\midl\Win32;C:\3DSMAXSDK2009\maxsdk\include;D:\projects\dxframe\dxframe\dxframe"
 				PreprocessorDefinitions="_HYBRID;IS_HYBRID;_SECURE_SCL=0;WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;ISOLATION_AWARE_ENABLED=1"
 				ExceptionHandling="2"
 				BasicRuntimeChecks="3"
@@ -311,7 +311,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=" "
-				AdditionalDependencies="odbc32.lib odbccp32.lib comctl32.lib core.lib geom.lib gfx.lib mesh.lib maxutil.lib maxscrpt.lib paramblk2.lib "
+				AdditionalDependencies="igame.lib odbc32.lib odbccp32.lib comctl32.lib core.lib geom.lib gfx.lib mesh.lib maxutil.lib maxscrpt.lib paramblk2.lib"
 				OutputFile="g:\projects\dxframe\dxframeexp\dxframeexp.dle"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"

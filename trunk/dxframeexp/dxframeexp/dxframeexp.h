@@ -15,6 +15,8 @@
 //***************************************************************************/
 
 #include "3dsmaxsdk_preinclude.h"
+#include "IGame/IGame.h"
+#include "IGame/IGameModifier.h"
 #include "Max.h"
 #include "resource.h"
 #include "istdplug.h"

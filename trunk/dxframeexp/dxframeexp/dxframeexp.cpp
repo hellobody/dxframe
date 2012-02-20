@@ -17,6 +17,7 @@
 #include "tchar.h"
 
 //****************************added by me************************************/
+
 #include <fstream>
 
 using namespace std;
@@ -84,10 +85,6 @@ void SceneSaver::ProcNode(INode *node)
 	if (!TObj) return;
 	
 	Point3 v;
-
-	//temp test
-	//node->Ge
-	//
 
 	//Get and write name
 	char Name [nameSize] = "";
@@ -449,6 +446,57 @@ int	dxframeexp::DoExport(const char *name,ExpInterface *ei,Interface *i, BOOL su
 {
 	#pragma message(TODO("Implement the actual file Export here and"))
 
+	////SKINNED MESH TEST BEGIN
+	IGameScene *pIgame = GetIGameInterface ();	//получаем игровую сцену
+
+	pIgame->InitialiseIGame ();	//зачем-то инициализируем
+	pIgame->SetStaticFrame (0); //не знаю зачем это
+
+	Tab <IGameNode *> meshes = pIgame->GetIGameNodeByType (IGameObject::IGAME_MESH);
+
+	//кости тоже являются мешами
+
+	for (int n=0; n<meshes.Count (); n++)
+	{
+		IGameNode *node = meshes [n];
+		IGameObject *obj = node->GetIGameObject ();
+		obj->InitializeData ();
+
+		IGameSkin *skin = obj->GetIGameSkin ();
+
+		if (skin)
+		{
+			if (IGameSkin::IGAME_SKIN == skin->GetSkinType ())
+			{
+				const int numSkinnedVerts = skin->GetNumOfSkinnedVerts ();
+
+				int i, j, type, bone_id;
+
+				for ( i = 0; i < numSkinnedVerts; ++i )
+				{
+					type = skin->GetVertexType( i );
+
+					if ( IGameSkin::IGAME_RIGID == type )
+					{
+						bone_id = skin->GetBoneID( i, 0 );
+						//this->AddMaxBone( skin->GetIGameBone( i, 0 ), bone_id );
+					}
+					else	// blended
+					{
+						for ( j = 0; j < skin->GetNumberOfBones( i ); ++j )
+						{
+							bone_id = skin->GetBoneID( i, j );
+							//this->AddMaxBone( skin->GetIGameBone( i, j ), bone_id );
+						}
+					}
+				}
+
+				int q = 0;
+			}
+		}
+	}
+	////SKINNED MESH TEST END
+
 	ip = i;
 
 	fout.open (name, ios::out | ios::binary);
@@ -466,6 +514,6 @@ int	dxframeexp::DoExport(const char *name,ExpInterface *ei,Interface *i, BOOL su
 
 	return TRUE;
 
-	#pragma message(TODO("return TRUE If the file is exported properly"))
+	#pragma message (TODO ("return TRUE If the file is exported properly"))
 	return FALSE;
 }
