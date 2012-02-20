@@ -2,9 +2,9 @@
 <CodeSnippets  xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
 	<CodeSnippet Format="1.0.0">
 		<Header>
-			<Title>dx_class_h</Title>
-			<Shortcut>dx_class_h</Shortcut>
-			<Description>Code snippet for class header</Description>
+			<Title>pugi_xml_load</Title>
+			<Shortcut>pugi_xml_load</Shortcut>
+			<Description>Code snippet for quick start load pugi xml</Description>
 			<Author>hellobody</Author>
 			<SnippetTypes>
 				<SnippetType>Expansion</SnippetType>
@@ -20,32 +20,19 @@
 				</Literal>
 			</Declarations>
 			<Code Language="cpp">
-			<![CDATA[#ifndef MYCLASS_H
-			#define MYCLASS_H
-			
-			#include "dxObj.h"
-			
-			class DXFRAME_API $name$
-			{
-				protected:
+			<![CDATA[xml_document doc;
+
+			xml_parse_result result = doc.load_file (_T("path_to_xml_here"));
+
+			if (result) {
+
+				xml_node tagRoot = doc.child (_T("root_tag_name_here"));
 				
-					dxObj *body;
-			
-				public:
-				
-					$name$ ();
-					~$name$ ();
-					
-					void Create ();
-					void Reset ();
-					void Update ();
-					void Render ();
-					void Destroy ();
-					
-				$selected$$end$
-			};
-			
-			#endif
+				for (xml_node tag = tagRoot.child (_T("tag_name_here")); tag; tag = tag.next_sibling (_T("tag_name_here")))
+				{
+					const TCHAR *attrVal = (TCHAR *) tag.attribute (_T("attribute_name_here")).value ();
+				}
+			}
 			]]>
 			</Code>
 		</Snippet>
