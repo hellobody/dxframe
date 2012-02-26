@@ -1,6 +1,6 @@
-rollout ExportBonesDialog "Export Sceleton Dialog" width:300
+rollout ExportBonesDialog "Export Sceleton" width:300
 (
-	button ExportBonesButton "Export Bones"
+	button ExportBonesButton "Export Sceleton"
 	
 	on ExportBonesButton pressed do
 	(
@@ -16,7 +16,7 @@ rollout ExportBonesDialog "Export Sceleton Dialog" width:300
 		
 		if (allBones.count > 0) then
 		(
-			FileName = GetSaveFileName types:"dxframe bones (*.dxfbones)|*.dxfbones|"
+			FileName = GetSaveFileName types:"dxframe sceleton (*.dxfskeleton)|*.dxfskeleton|"
 			
 			if (FileName != undefined) then
 			(
@@ -24,6 +24,9 @@ rollout ExportBonesDialog "Export Sceleton Dialog" width:300
 				
 				start = animationRange.start.frame as integer
 				end = animationRange.end.frame as integer
+				
+				WriteShort file (allBones.count)
+				WriteShort file (end - start + 1)
 				
 				for bn in allBones do
 				(
@@ -49,9 +52,9 @@ rollout ExportBonesDialog "Export Sceleton Dialog" width:300
 				)
 				
 				fclose file
+				messageBox (allBones.count as string + " bones was exported.") title:"Message"
 			)
-			
-			messageBox (allBones.count as string + " bones was exported.") title:"Message"
+			else messageBox ("File open error.") title:"Message"
 		)
 		else messageBox ("No bones found in the scene.") title:"Message"
 	)
